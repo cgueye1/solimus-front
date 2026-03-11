@@ -1,0 +1,119 @@
+<div class="subscription-container">
+  <div class="subscription-container-header">
+    <h3>Types de plans d'abonnement</h3>
+    <button class="btn btn-primary" (click)="openCreate()" [disabled]="loading">
+      <ng-container *ngIf="!loading; else loadingTpl"> + Ajouter </ng-container>
+      <ng-template #loadingTpl>
+        <span
+          class="spinner-border spinner-border-sm me-2"
+          role="status"
+          aria-hidden="true"
+        ></span>
+        Chargement...
+      </ng-template>
+    </button>
+  </div>
+
+  <!-- Loader global -->
+  <div class="text-center mt-4" *ngIf="loading && planTypes.length === 0">
+    <span class="spinner-border" role="status"></span>
+    <p class="mt-2">Chargement des types de plans...</p>
+  </div>
+
+  <!-- Message liste vide -->
+  <div
+    class="alert alert-info text-center mt-4"
+    *ngIf="!loading && planTypes.length === 0"
+  >
+    Aucun type de plan n'est disponible pour le moment.
+  </div>
+
+  <table class="table table-striped" *ngIf="planTypes.length && !loading">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Label</th>
+        <th>Level</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let type of planTypes">
+        <td>{{ type.id }}</td>
+        <td>{{ type.label }}</td>
+        <td>{{ type.level }}</td>
+        <td>
+          <button class="icon-btn" (click)="openEdit(type)">
+            <i class="material-icons text-warning">edit</i>
+          </button>
+          <button class="icon-btn" (click)="delete(type)">
+            <i class="material-icons text-danger">delete</i>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- MODAL -->
+<ng-template #typeModal>
+  <div class="modal-header">
+    <h5 class="modal-title">{{ editing ? "Modifier" : "Créer" }} un type de plan</h5>
+    <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
+  </div>
+
+  <form [formGroup]="typeForm" (ngSubmit)="submit()" class="modal-body">
+    <div class="row g-3">
+      <!-- Label -->
+      <div class="col-12">
+        <label class="form-label">Label *</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="label"
+          [class.is-invalid]="typeForm.get('label')?.invalid && typeForm.get('label')?.touched"
+          placeholder="Ex: Basic, Premium, Platinium"
+        />
+        <div *ngIf="typeForm.get('label')?.invalid && typeForm.get('label')?.touched" class="invalid-feedback">
+          Le label est obligatoire (max 100 caractères)
+        </div>
+      </div>
+
+      <!-- Level -->
+      <div class="col-12">
+        <label class="form-label">Level *</label>
+        <input
+          type="number"
+          class="form-control"
+          formControlName="level"
+          [class.is-invalid]="typeForm.get('level')?.invalid && typeForm.get('level')?.touched"
+          [min]="0"
+        />
+        <div *ngIf="typeForm.get('level')?.invalid && typeForm.get('level')?.touched" class="invalid-feedback">
+          Le niveau doit être un nombre positif
+        </div>
+        <small class="text-muted">Niveau pour trier les types (0 = bas, 10 = haut)</small>
+      </div>
+    </div>
+
+    <!-- Boutons d'action -->
+    <div class="modal-footer mt-4">
+      <button type="button" class="btn btn-secondary" (click)="closeModal()">
+        Annuler
+      </button>
+      <button type="submit" class="btn btn-primary" [disabled]="loading || typeForm.invalid">
+        <ng-container *ngIf="!loading; else btnLoading">
+          {{ editing ? 'Mettre à jour' : 'Créer' }}
+        </ng-container>
+        <ng-template #btnLoading>
+          <span
+            class="spinner-border spinner-border-sm me-2"
+            role="status"
+            aria-hidden="true"
+          ></span>
+          Enregistrement...
+        </ng-template>
+      </button>
+    </div>
+  </form>
+</ng-template>

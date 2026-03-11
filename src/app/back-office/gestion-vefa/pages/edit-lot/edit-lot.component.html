@@ -1,0 +1,387 @@
+<div class="project-creation-container">
+  <!-- Header avec breadcrumb -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">
+        <i class="material-icons">edit</i>
+        {{ singleBien?.parentProperty?.name || 'Modification de Lot' }}
+      </h1>
+      
+      <nav aria-label="breadcrumb" class="breadcrumb-nav">
+        <ol class="breadcrumb-list">
+          <li class="breadcrumb-item">
+            <a [routerLink]="['/gestion-vente-vefa']">
+              <i class="material-icons">home</i>
+              Gestion VEFA
+            </a>
+          </li>
+          <li class="breadcrumb-item">
+            <a [routerLink]="['/gestion-vente-vefa', singleBien?.parentProperty?.id, 'detail-bien']">
+              <i class="material-icons">apartment</i>
+              {{ singleBien?.parentProperty?.name }}
+            </a>
+          </li>
+          <li class="breadcrumb-item active" aria-current="page">
+            <i class="material-icons">chevron_right</i>
+            {{ singleBien?.name || 'Modification du lot' }}
+          </li>
+        </ol>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Formulaire principal -->
+  <div class="form-container">
+    <form [formGroup]="realEstatePropertyForm" (ngSubmit)="onSave()">
+      <!-- Section Informations générales -->
+      <div class="form-section">
+        <div class="section-header">
+          <i class="material-icons section-icon">info</i>
+          <h2 class="section-title">Informations du lot</h2>
+          <div class="section-line"></div>
+        </div>
+
+        <div class="form-grid">
+          <!-- Nom du lot -->
+          <div class="form-field">
+            <label class="field-label">
+              Nom du lot <span class="required-star">*</span>
+            </label>
+            <input 
+              type="text" 
+              class="form-input" 
+              formControlName="name" 
+              placeholder="Ex: Appartement 101"
+            >
+            <div class="error-message" *ngIf="isFieldInvalid('name')">
+              Nom requis
+            </div>
+          </div>
+
+          <!-- Type de lot -->
+          <div class="form-field">
+            <label class="field-label">
+              Type de lot <span class="required-star">*</span>
+            </label>
+            <div class="select-wrapper">
+              <select class="form-select" formControlName="propertyTypeId">
+                <option value="" disabled selected>Sélectionner un type</option>
+                <option *ngFor="let type of propertyTypeList" [value]="type.id">
+                  {{ type.typeName }}
+                </option>
+              </select>
+              <i class="material-icons select-arrow">expand_more</i>
+            </div>
+            <div class="error-message" *ngIf="isFieldInvalid('propertyTypeId')">
+              Type requis
+            </div>
+          </div>
+
+          <!-- Surface -->
+          <div class="form-field">
+            <label class="field-label">
+              Surface (m²) <span class="required-star">*</span>
+            </label>
+            <input 
+              type="number" 
+              class="form-input" 
+              formControlName="area" 
+              placeholder="Ex: 75"
+              min="0"
+              step="0.1"
+            >
+            <div class="error-message" *ngIf="isFieldInvalid('area')">
+              Surface requise
+            </div>
+          </div>
+
+          <!-- Prix -->
+          <div class="form-field">
+            <label class="field-label">
+              Prix (F CFA) <span class="required-star">*</span>
+            </label>
+            <div class="input-with-prefix">
+              <span class="input-prefix">FCFA</span>
+              <input 
+                type="text" 
+                class="form-input with-prefix" 
+                formControlName="price"
+                (input)="onPriceInput($event)"
+                placeholder="0"
+                [mask]="'separator.0'"
+                [thousandSeparator]="' '"
+              >
+            </div>
+            <div class="error-message" *ngIf="isFieldInvalid('price')">
+              Prix requis
+            </div>
+          </div>
+
+          <!-- Adresse (readonly) -->
+          <div class="form-field">
+            <label class="field-label">
+              Adresse <span class="required-star">*</span>
+            </label>
+            <div class="readonly-input">
+              <i class="material-icons">location_on</i>
+              <input 
+                type="text" 
+                class="form-input readonly" 
+                formControlName="address" 
+                readonly
+              >
+            </div>
+          </div>
+
+          <!-- Frais de réservation -->
+          <div class="form-field">
+            <label class="field-label">
+              Frais de réservation (%) <span class="required-star">*</span>
+            </label>
+            <div class="select-wrapper">
+              <select 
+                class="form-select" 
+                formControlName="reservationFee"
+                (change)="onPercentageSelect($event)"
+              >
+                <option value="" disabled selected>Choisir un pourcentage</option>
+                <option *ngFor="let percentage of percentageOptions" [value]="percentage">
+                  {{ percentage }}%
+                </option>
+              </select>
+              <i class="material-icons select-arrow">expand_more</i>
+            </div>
+            <div class="error-message" *ngIf="isFieldInvalid('reservationFee')">
+              Pourcentage requis
+            </div>
+          </div>
+
+          <!-- Nombre de chambres -->
+          <div class="form-field">
+            <label class="field-label">Nombre de chambres</label>
+            <input 
+              type="number" 
+              class="form-input" 
+              formControlName="numberOfRooms" 
+              placeholder="Ex: 3"
+              min="0"
+            >
+          </div>
+
+          <!-- Mezzanine -->
+          <div class="form-field">
+            <label class="field-label">Mezzanine</label>
+            <div class="radio-group">
+              <label class="radio-card" [class.selected]="realEstatePropertyForm.get('mezzanine')?.value === false">
+                <input type="radio" [value]="false" formControlName="mezzanine" class="hidden-radio">
+                <div class="radio-content">
+                  <i class="material-icons">close</i>
+                  <span>Non</span>
+                </div>
+              </label>
+              <label class="radio-card" [class.selected]="realEstatePropertyForm.get('mezzanine')?.value === true">
+                <input type="radio" [value]="true" formControlName="mezzanine" class="hidden-radio">
+                <div class="radio-content">
+                  <i class="material-icons">check</i>
+                  <span>Oui</span>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Niveau (caché si mezzanine) -->
+          <div class="form-field" *ngIf="!realEstatePropertyForm.get('mezzanine')?.value">
+            <label class="field-label">
+              Niveau <span class="required-star">*</span>
+            </label>
+            <input 
+              type="number" 
+              class="form-input" 
+              formControlName="level" 
+              placeholder="Ex: 2"
+              min="0"
+            >
+            <div class="error-message" *ngIf="isFieldInvalid('level')">
+              Niveau requis
+            </div>
+          </div>
+
+          <!-- Remise -->
+          <div class="form-field">
+            <label class="field-label">Remise (%)</label>
+            <div class="select-wrapper">
+              <select 
+                class="form-select" 
+                formControlName="discount"
+                (change)="onPercentageDiscountSelect($event)"
+              >
+                <option value="" disabled selected>Sélectionner un pourcentage</option>
+                <option *ngFor="let percentage of percentageOptions" [value]="percentage">
+                  {{ percentage }}%
+                </option>
+              </select>
+              <i class="material-icons select-arrow">expand_more</i>
+            </div>
+          </div>
+
+          <!-- Frais de dossier -->
+          <div class="form-field">
+            <label class="field-label">
+              Frais de dossier <span class="required-star">*</span>
+            </label>
+            <div class="input-with-prefix">
+              <span class="input-prefix">FCFA</span>
+              <input 
+                type="text" 
+                class="form-input with-prefix" 
+                formControlName="feesFile"
+                (input)="onFeesFileInput($event)"
+                placeholder="0"
+                [mask]="'separator.0'"
+                [thousandSeparator]="' '"
+              >
+            </div>
+            <div class="error-message" *ngIf="isFieldInvalid('feesFile')">
+              Frais de dossier requis
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="form-field full-width">
+            <label class="field-label">
+              Description <span class="required-star">*</span>
+            </label>
+            <textarea 
+              class="form-textarea" 
+              rows="4" 
+              formControlName="description"
+              placeholder="Décrivez le lot en détail..."
+            ></textarea>
+            <div class="error-message" *ngIf="isFieldInvalid('description')">
+              Description requise
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section Documents -->
+      <div class="form-section">
+        <div class="section-header">
+          <i class="material-icons section-icon">description</i>
+          <h2 class="section-title">Documents</h2>
+          <div class="section-line"></div>
+        </div>
+
+        <div class="documents-grid">
+          <!-- Plan du lot -->
+          <div class="document-upload">
+            <label class="field-label">
+              Plan du lot <span class="required-star">*</span>
+            </label>
+            <div class="upload-area" (click)="planInput.click()" [class.has-file]="plan">
+              <input #planInput type="file" hidden accept="image/*" (change)="onPlanSelected($event)">
+              
+              <div class="upload-content" *ngIf="!plan">
+                <i class="material-icons upload-icon">cloud_upload</i>
+                <span class="upload-text">Cliquez pour modifier</span>
+                <span class="upload-hint">PNG, JPG, JPEG (max. 5 Mo)</span>
+              </div>
+
+              <div class="file-preview" *ngIf="plan">
+                <img [src]="planPreview" alt="Plan preview" class="preview-image">
+                <div class="file-info">
+                  <i class="material-icons">insert_drive_file</i>
+                  <span class="file-name">{{ plan.name }}</span>
+                </div>
+                <button type="button" class="remove-file" (click)="onDeletePlan(planInput); $event.stopPropagation()">
+                  <i class="material-icons">close</i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Document existant (plan) -->
+          <div class="document-upload" *ngIf="singleBien?.plan && !plan">
+            <label class="field-label">Plan existant</label>
+            <div class="existing-document">
+              <i class="material-icons file-icon">insert_drive_file</i>
+              <span class="file-name">Plan actuel</span>
+              <a [href]="IMG_URL + singleBien.plan" target="_blank" class="document-link">
+                <i class="material-icons">visibility</i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section Galerie d'images -->
+      <div class="form-section">
+        <div class="section-header">
+          <i class="material-icons section-icon">photo_library</i>
+          <h2 class="section-title">Galerie d'images</h2>
+          <div class="section-line"></div>
+        </div>
+
+        <div class="gallery-upload">
+          <div class="upload-area gallery-area" (click)="fileInput.click()">
+            <input #fileInput type="file" multiple hidden accept="image/*" (change)="onMultipleFilesSelected($event)">
+            <i class="material-icons upload-icon">add_photo_alternate</i>
+            <span class="upload-text">Ajouter des images</span>
+            <span class="upload-hint" *ngIf="images.length === 0">PNG, JPG, JPEG (max. 5 Mo par image)</span>
+            <span class="upload-hint file-count" *ngIf="images.length > 0">
+              <i class="material-icons">check_circle</i>
+              {{ images.length }} nouvelle(s) image(s)
+            </span>
+          </div>
+
+          <!-- Aperçu des images existantes -->
+          <div class="section-subtitle" *ngIf="singleBien?.pictures?.length > 0">
+            <i class="material-icons">photo_library</i>
+            <span>Images existantes</span>
+          </div>
+          
+          <div class="gallery-preview" *ngIf="singleBien?.pictures?.length > 0">
+            <div class="preview-item existing" *ngFor="let picture of singleBien.pictures; let i = index">
+              <img [src]="IMG_URL + picture" class="preview-image" alt="Image existante">
+              <span class="existing-badge">Existant</span>
+            </div>
+          </div>
+
+          <!-- Aperçu des nouvelles images -->
+          <div class="section-subtitle" *ngIf="pictures.controls.length > 0">
+            <i class="material-icons">add_photo_alternate</i>
+            <span>Nouvelles images</span>
+          </div>
+
+          <div class="gallery-preview" *ngIf="pictures.controls.length > 0">
+            <div class="preview-item" *ngFor="let picture of pictures.controls; let i = index">
+              <img [src]="picture.value" class="preview-image" alt="Image preview">
+              <button type="button" class="remove-image" (click)="onDeleteGalleryImage(i)">
+                <i class="material-icons">close</i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Boutons d'action -->
+      <div class="form-actions">
+        <button 
+          type="submit" 
+          class="btn-primary" 
+          [disabled]="loading || realEstatePropertyForm.invalid"
+          [class.loading]="loading"
+        >
+          <i class="material-icons" *ngIf="!loading">save</i>
+          <span class="spinner" *ngIf="loading"></span>
+          {{ loading ? 'Mise à jour...' : 'Mettre à jour' }}
+        </button>
+        
+        <button type="button" class="btn-secondary" (click)="onReset()" [disabled]="loading">
+          <i class="material-icons">close</i>
+          Annuler
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

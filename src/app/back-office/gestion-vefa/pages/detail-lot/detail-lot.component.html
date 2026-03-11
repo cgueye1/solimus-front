@@ -1,0 +1,146 @@
+<div class="p-3">
+  <div class="flex-row-between">
+    <h3 class="title-bo">
+      {{ singleBien.rental ? "Bien" : singleBien.parentProperty.name }} -
+      {{ singleBien.propertyType.typeName }}
+    </h3>
+  </div>
+
+  <nav aria-label="breadcrumb" class="breadcrumb-bo">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="javascript:void(0)" [routerLink]="['/gestion-vente-vefa']"
+          >{{ singleBien.rental ? "Gestion  Location" : "Gestion VEFA " }}
+        </a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="javascript:void(0)" (click)="goReturn()">
+          {{
+            singleBien.rental
+              ? singleBien.propertyType.typeName
+              : singleBien.parentProperty.name
+          }}
+        </a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">Détails</li>
+    </ol>
+  </nav>
+
+  <div class="row g-4">
+    <!-- Detail du bien -->
+    <div class="col-lg-4" *ngIf="singleBien && !singleBien.rental">
+      <app-card-bien-vertical
+        [data]="singleBien.rental ? singleBien : singleBien.parentProperty"
+      ></app-card-bien-vertical>
+    </div>
+
+    <!-- Liste des lots -->
+    <div
+      [ngClass]="singleBien.rental ? 'col-lg-12' : 'col-lg-8'"
+      *ngIf="singleBien"
+    >
+      <div class="card__content bg-white">
+        <div class="container_page-header">
+          <h3 class="subtitle-bo">{{ getTabTitle() }}</h3>
+        </div>
+
+        <mat-tab-group
+          mat-align-tabs="start"
+          [selectedIndex]="activeTabIndex"
+          (selectedIndexChange)="onTabChange($event)"
+        >
+          <mat-tab
+            [label]="
+              singleBien.rental ? 'Information du bien' : 'Informations du lot'
+            "
+          >
+            <app-infos-lot [singleLot]="singleBien"></app-infos-lot>
+          </mat-tab>
+ <mat-tab
+            label="Contrats et Formulaires"
+            
+          >
+           <app-document-list [propertyId]="singleBien.id" [parentId]="singleBien.parentProperty.id" [lot]="singleBien" [canAdd]="this.currentUser.profil != 'RESERVATAIRE'"></app-document-list>
+          </mat-tab>
+          
+            <mat-tab
+            [label]="
+              singleBien.rental ? 'Quitances de loyer' : 'Appel de fonds'
+            "
+          >
+            <span *ngIf="singleBien && singleBien.rental">
+              <app-avis-echeance [singleLot]="singleBien"></app-avis-echeance>
+            </span>
+
+            <span *ngIf="singleBien && !singleBien.rental">
+              <app-avis-echeance [singleLot]="singleBien"></app-avis-echeance>
+              <!--<app-appel-fond [singleLot]="singleBien"></app-appel-fond>-->
+            </span>
+          </mat-tab>
+          <mat-tab
+            label="Liste d’attente"
+            *ngIf="
+              ((currentUser.profil === ProfilEnum.PROMOTEUR &&
+                !singleBien.parentProperty?.agency) ||
+                currentUser.profil === ProfilEnum.AGENCY) &&
+              !singleBien.rental
+            "
+          >
+            <app-list-attente [singleLot]="singleBien"></app-list-attente>
+          </mat-tab>
+          
+         
+          
+          
+          
+          
+          
+
+          <mat-tab label="Contrats" *ngIf="singleBien.rental">
+            <app-rental-contract [singleLot]="singleBien"></app-rental-contract>
+          </mat-tab>
+
+          <mat-tab
+            *ngIf="singleBien.rental"
+            [label]="singleBien.rental ? 'État des lieux' : 'État d’avancement'"
+          >
+            <app-etat-des-lieux [singleLot]="singleBien"></app-etat-des-lieux>
+            <!--<app-etat-avancement [singleLot]="singleBien"></app-etat-avancement>-->
+          </mat-tab>
+
+        
+
+          <mat-tab
+            [label]="singleBien.rental ? 'Proprietaire' : 'Promoteur'"
+            *ngIf="currentUser.profil !== ProfilEnum.PROMOTEUR"
+          >
+            <app-proprietaire [singleLot]="singleBien"></app-proprietaire>
+          </mat-tab>
+
+          <mat-tab
+            [label]="singleBien.rental ? 'Locataire' : 'Réservataire'"
+            *ngIf="currentUser.profil === ProfilEnum.PROMOTEUR || currentUser.profil === ProfilEnum.NOTAIRE"
+          >
+            <span *ngIf="!singleBien.rental">
+            <app-locataire
+                [singleLot]="singleBien"
+                [currentuser]="currentUser"
+              ></app-locataire>
+              <!--<app-reservataire
+                [singleLot]="singleBien"
+                [currentuser]="currentUser"
+              ></app-reservataire>-->
+            </span>
+
+            <span *ngIf="singleBien.rental">
+              <app-locataire
+                [singleLot]="singleBien"
+                [currentuser]="currentUser"
+              ></app-locataire>
+            </span>
+          </mat-tab>
+        </mat-tab-group>
+      </div>
+    </div>
+  </div>
+</div>

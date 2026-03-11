@@ -1,0 +1,389 @@
+/* Styles pour l'image principale */
+.card-img-big {
+  width: 100%;
+  max-width: 30rem;
+  height: auto;
+  object-fit: contain;
+  margin: 0 auto;
+}
+
+/* Carousel Thumbnails */
+.carousel-item-thumbs {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 15px;
+}
+
+.img-thumbnail {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border: 2px solid transparent;
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.img-thumbnail:hover {
+  transform: scale(1.1);
+  border-color: var(--primary-color-front);
+}
+
+.img-thumbnail.active {
+  border-color: var(--primary-color-front);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Styles des boutons de contrôle du carousel */
+.fab-button {
+  position: relative;
+  overflow: hidden;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  background: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background-color 0.3s;
+  font-size: 18px;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 50%;
+  background-color: #fff;
+  color: var(--primary-color-front);
+}
+
+.fab-button::before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    circle,
+    transparent 10%,
+    rgba(255, 255, 255, 0.2) 40%
+  );
+  transform: scale(0);
+  transition: transform 0.5s, opacity 0.5s;
+  pointer-events: none;
+}
+
+.fab-button:hover {
+  background-color: var(--primary-color-front);
+  color: #fff;
+}
+
+.fab-button:hover::before {
+  transform: scale(2);
+  opacity: 0;
+}
+
+/* Responsiveness */
+@media (max-width: 768px) {
+  .carousel-item-thumbs {
+    gap: 8px;
+  }
+
+  .img-thumbnail {
+    width: 60px;
+    height: 60px;
+  }
+
+  .fab-button {
+    width: 30px;
+    height: 30px;
+  }
+
+  .card-img-big {
+    max-height: 250px;
+  }
+}
+
+
+
+.description-property.clamped {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* Limite à 3 lignes */
+  -webkit-box-orient: vertical;
+  max-height: 4.5em; /* hauteur approximative pour 3 lignes */
+}
+
+
+
+
+
+.zoomable-image {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  transition: transform 0.2s ease;
+  cursor: zoom-in;
+}
+
+
+
+
+
+.item__surface {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+.item__surface img {
+  width: 40px;
+  height: 40px;
+}
+.block__text h6 {
+  margin: 0;
+}
+
+
+
+/*room*/
+.room__grid {
+  margin-top: 2rem;
+  margin-bottom: 4rem;
+  display: grid;
+  gap: 2rem;
+
+  
+  
+  /* Définir 1 à 3 colonnes selon la taille de l'écran */
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+
+.room__card {
+  overflow: hidden;
+  border-radius: 10px;
+  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  color: #ffffff;
+}
+
+.room__card__image {
+  position: relative;
+  height: 250px;
+  isolation: isolate;
+  overflow: hidden;
+    color: #ffffff;
+}
+
+.room__card__image img{
+  width: 100%;
+  object-fit: cover;
+  height: auto;
+  transition: all .3s ease-in-out;
+}
+
+.room__card__icons {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 1rem;
+  z-index: 1;
+}
+
+.room__card__icons span {
+  display: inline-block;
+  padding: 2px 8px;
+  font-size: 1.5rem;
+  background-color: var(--white);
+  border-radius: 100%;
+  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+}
+
+.room__card__icons span:nth-child(1) {
+  color: #f472b6;
+}
+
+.room__card__icons span:nth-child(2) {
+  color: #c084fc;
+}
+
+.room__card__icons span:nth-child(3) {
+  color: #60a5fa;
+}
+
+.room__card__details {
+  padding: 1rem;
+  background-color: #ffffff;
+}
+
+.room__card h4 {
+  margin-bottom: 0.5rem;
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: var(--text-dark);
+}
+
+.room__card p {
+  margin-bottom: 0.5rem;
+  color: var(--text-light);
+}
+
+.room__card h5 {
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-light);
+}
+
+.room__card h5.price {
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--primary-color-front);
+}
+
+.room__card__details__footer{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+    color: #ffffff;
+}
+
+
+.room__card h5.price {
+  padding: 0;
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--primary-color-front);
+}
+
+.room__card button {
+ opacity: 0;
+ transition: all .3s ease-out;
+ font-size: .8rem;
+ padding: .4rem .8rem;
+}
+
+.room__card:hover img {
+ transform: scale(1.1);
+}
+
+.room__card:hover button {
+ opacity: 1;
+}
+.room__card__details p {
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* Limite à 2 lignes */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis; /* Ajoute les points de suspension (...) */
+}
+
+.image-display-wrapper {
+  display: flex;
+  width: 100%;
+  max-width: 100%;
+  height: 500px;
+  gap: 1rem;
+  box-sizing: border-box;
+}
+
+/* Image principale à gauche */
+.image-zoom-container {
+  flex: 1 1 auto;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Image à zoomer */
+.zoomable-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.zoomable-image:hover {
+  transform: scale(1.5);
+  z-index: 10;
+}
+
+/* Miniatures à droite */
+.carousel-vertical-thumbs {
+  width: 100px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.thumb-wrapper img {
+  width: 100%;
+  height: 80px;
+  object-fit: cover;
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+
+.thumb-wrapper img.active {
+  border-color: #007bff;
+}
+/* Fond noir plein écran */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  justify-content: center;
+  padding-top: 90px;
+  align-items: center; /* centre verticalement */
+  z-index: 1000;
+  overflow: auto; /* permet de scroller si image trop grande */
+}
+
+/* Conteneur image + bouton */
+.modal-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Image centrée */
+.modal-image {
+  max-width: 90vw;
+  max-height: 85vh;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+/* Bouton de fermeture sous l’image */
+.close-btn {
+  margin-top: 12px;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+  line-height: 24px;
+  width: 36px;
+  height: 36px;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.close-btn:hover {
+  background: rgba(255, 0, 0, 0.7);
+}

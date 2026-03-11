@@ -1,0 +1,141 @@
+.dflex-start {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.flex-row-between,
+.flex-col-between {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.dflex-start {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 12px;
+}
+
+.flex-col-between {
+  flex-direction: column;
+}
+
+.dflex-column {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  flex-direction: column;
+  flex-wrap: wrap;
+}
+
+.dflex-column-end {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  flex-direction: column;
+}
+
+.dflex-end {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.dflex-center {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.dflex-centered {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.dflex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.card-border {
+  border: solid 0.5px rgba(148, 163, 184, 1);
+  border-radius: 8px;
+}
+
+.card-head-top {
+  padding: 0 1rem;
+  border-bottom: solid 0.5px rgba(148, 163, 184, 1);
+  height: 60px;
+}
+
+.form-select-oultine-none {
+  border: none !important;
+}
+
+/* form */
+
+.custom-select-style {
+  border: none;
+  border-radius: 4px;
+  background: #f4f6f9;
+  padding: 10px 12px;
+  margin-top: 8px;
+}
+
+.custom-select-style:focus {
+  outline: solid 1 var(--primary-color) !important;
+  box-shadow: none;
+  background: #f4f6f9;
+}
+
+.form-label {
+  color: var(--Dark-Gray, var(--grey, #646b78));
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+}
+
+.actions-flex-right {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.text-pink {
+  color: rgba(255, 71, 126, 1);
+}
+.bg-pink {
+  background-color: rgba(255, 71, 126, 1) !important;
+}
+
+.btn-pink{
+  background-color: rgba(255, 71, 126, 1) !important;
+  color: #fff !important;
+}
+
+.text-green {
+  color: rgba(10, 151, 72, 1);
+}
+
+.text-blue {
+  color: rgba(29, 74, 123, 1);
+}
+

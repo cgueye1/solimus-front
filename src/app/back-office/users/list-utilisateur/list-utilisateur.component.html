@@ -1,0 +1,283 @@
+<div class="p-3">
+  <div class="flex-row-between">
+    <h3 class="title-bo">Gestion Utilisateurs</h3>
+    <button
+      type="button"
+      class="btn btn-primary d-flex align-items-center gap-1"
+      (click)="openFormModal(formUserModal)"
+    >
+      <i class="material-icons">add</i> Nouvel Utilisateur
+    </button>
+  </div>
+  <div class="panel-list-search mb-0">
+    <div class="search">
+      <div class="search-box">
+        <input
+          class="search-box__input"
+          type="text"
+          placeholder="Rechercher"
+          [(ngModel)]="searchText"
+        />
+        <button
+          class="search-box__button"
+          aria-label="Search"
+          (click)="onSearch()"
+        >
+          <i class="material-icons">search</i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="loader">
+    <div class="spinner"></div>
+  </div>
+
+  <div class="panel-list-body">
+    <div class="table-responsive p-3">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            @for (header of headers; track header) {
+              <th scope="col">{{ header }}</th>
+            } @empty {
+              <th scope="col">Aucune donnée disponible</th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of dataList; let i = index">
+            <td>{{ user.prenom }} {{ user.nom }}</td>
+            <td>{{ user.telephone }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ translateProfil(user.profil) }}</td>
+
+            <td>
+              {{ user.activated ? "Actif" : "Non Actif" }}
+            </td>
+            <td>
+              <div class="d-flex gap-2">
+                <button
+                  type="button"
+                  class="btn btn-sm"
+                  title="Voir les détails de l'utilisateur"
+                  (click)="onViewUser(user, userDetailsModal)"
+                >
+                  <i class="material-icons text-white">visibility</i>
+                </button>
+                <!-- Factures -->
+                <!---- <button
+                  type="button"
+                  class="btn btn-sm"
+                  title="Voir les factures d’abonnement"
+                  (click)="onViewInvoices(user, userSubscribeModal)"
+           
+                  <i class="material-icons text-white">receipt_long</i>
+                </button>   --->
+                <!-- Modifier -->
+                <button
+                  type="button"
+                  class="btn btn-sm"
+                  title="Modifier un utilisateur"
+                  (click)="onEdit(user)"
+                >
+                  <i class="material-icons text-warning">edit</i>
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-sm"
+                  [ngClass]="user.activated ? 'btn-success' : 'btn-secondary'"
+                  (click)="toggleStatus(user)"
+                  title="{{ user.activated ? 'Désactiver' : 'Activer' }}"
+                >
+                  <i class="material-icons">
+                    {{ user.activated ? "lock_open" : "lock" }}
+                  </i>
+                </button>
+
+                <!-- Supprimer -->
+                <!--<button
+                  type="button"
+                  class="btn btn-sm"
+                  title="Supprimer un utilisateur"
+                  (click)="onDeleteUser(user)"
+                >
+                  <i class="material-icons text-danger">delete</i>
+                </button>-->
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Template -->
+<ng-template #formUserModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">
+      {{ isEditMode ? "Modifier" : "Créer un utilisateur" }}
+    </h5>
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Close"
+      (click)="modal.dismiss('close')"
+    ></button>
+  </div>
+
+  <div class="modal-body">
+    <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+      <div class="row g-3">
+        <div class="col-md-12">
+          <label class="form-label">Prénom</label>
+          <input
+            class="form-control"
+            formControlName="prenom"
+            placeholder="Prénom"
+          />
+        </div>
+        <div class="col-md-12">
+          <label class="form-label">Nom</label>
+          <input class="form-control" formControlName="nom" placeholder="Nom" />
+        </div>
+        <div class="col-md-12">
+          <label class="form-label">Téléphone</label>
+          <div class="input-group">
+            <select class="form-select" formControlName="indicatif">
+              <option
+                *ngFor="let indicatif of indicatifs"
+                [value]="indicatif.code"
+              >
+                ({{ indicatif.code }})
+              </option>
+            </select>
+            <input
+              class="form-control"
+              placeholder="Saisir"
+              formControlName="telephone"
+            />
+          </div>
+          <div
+            *ngIf="
+              userForm.get('telephone')?.invalid &&
+              userForm.get('telephone')?.touched
+            "
+            class="text-danger"
+          >
+            Téléphone est requis
+          </div>
+        </div>
+        <div class="col-md-12">
+          <label class="form-label">Email</label>
+          <input
+            class="form-control"
+            formControlName="email"
+            placeholder="Email"
+            type="email"
+          />
+        </div>
+        <div class="col-md-12">
+          <label class="form-label">Adresse</label>
+          <input
+            class="form-control"
+            formControlName="adress"
+            placeholder="Adresse"
+          />
+        </div>
+
+        <div class="col-md-12">
+          <label class="form-label">Profil ?</label>
+          <select
+            class="form-select"
+            formControlName="profil"
+            aria-placeholder="Choisir"
+          >
+            <option value="" disabled selected>Choisir</option>
+            <option *ngFor="let profil of profils" [value]="profil">
+              {{ translateProfilEnum(profil) }}
+            </option>
+          </select>
+          <div
+            *ngIf="
+              userForm.get('profil')?.invalid && userForm.get('profil')?.touched
+            "
+            class="text-danger"
+          >
+            Profil est requis
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-12 mt-3">
+        <button type="submit" class="btn btn-primary w-100">Soumettre</button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+<ng-template #userDetailsModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">Détails de l'utilisateur</h5>
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Close"
+      (click)="modal.dismiss()"
+    ></button>
+  </div>
+  <div class="modal-body" *ngIf="selectedUser">
+    <p><strong>Nom :</strong> {{ selectedUser.nom }}</p>
+    <p><strong>Prénom :</strong> {{ selectedUser.prenom }}</p>
+    <p><strong>Email :</strong> {{ selectedUser.email }}</p>
+    <p><strong>Téléphone :</strong> {{ selectedUser.telephone }}</p>
+    <p><strong>Adresse :</strong> {{ selectedUser.adress }}</p>
+    <p>
+      <strong>Profil :</strong> {{ translateProfilEnum(selectedUser.profil) }}
+    </p>
+    <p>
+      <strong>Activé :</strong> {{ selectedUser.activated ? "Oui" : "Non" }}
+    </p>
+    <p>
+      <strong>Notifications activées :</strong>
+      {{ selectedUser.notifiable ? "Oui" : "Non" }}
+    </p>
+    <!--    <p><strong>Fonds disponibles :</strong> {{ selectedUser.funds }} €</p>
+    <p><strong>Note :</strong> {{ selectedUser.note }}</p>-->
+    <p>
+      <strong>Date de création :</strong>
+      {{ selectedUser.createdAt | date: "dd/MM/yyyy HH:mm" }}
+    </p>
+    <!--<p><strong>Photo :</strong>
+      <img *ngIf="selectedUser.photo" [src]="selectedUser.photo" alt="Photo utilisateur" class="img-thumbnail" style="max-width: 100px;" />
+      <span *ngIf="!selectedUser.photo">Aucune</span>
+    </p>
+    <p><strong>Pièce d'identité :</strong>
+      <a *ngIf="selectedUser.idCard" [href]="selectedUser.idCard" target="_blank">Voir le document</a>
+      <span *ngIf="!selectedUser.idCard">Aucune</span>
+    </p>
+    <p><strong>Fiche technique :</strong> {{ selectedUser.technicalSheet || 'Non renseignée' }}</p>-->
+
+    <!-- Données liées -->
+    <!-- <p><strong>Entreprise :</strong> {{ selectedUser.company?.name || 'Non assignée' }}</p>
+    <p><strong>Métier :</strong> {{ selectedUser.job?.name || 'Non défini' }}</p>
+    <p><strong>Nombre de propriétés :</strong> {{ selectedUser.properties?.length || 0 }}</p>
+    <p><strong>Nombre d'abonnements :</strong> {{ selectedUser.subscriptions?.length || 0 }}</p>-->
+  </div>
+</ng-template>
+
+<ng-template #userSubscribeModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">Factures</h5>
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Close"
+      (click)="modal.dismiss()"
+    ></button>
+  </div>
+  <div class="modal-body" *ngIf="selectedUser">
+    <app-abonnements [currentUser]="selectedUser"></app-abonnements>
+  </div>
+</ng-template>

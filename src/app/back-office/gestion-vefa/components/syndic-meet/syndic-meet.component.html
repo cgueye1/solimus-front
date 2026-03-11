@@ -1,0 +1,454 @@
+<div class="meetings-container">
+  <!-- HEADER -->
+  <div class="header-section">
+    <div class="header-left">
+      <h1 class="page-title">
+        <i class="material-icons header-icon">event</i>
+        Gestion des réunions
+      </h1>
+      <p class="page-subtitle">Organisez et suivez toutes vos réunions de copropriété</p>
+    </div>
+    <button class="btn-create" (click)="openCreateModal(createModal)">
+      <i class="material-icons">add</i>
+      <span>Nouvelle réunion</span>
+    </button>
+  </div>
+
+  <!-- STATISTIQUES -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon blue">
+        <i class="material-icons">upcoming</i>
+      </div>
+      <div class="stat-info">
+        <span class="stat-value">{{ upcomingCount }}</span>
+        <span class="stat-label">À venir</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon green">
+        <i class="material-icons">event_available</i>
+      </div>
+      <div class="stat-info">
+        <span class="stat-value">{{ pastCount }}</span>
+        <span class="stat-label">Passées</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon orange">
+        <i class="material-icons">people</i>
+      </div>
+      <div class="stat-info">
+        <span class="stat-value">{{ totalParticipants }}</span>
+        <span class="stat-label">Participants</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs-container">
+    <button class="tab-btn" [ngClass]="{'active': activeTab === 'UPCOMING'}" (click)="switchTab('UPCOMING')">
+      <i class="material-icons">schedule</i>
+      À venir
+      <span class="tab-badge" *ngIf="upcomingCount > 0">{{ upcomingCount }}</span>
+    </button>
+    <button class="tab-btn" [ngClass]="{'active': activeTab === 'PAST'}" (click)="switchTab('PAST')">
+      <i class="material-icons">history</i>
+      Passées
+      <span class="tab-badge" *ngIf="pastCount > 0">{{ pastCount }}</span>
+    </button>
+  </div>
+
+  <!-- LOADING -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner-ring"></div>
+    <p>Chargement des réunions...</p>
+  </div>
+
+  <!-- EMPTY STATE -->
+  <div *ngIf="!loading && meets.length === 0" class="empty-state">
+    <div class="empty-state-icon">
+      <i class="material-icons">event_busy</i>
+    </div>
+    <h3>Aucune réunion {{ activeTab === 'UPCOMING' ? 'à venir' : 'passée' }}</h3>
+    <p *ngIf="activeTab === 'UPCOMING'">Commencez par créer une nouvelle réunion</p>
+    <button *ngIf="activeTab === 'UPCOMING'" class="btn-create" (click)="openCreateModal(createModal)">
+      <i class="material-icons">add</i>
+      Créer une réunion
+    </button>
+  </div>
+
+  <!-- MEETINGS GRID -->
+  <div class="meetings-grid" *ngIf="!loading && meets.length > 0">
+    <div class="meeting-card" *ngFor="let meet of meets">
+      <div class="card-header">
+        <div class="meeting-type" [ngClass]="{'online': meet.isOnline, 'presential': !meet.isOnline}">
+          <i class="material-icons">{{ meet.isOnline ? 'videocam' : 'location_on' }}</i>
+          <span>{{ meet.isOnline ? 'En ligne' : 'Présentiel' }}</span>
+        </div>
+        <div class="meeting-status" *ngIf="activeTab === 'UPCOMING'">
+          <span class="status-badge" [ngClass]="{'today': isToday(meet.dateTime)}">
+            {{ getRelativeDate(meet.dateTime) }}
+          </span>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <h3 class="meeting-title">{{ meet.title }}</h3>
+        
+        <div class="meeting-datetime">
+          <i class="material-icons">event</i>
+          <div class="datetime-info">
+            <span class="date">{{ formatDisplayDate(meet.dateTime) }}</span>
+          </div>
+        </div>
+
+        <div class="meeting-location">
+          <i class="material-icons">{{ meet.isOnline ? 'link' : 'place' }}</i>
+          <span class="location-text">{{ meet.address || 'Adresse non spécifiée' }}</span>
+        </div>
+
+        <div class="meeting-meta">
+          <div class="meta-item">
+            <i class="material-icons">hourglass_empty</i>
+            <span>{{ meet.duration }} min</span>
+          </div>
+          <div class="meta-item">
+            <i class="material-icons">people</i>
+            <span>{{ getParticipantCount(meet) }} participant(s)</span>
+          </div>
+          <div class="meta-item" *ngIf="getDocumentCount(meet) > 0">
+            <i class="material-icons">attach_file</i>
+            <span>{{ getDocumentCount(meet) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-footer">
+        <div class="participants-avatars" *ngIf="hasParticipants(meet)">
+          <div class="avatar-group">
+            <div class="avatar" *ngFor="let p of getParticipantsSlice(meet.participants, 0, 3)" 
+                 [title]="getParticipantName(p)">
+              {{ getInitials(p) }}
+            </div>
+            <div class="avatar more" *ngIf="meet.participants && meet.participants.length > 3">
+              +{{ meet.participants.length - 3 }}
+            </div>
+          </div>
+        </div>
+        <button class="btn-details" (click)="openDetails(detailsModal, meet)">
+          <span>Voir détails</span>
+          <i class="material-icons">arrow_forward</i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGINATION -->
+  <div class="pagination-section" *ngIf="meets.length > 0">
+    <button class="btn-pagination" [disabled]="page === 0" (click)="changePage(page - 1)">
+      <i class="material-icons">chevron_left</i>
+    </button>
+    <span class="page-info">Page {{ page + 1 }} / {{ totalPages }}</span>
+    <button class="btn-pagination" [disabled]="page >= totalPages - 1" (click)="changePage(page + 1)">
+      <i class="material-icons">chevron_right</i>
+    </button>
+  </div>
+</div>
+
+<!-- MODAL DE CRÉATION -->
+<ng-template #createModal let-modal>
+  <div class="modal-modern">
+    <div class="modal-header-modern">
+      <div class="modal-icon">
+        <i class="material-icons">add_circle</i>
+      </div>
+      <div>
+        <h2>Nouvelle réunion</h2>
+        <p>Planifiez une réunion avec les copropriétaires</p>
+      </div>
+      <button type="button" class="btn-close-modern" (click)="close()">
+        <i class="material-icons">close</i>
+      </button>
+    </div>
+
+    <div class="modal-body-modern">
+      <form [formGroup]="meetForm" class="meeting-form">
+        <div class="form-group">
+          <label>Titre de la réunion *</label>
+          <input type="text" class="form-control-modern" 
+                 placeholder="Ex: Assemblée générale trimestrielle"
+                 formControlName="title">
+          <small class="error-text" *ngIf="meetForm.get('title')?.invalid && meetForm.get('title')?.touched">
+            Le titre est requis
+          </small>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Date et heure *</label>
+            <input type="datetime-local" class="form-control-modern" formControlName="dateTime">
+            <small class="error-text" *ngIf="meetForm.get('dateTime')?.invalid && meetForm.get('dateTime')?.touched">
+              La date est requise
+            </small>
+          </div>
+          <div class="form-group">
+            <label>Durée (minutes) *</label>
+            <input type="number" class="form-control-modern" formControlName="duration">
+            <small class="error-text" *ngIf="meetForm.get('duration')?.invalid && meetForm.get('duration')?.touched">
+              Durée minimum: 15 minutes
+            </small>
+          </div>
+        </div>
+
+        <!--<div class="form-group">
+          <label>Type de réunion</label>
+          <div class="radio-group">
+            <label class="radio-label">
+              <input type="radio" name="meetingType" [value]="false" formControlName="isOnline">
+              <span>Présentiel</span>
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="meetingType" [value]="true" formControlName="isOnline">
+              <span>En ligne</span>
+            </label>
+          </div>
+        </div>-->
+
+        <div class="form-group">
+          <label>{{ meetForm.get('isOnline')?.value ? 'Lien de visioconférence' : 'Adresse *' }}</label>
+          <input type="text" class="form-control-modern" 
+                 [placeholder]="meetForm.get('isOnline')?.value ? 'https://meet.google.com/...' : 'Adresse complète'"
+                 formControlName="address">
+          <small class="error-text" *ngIf="meetForm.get('address')?.invalid && meetForm.get('address')?.touched">
+            {{ meetForm.get('isOnline')?.value ? 'Le lien est requis' : 'L\'adresse est requise' }}
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label>Description (optionnelle)</label>
+          <textarea class="form-control-modern textarea" rows="4"
+                    placeholder="Ordre du jour, points à discuter..."
+                    formControlName="description"></textarea>
+        </div>
+      </form>
+    </div>
+
+    <div class="modal-footer-modern">
+      <button type="button" class="btn-cancel" (click)="close()">Annuler</button>
+      <button type="button" class="btn-save" (click)="createMeeting()" [disabled]="meetForm.invalid || creatingMeet">
+        <span *ngIf="!creatingMeet">Créer la réunion</span>
+        <span *ngIf="creatingMeet" class="spinner-small"></span>
+      </button>
+    </div>
+  </div>
+</ng-template>
+
+<!-- MODAL DE DÉTAILS -->
+<ng-template #detailsModal let-modal>
+  <div class="modal-modern modal-lg" *ngIf="selectedMeet">
+    <div class="modal-header-modern">
+      <div class="modal-icon" [ngClass]="{'online': selectedMeet.isOnline}">
+        <i class="material-icons">{{ selectedMeet.isOnline ? 'videocam' : 'meeting_room' }}</i>
+      </div>
+      <div>
+        <h2>{{ selectedMeet.title }}</h2>
+        <p>Détails de la réunion</p>
+      </div>
+      <button type="button" class="btn-close-modern" (click)="close()">
+        <i class="material-icons">close</i>
+      </button>
+    </div>
+
+    <div class="modal-body-modern">
+      <!-- INFO BANNER -->
+      <div class="info-banner">
+        <div class="info-item">
+          <i class="material-icons">event</i>
+          <div>
+            <span class="info-label">Date </span>
+            <span class="info-value">{{ formatDisplayDate(selectedMeet.dateTime) }}</span>
+          </div>
+        </div>
+        <div class="info-item">
+          <i class="material-icons">hourglass_empty</i>
+          <div>
+            <span class="info-label">Durée </span>
+            <span class="info-value">{{ selectedMeet.duration }} minutes</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- LOCATION -->
+      <div class="detail-section">
+        <h3>
+          <i class="material-icons">place</i>
+          {{ selectedMeet.isOnline ? 'Lien de connexion' : 'Lieu' }}
+        </h3>
+        <div class="location-card" [ngClass]="{'online': selectedMeet.isOnline}">
+          <i class="material-icons">{{ selectedMeet.isOnline ? 'link' : 'location_on' }}</i>
+          <span>{{ selectedMeet.address || 'Non spécifié' }}</span>
+          <button *ngIf="selectedMeet.isOnline" class="btn-copy" (click)="copyLink(selectedMeet.address)">
+            <i class="material-icons">content_copy</i>
+          </button>
+        </div>
+      </div>
+
+      <!-- DESCRIPTION -->
+      <div class="detail-section" *ngIf="selectedMeet.description">
+        <h3>
+          <i class="material-icons">description</i>
+          Description
+        </h3>
+        <p class="description-text">{{ selectedMeet.description }}</p>
+      </div>
+
+      <!-- PARTICIPANTS -->
+      <div class="detail-section">
+        <div class="section-header">
+          <h3>
+            <i class="material-icons">people</i>
+            Participants ({{ selectedMeet.participants?.length || 0 }})
+          </h3>
+          <button class="btn-add-participant" (click)="openAddParticipant()" *ngIf="canEdit">
+            <i class="material-icons">person_add</i>
+            Ajouter
+          </button>
+        </div>
+
+        <div class="participants-list" *ngIf="selectedMeet.participants && selectedMeet.participants.length > 0">
+          <div class="participant-item" *ngFor="let p of selectedMeet.participants">
+            <div class="participant-avatar">
+              {{ getInitials(p) }}
+            </div>
+            <div class="participant-info">
+              <span class="participant-name">{{ getParticipantName(p) }}</span>
+            </div>
+            <button class="btn-more" *ngIf="canEdit" (click)="removeParticipant(p.id)">
+              <i class="material-icons">remove_circle</i>
+            </button>
+          </div>
+        </div>
+
+        <div class="empty-participants" *ngIf="!selectedMeet.participants?.length">
+          <i class="material-icons">group_off</i>
+          <p>Aucun participant pour le moment</p>
+        </div>
+      </div>
+
+      <!-- DOCUMENTS EXISTANTS -->
+      <div class="detail-section">
+        <div class="section-header">
+          <h3>
+            <i class="material-icons">attach_file</i>
+            Documents existants ({{ files.length }})
+          </h3>
+        </div>
+
+        <div class="documents-grid" *ngIf="files.length > 0">
+          <div class="document-card" *ngFor="let f of files">
+            <div class="document-icon">
+              <i class="material-icons">insert_drive_file</i>
+            </div>
+            <div class="document-info">
+              <span class="document-name">{{ f.label }}</span>
+              <span class="document-size">{{ f.size | fileSize }}</span>
+            </div>
+            <button class="btn-download" (click)="openFile(f.file)" title="Télécharger">
+              <i class="material-icons">download</i>
+            </button>
+          </div>
+        </div>
+
+        <div class="empty-documents" *ngIf="files.length === 0">
+          <i class="material-icons">folder_open</i>
+          <p>Aucun document pour cette réunion</p>
+        </div>
+      </div>
+
+      <!-- NOUVELLE SECTION UPLOAD AMÉLIORÉE -->
+      <div class="detail-section upload-enhanced" *ngIf="canEdit">
+        <div class="section-header">
+          <h3>
+            <i class="material-icons">cloud_upload</i>
+            Ajouter des documents
+          </h3>
+          <span class="files-count" *ngIf="pendingFiles.length > 0">
+            {{ pendingFiles.length }} fichier(s) sélectionné(s)
+          </span>
+        </div>
+
+        <!-- Zone de drop -->
+        <div class="upload-area-enhanced" 
+             (click)="fileInput.click()" 
+             (dragover)="onDragOver($event)" 
+             (drop)="onFileDrop($event)"
+             [class.has-files]="pendingFiles.length > 0">
+          <div class="upload-icon">
+            <i class="material-icons">cloud_upload</i>
+          </div>
+          <div class="upload-text">
+            <strong>Cliquez pour parcourir</strong> ou glissez-déposez vos fichiers
+          </div>
+          <div class="upload-hint">
+            Formats acceptés: PDF, DOC, DOCX, XLS, XLSX, JPG, PNG (max 10MB)
+          </div>
+          <input type="file" #fileInput style="display: none" (change)="onFileSelected($event)" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png">
+        </div>
+
+        <!-- Liste des fichiers en attente -->
+        <div class="pending-files-list" *ngIf="pendingFiles.length > 0">
+          <div class="pending-file-item" *ngFor="let file of pendingFiles; let i = index">
+            <div class="file-preview" *ngIf="file.preview">
+              <img [src]="file.preview" alt="Aperçu">
+            </div>
+            <div class="file-icon" *ngIf="!file.preview">
+              <i class="material-icons">insert_drive_file</i>
+            </div>
+            <div class="file-details">
+              <input type="text" class="file-label-input" 
+                     [(ngModel)]="file.label" 
+                     placeholder="Nom du document"
+                     (click)="$event.stopPropagation()">
+              <div class="file-meta">
+                <span class="file-name">{{ file.name }}</span>
+                <span class="file-size">{{ file.size | fileSize }}</span>
+              </div>
+            </div>
+            <button class="btn-remove-file" (click)="removePendingFile(i); $event.stopPropagation()" title="Supprimer">
+              <i class="material-icons">close</i>
+            </button>
+          </div>
+
+          <!-- Bouton d'upload global -->
+          <div class="upload-actions">
+            <button class="btn-upload-all" (click)="uploadAllFiles()" [disabled]="uploadingFile || pendingFiles.length === 0">
+              <i class="material-icons">publish</i>
+              <span *ngIf="!uploadingFile">Uploader {{ pendingFiles.length }} fichier(s)</span>
+              <span *ngIf="uploadingFile" class="uploading-status">
+                <span class="spinner-small"></span>
+                Upload en cours...
+              </span>
+            </button>
+            <button class="btn-clear-all" (click)="pendingFiles = []; $event.stopPropagation()" *ngIf="pendingFiles.length > 0">
+              <i class="material-icons">delete_sweep</i>
+              Tout vider
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer-modern">
+      <button type="button" class="btn-cancel" (click)="close()">Fermer</button>
+      <button type="button" class="btn-edit" (click)="editMeeting()" *ngIf="canEdit">
+        <i class="material-icons">edit</i>
+        Modifier
+      </button>
+      <button type="button" class="btn-delete" (click)="deleteMeeting()" *ngIf="canDelete">
+        <i class="material-icons">delete</i>
+        Supprimer
+      </button>
+    </div>
+  </div>
+</ng-template>

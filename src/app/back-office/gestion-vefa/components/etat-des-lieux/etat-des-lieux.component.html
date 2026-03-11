@@ -1,0 +1,550 @@
+<div class="etat-lieux-container py-5">
+  <!-- Espacement supérieur -->
+  <div class="mt-4"></div>
+
+  <!-- Header avec titre et navigation -->
+  <div class="d-flex justify-content-between align-items-center mb-5">
+    <h2 class="page-title">
+      {{ singleLot.rental ? "État des lieux" : "Suivi des travaux" }}
+    </h2>
+    
+    <div class="view-toggles">
+        <!-- Barre d'actions -->
+  
+   
+      <!-- Bouton archives -->
+      <button
+        *ngIf="activeView === 'albums' || activeView === 'rapport'"
+        class="archive-toggle"
+        [class.active]="showArchive"
+        (click)="toggleShowArchive()">
+        <i class="material-icons">{{ showArchive ? 'unarchive' : 'archive' }}</i>
+        <span>{{ showArchive ? 'Voir actifs' : 'Voir archives' }}</span>
+        <span class="badge" *ngIf="showArchive">
+          {{ activeView === 'albums' ? archivedAlbumsCount : archivedRapportsCount }}
+        </span>
+        <span class="badge" *ngIf="!showArchive">
+          {{ activeView === 'albums' ? albumsCount : rapportsCount }}
+        </span>
+      </button>
+
+      <!-- Bouton ajouter -->
+      <button
+        *ngIf="canAdd() && !showArchive"
+        class="btn-primary"
+        (click)="openModal(ADD_FORM, '')">
+        <i class="material-icons">add</i>
+        <span>Ajouter</span>
+      </button>
+   
+ 
+    </div>
+  </div>
+
+
+
+  <!-- Loading spinner -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Chargement en cours...</p>
+  </div>
+
+  <!-- Vue Albums -->
+  <div *ngIf="activeView === 'albums' && !loading" class="albums-grid">
+    <div *ngIf="progressAlbums.length > 0; else noAlbums" class="row g-4">
+      <div *ngFor="let album of progressAlbums" class="col-lg-6 col-xl-4">
+        <div class="album-card" [class.archived]="album.archived">
+          <div class="album-image">
+            <img
+              [src]="getFullImageUrl(album.pictures[0])"
+              [alt]="album.phaseName"
+              class="img-fluid"
+              (error)="handleImageError($event)"
+            />
+            <span *ngIf="album.archived" class="archive-badge">
+              <i class="material-icons">archive</i>
+              Archivé
+            </span>
+            <span *ngIf="singleLot.rental" class="type-badge" [class.entrance]="album.entrance" [class.exit]="!album.entrance">
+              <i class="material-icons">{{ album.entrance ? 'login' : 'logout' }}</i>
+              {{ album.entrance ? 'Entrée' : 'Sortie' }}
+            </span>
+          </div>
+
+          <div class="album-content">
+            <h3 class="album-title">{{ album.phaseName }}</h3>
+            <p class="album-description">{{ album.description }}</p>
+
+            <div class="album-meta">
+              <div class="meta-item">
+                <i class="material-icons">photo</i>
+                <span>{{ album.pictures.length }} photo(s)</span>
+              </div>
+              <div class="meta-item">
+                <i class="material-icons">calendar_today</i>
+                <span>{{ album.lastUpdated | date:'dd/MM/yyyy' }}</span>
+              </div>
+            </div>
+
+            <div class="album-actions">
+              <button class="action-btn view" (click)="openModal(VIEW_IMAGE, 'fullscreen', album)" title="Voir">
+                <i class="material-icons">visibility</i>
+              </button>
+
+              <ng-container *ngIf="canManage()">
+                <button *ngIf="!album.archived" class="action-btn archive" (click)="onArchiveAlbum(album.id)" title="Archiver">
+                  <i class="material-icons">archive</i>
+                </button>
+                <button *ngIf="album.archived" class="action-btn restore" (click)="onRestoreAlbum(album.id)" title="Restaurer">
+                  <i class="material-icons">unarchive</i>
+                </button>
+                <button class="action-btn delete" (click)="onDeleteAlbum(album.id)" title="Supprimer">
+                  <i class="material-icons">delete</i>
+                </button>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #noAlbums>
+      <div class="empty-state">
+        <div class="empty-icon">
+          <i class="material-icons">{{ showArchive ? 'archive' : 'photo_album' }}</i>
+        </div>
+        <h3>{{ showArchive ? 'Aucun album archivé' : 'Aucun album disponible' }}</h3>
+        <p>{{ showArchive ? 'Les albums archivés apparaîtront ici.' : 'Commencez par créer votre premier album.' }}</p>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- Vue Graphiques -->
+  <div *ngIf="activeView === 'graphique' && !loading" class="charts-view">
+    <div class="row g-4">
+      <div class="col-lg-12">
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3>Progression par étape</h3>
+            <span class="chart-badge">Barres</span>
+          </div>
+          <div class="chart-container">
+            <canvasjs-chart
+              [options]="chartOptions"
+              [styles]="{ width: '100%', height: '400px' }"
+            ></canvasjs-chart>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-12">
+        <div class="chart-card">
+          <div class="chart-header">
+            <h3>Répartition de la progression</h3>
+            <span class="chart-badge">Camembert</span>
+          </div>
+          <div class="chart-container">
+            <canvasjs-chart
+              [options]="chartOptions2"
+              [styles]="{ width: '100%', height: '400px' }"
+            ></canvasjs-chart>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vue Rapports -->
+  <div *ngIf="activeView === 'rapport' && !loading" class="rapports-list">
+    <div *ngIf="rapports.length > 0; else noRapports" class="rapports-grid">
+      <div *ngFor="let rapport of rapports" class="rapport-card" [class.archived]="rapport.archived">
+        <div class="rapport-icon">
+          <i class="material-icons">picture_as_pdf</i>
+        </div>
+
+        <div class="rapport-content">
+          <div class="rapport-header">
+            <h3 class="rapport-title">{{ rapport.titre }}</h3>
+            <span *ngIf="rapport.archived" class="archive-badge small">
+              <i class="material-icons">archive</i>
+            </span>
+          </div>
+
+          <p *ngIf="rapport.description" class="rapport-description">{{ rapport.description }}</p>
+
+          <div class="rapport-meta">
+            <div class="meta-item">
+              <i class="material-icons">calendar_today</i>
+              <span>{{ rapport.lastUpdated | date:'dd/MM/yyyy HH:mm' }}</span>
+            </div>
+            <div class="meta-item" *ngIf="rapport.fileSize">
+              <i class="material-icons">storage</i>
+              <span>{{ (rapport.fileSize / 1024).toFixed(0) }} Ko</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="rapport-actions">
+          <button class="action-btn view" (click)="viewRapport(rapport.pdf)" title="Voir">
+            <i class="material-icons">visibility</i>
+          </button>
+
+          <ng-container *ngIf="canManage()">
+            <button *ngIf="!rapport.archived" class="action-btn archive" (click)="archiveRapport(rapport.id)" title="Archiver">
+              <i class="material-icons">archive</i>
+            </button>
+            <button *ngIf="rapport.archived" class="action-btn restore" (click)="restoreRapport(rapport.id)" title="Restaurer">
+              <i class="material-icons">unarchive</i>
+            </button>
+            <button class="action-btn delete" (click)="deleteRapport(rapport.id)" title="Supprimer">
+              <i class="material-icons">delete</i>
+            </button>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #noRapports>
+      <div class="empty-state">
+        <div class="empty-icon">
+          <i class="material-icons">{{ showArchive ? 'archive' : 'description' }}</i>
+        </div>
+        <h3>{{ showArchive ? 'Aucun rapport archivé' : 'Aucun rapport disponible' }}</h3>
+        <p>{{ showArchive ? 'Les rapports archivés apparaîtront ici.' : 'Commencez par ajouter votre premier rapport.' }}</p>
+      </div>
+    </ng-template>
+  </div>
+</div>
+
+<!-- Modal Ajout Album -->
+<ng-template #ADD_FORM let-modal>
+  <div class="modal-modern">
+    <div class="modal-header">
+      <div class="modal-header-content">
+        <i class="material-icons modal-icon">photo_album</i>
+        <h4 class="modal-title">
+          {{ singleLot.rental ? "État des lieux" : "Suivi des travaux" }}
+        </h4>
+      </div>
+      <button class="modal-close" (click)="modal.dismiss()">
+        <i class="material-icons">close</i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <form [formGroup]="progressAlbuForm">
+        <!-- Titre -->
+        <div class="form-group">
+          <label class="form-label">
+            <i class="material-icons">title</i>
+            Titre *
+          </label>
+          <input
+            type="text"
+            class="form-control"
+            formControlName="phaseName"
+            placeholder="Ex: Phase 1 - Fondations"
+          />
+          <div *ngIf="progressAlbuForm.get('phaseName')?.invalid && progressAlbuForm.get('phaseName')?.touched" 
+               class="error-message">
+            Le titre est requis
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="form-group">
+          <label class="form-label">
+            <i class="material-icons">description</i>
+            Description *
+          </label>
+          <textarea
+            class="form-control"
+            rows="4"
+            formControlName="description"
+            placeholder="Description détaillée de l'étape..."
+          ></textarea>
+          <div *ngIf="progressAlbuForm.get('description')?.invalid && progressAlbuForm.get('description')?.touched" 
+               class="error-message">
+            La description est requise
+          </div>
+        </div>
+
+        <!-- Type (pour location) -->
+        <div class="form-group" *ngIf="singleLot.rental">
+          <label class="form-label">
+            <i class="material-icons">swap_horiz</i>
+            Type *
+          </label>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" formControlName="isEntrance" [value]="true" />
+              <span class="radio-label">
+                <i class="material-icons">login</i>
+                Entrée
+              </span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" formControlName="isEntrance" [value]="false" />
+              <span class="radio-label">
+                <i class="material-icons">logout</i>
+                Sortie
+              </span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Upload images -->
+        <div class="form-group">
+          <label class="form-label">
+            <i class="material-icons">photo</i>
+            Images *
+          </label>
+
+          <div class="file-upload-area"
+               (dragover)="$event.preventDefault()"
+               (drop)="onMultipleFilesSelected($event)">
+            <input
+              #fileInput
+              type="file"
+              multiple
+              hidden
+              (change)="onMultipleFilesSelected($event)"
+              accept="image/*"
+            />
+
+            <div *ngIf="images.length === 0" class="upload-placeholder" (click)="fileInput.click()">
+              <i class="material-icons upload-icon">cloud_upload</i>
+              <div class="upload-text">
+                <span class="upload-main">Cliquez pour sélectionner</span>
+                <span class="upload-hint">ou glissez-déposez vos images</span>
+              </div>
+              <div class="file-info">
+                <i class="material-icons">info</i>
+                <span>JPG, PNG, GIF - Max 10 Mo par image</span>
+              </div>
+            </div>
+
+            <div *ngIf="images.length > 0" class="upload-success">
+              <i class="material-icons success-icon">check_circle</i>
+              <span>{{ images.length }} image(s) sélectionnée(s)</span>
+              <button type="button" class="change-btn" (click)="fileInput.click()">
+                Modifier
+              </button>
+            </div>
+          </div>
+
+          <!-- Aperçu des images -->
+          <div *ngIf="pictures.controls.length > 0" class="image-preview-grid">
+            <div *ngFor="let picture of pictures.controls; let i = index" class="preview-item">
+              <img [src]="picture.value" class="preview-img" alt="Aperçu" />
+              <button type="button" class="remove-image" (click)="onDeleteGalleryImage(i)">
+                <i class="material-icons">close</i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="modal.dismiss()">
+        <i class="material-icons">cancel</i>
+        Annuler
+      </button>
+      <button class="btn-primary" (click)="onSave()" [disabled]="!progressAlbuForm.valid || images.length === 0 || loading">
+        <i class="material-icons">{{ loading ? 'hourglass_empty' : 'save' }}</i>
+        <span>{{ loading ? 'Enregistrement...' : 'Enregistrer' }}</span>
+      </button>
+    </div>
+  </div>
+</ng-template>
+
+<!-- Modal Ajout Rapport -->
+<ng-template #ADD_RAPPORT let-modal>
+  <div class="modal-modern">
+    <div class="modal-header">
+      <div class="modal-header-content">
+        <i class="material-icons modal-icon">description</i>
+        <h4 class="modal-title">Nouveau rapport</h4>
+      </div>
+      <button class="modal-close" (click)="modal.dismiss()">
+        <i class="material-icons">close</i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <form [formGroup]="sheetForm">
+        <!-- Titre -->
+        <div class="form-group">
+          <label class="form-label">
+            <i class="material-icons">title</i>
+            Titre *
+          </label>
+          <input
+            type="text"
+            class="form-control"
+            formControlName="titre"
+            placeholder="Titre du document"
+          />
+          <div *ngIf="sheetForm.get('titre')?.invalid && sheetForm.get('titre')?.touched" 
+               class="error-message">
+            Le titre est requis
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="form-group">
+          <label class="form-label">
+            <i class="material-icons">description</i>
+            Description
+          </label>
+          <textarea
+            class="form-control"
+            rows="4"
+            formControlName="description"
+            placeholder="Description du document..."
+          ></textarea>
+        </div>
+
+        <!-- Upload fichier -->
+        <div class="form-group">
+          <label class="form-label">
+            <i class="material-icons">attach_file</i>
+            Document *
+          </label>
+
+          <div class="file-upload-area">
+            <input
+              #documentInput
+              type="file"
+              id="documentFile"
+              (change)="onFileChange($event)"
+              accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx"
+              hidden
+            />
+
+            <div *ngIf="!file" class="upload-placeholder" (click)="documentInput.click()">
+              <i class="material-icons upload-icon">cloud_upload</i>
+              <div class="upload-text">
+                <span class="upload-main">Cliquez pour sélectionner</span>
+                <span class="upload-hint">PDF, Word, Excel, PowerPoint</span>
+              </div>
+              <div class="file-info">
+                <i class="material-icons">info</i>
+                <span>Max 10 Mo</span>
+              </div>
+            </div>
+
+            <div *ngIf="file" class="file-preview">
+              <div class="file-icon">
+                <i class="material-icons">picture_as_pdf</i>
+              </div>
+              <div class="file-details">
+                <span class="file-name">{{ file.name }}</span>
+                <span class="file-size">{{ (file.size / 1024 / 1024).toFixed(2) }} Mo</span>
+              </div>
+              <button type="button" class="remove-file" (click)="removeFile()">
+                <i class="material-icons">close</i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="modal.dismiss()">
+        <i class="material-icons">cancel</i>
+        Annuler
+      </button>
+      <button class="btn-primary" (click)="onSaveRapport()" [disabled]="!sheetForm.valid || !file || loading">
+        <i class="material-icons">{{ loading ? 'hourglass_empty' : 'save' }}</i>
+        <span>{{ loading ? 'Enregistrement...' : 'Enregistrer' }}</span>
+      </button>
+    </div>
+  </div>
+</ng-template>
+<!-- Modal Visualisation Image -->
+<ng-template #VIEW_IMAGE let-modal>
+  <div class="modal-modern fullscreen-modal" [class.fullscreen]="isFullscreen">
+
+    <!-- HEADER -->
+    <div class="modal-header">
+      <div class="modal-header-content">
+        <i class="material-icons modal-icon">photo</i>
+        <div>
+          <h4 class="modal-title">{{ selectedAlbum?.phaseName }}</h4>
+          <span class="modal-subtitle">
+            {{ currentImageIndex + 1 }} / {{ selectedAlbum?.pictures?.length }}
+          </span>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="modal-action" (click)="toggleFullscreen()">
+          <i class="material-icons">
+            {{ isFullscreen ? 'fullscreen_exit' : 'fullscreen' }}
+          </i>
+        </button>
+        <button class="modal-close" (click)="closeModal()">
+          <i class="material-icons">close</i>
+        </button>
+      </div>
+    </div>
+
+    <!-- BODY -->
+    <div class="modal-body image-viewer-body">
+
+      <!-- IMAGE -->
+      <div
+        class="image-scroll-container"
+        (wheel)="onImageWheel($event)"
+      >
+        <img
+          class="zoomable-image"
+          [src]="getFullImageUrl(selectedImage)"
+          [style.width.%]="zoomLevel * 100"
+          [style.height]="'auto'"
+          draggable="false"
+        />
+      </div>
+
+      <!-- ZOOM CONTROLS -->
+      <div class="zoom-controls">
+        <button (click)="zoomOut()" [disabled]="zoomLevel <= 1">
+          <i class="material-icons">remove</i>
+        </button>
+        <span>{{ (zoomLevel * 100).toFixed(0) }}%</span>
+        <button (click)="zoomIn()" [disabled]="zoomLevel >= 3">
+          <i class="material-icons">add</i>
+        </button>
+        <button (click)="resetZoom()">
+          <i class="material-icons">refresh</i>
+        </button>
+      </div>
+
+      <!-- NAVIGATION -->
+      <button class="nav-btn prev" (click)="previousImage()" [disabled]="!hasPreviousImage()">
+        <i class="material-icons">chevron_left</i>
+      </button>
+      <button class="nav-btn next" (click)="nextImage()" [disabled]="!hasNextImage()">
+        <i class="material-icons">chevron_right</i>
+      </button>
+    </div>
+
+    <!-- THUMBNAILS -->
+    <div class="thumbnails-container">
+      <div class="thumbnails-scroll">
+        <div
+          class="thumbnail"
+          *ngFor="let img of selectedAlbum?.pictures; let i = index"
+          [class.active]="i === currentImageIndex"
+          (click)="selectImage(i)"
+        >
+          <img [src]="getFullImageUrl(img)" />
+        </div>
+      </div>
+    </div>
+
+  </div>
+</ng-template>

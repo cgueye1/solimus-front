@@ -1,0 +1,52 @@
+<div class="py-3">
+
+  <form [formGroup]="compagnyForm" (ngSubmit)="onSave()">
+    
+    <!-- Row for Logo and Input -->
+    <div class="d-flex align-items-center mb-3">
+      <!-- Logo Display -->
+      <div class="change__logo me-4" *ngIf="logoPreview &&  logoPreview!=''">
+        <img [src]="logoPreview" alt="Gestion Immo" width="150" class="rounded shadow-sm" />
+      </div>
+
+      <!-- Input Field -->
+      <div class="flex-grow-1">
+        <label for="compagnyName" class="form-label">Nom de la société</label>
+        <input
+          id="compagnyName"
+          class="form-control"
+          placeholder="Saisir"
+          formControlName="name"
+          [ngClass]="{ 'is-invalid': compagnyForm.get('name')?.invalid && compagnyForm.get('name')?.touched }"
+          readonly
+        />
+        <div *ngIf="compagnyForm.get('name')?.invalid && compagnyForm.get('name')?.touched" class="invalid-feedback">
+          Le nom est requis.
+        </div>
+      </div>
+    </div>
+
+    <!-- Hidden File Input for Changing the Logo -->
+    <input type="file" accept="image/*" (change)="onLogoChange($event)" class="d-none" #logoInput id="logoInput" />
+
+    <!-- Action Buttons -->
+    <div class="d-flex justify-content-start gap-3 mt-4">
+      <!-- Button to Change the Logo -->
+      <button class="button button-outline-primary" (click)="logoInput.click()" type="button">
+        Changer le logo
+      </button>
+
+      <!-- Button to Restore the Logo -->
+     <!--- <button class="button button-light" type="button" (click)="restoreLogo()">
+        Restaurer le logo
+      </button>-->
+
+      <!-- Submit Button -->
+      <button class="button button-primary" type="submit" [disabled]="compagnyForm.invalid || loading">
+        Mettre à jour
+      </button>
+    </div>
+
+  </form>
+
+</div>

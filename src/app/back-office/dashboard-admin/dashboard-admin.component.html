@@ -1,0 +1,160 @@
+<div class="hero-db p-3">
+  <div class="flex-row-between">
+    <h1 class="title-bo">Tableau de bord</h1>
+    <div class="row mb-3">
+      <div class="col-lg-12">
+        <div class="d-flex align-items-center gap-2">
+          <!--<select [(ngModel)]="selectedYear" (change)="onYearChange()">
+            <option *ngFor="let year of years" [value]="year">
+              {{ year }}
+            </option>
+          </select>-->
+        </div>
+      </div>
+    </div>
+  </div>
+  <ng-template #rt let-r="result" let-t="term">
+    <img [src]="getFullImageUrl(r.plan)" class="me-2" style="width: 50px" />
+    <ngb-highlight [result]="r.name" [term]="t"></ngb-highlight>
+  </ng-template>
+
+  <div class="hero-db-container">
+    <!-- Indicateurs -->
+    <div class="row g-3 hero-db-widget">
+      <div class="col-lg-3" *ngFor="let indicateur of indicateurs">
+        <div
+          class="stat-card p-3 rounded shadow-sm d-flex flex-column justify-content-between h-100"
+          (click)="onClick(indicateur)"
+        >
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <div>
+              <h2 class="fw-bold mb-0" [style.color]="indicateur.color">
+                {{ animatedValue[indicateur.id] }}
+              </h2>
+              <p class="mb-0 text-muted">{{ indicateur.label }}</p>
+            </div>
+            <div class="icon-box">
+              <i class="material-icons text-primary">{{ indicateur.icon }}</i>
+            </div>
+          </div>
+
+          <div
+            class="d-flex align-items-center mt-2"
+            *ngIf="indicateur.evolution"
+          >
+            <i class="material-icons text-success me-1" style="font-size: 16px"
+              >trending_up</i
+            >
+            <small class="text-success fw-medium me-1">|</small>
+            <small class="text-muted">{{ indicateur.suffix }}</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Graphiques -->
+    <div class="row mt-4" *ngIf="chartVisible">
+      <!-- Graphique Barres -->
+      <div class="col-lg-6 mb-4">
+        <div class="bg-white p-3 rounded shadow-sm h-100 d-flex flex-column">
+          <h5>Revenu total {{ formatPrix(totalRevenue) }} CFA</h5>
+          <div class="flex-fill">
+            <ngx-charts-bar-vertical
+              [results]="barChartData"
+              [scheme]="colorSchemeVentes"
+              [xAxis]="true"
+              [yAxis]="true"
+              [legend]="true"
+              [showXAxisLabel]="true"
+              [showYAxisLabel]="true"
+              [showDataLabel]="true"
+              [view]="[600, 300]"
+            >
+            </ngx-charts-bar-vertical>
+          </div>
+        </div>
+      </div>
+
+      <!-- Graphique Camembert -->
+      <div class="col-lg-6 mb-4">
+        <div class="bg-white p-3 rounded shadow-sm h-100 d-flex flex-column">
+          <h5>Répartition des utilisateurs par profil</h5>
+          <div
+            class="flex-fill d-flex justify-content-center align-items-center"
+          >
+            <ngx-charts-pie-chart
+              [results]="pieChartData"
+              [legend]="true"
+              [labels]="true"
+              [doughnut]="true"
+              [scheme]="colorScheme"
+              [view]="[600, 300]"
+            >
+            </ngx-charts-pie-chart>
+          </div>
+        </div>
+      </div>
+
+      <!-- Graphique Ligne -->
+      <!-- <div class="col-lg-12">
+    <div class="bg-white p-3 rounded shadow-sm">
+      <h5>Évolution des réservations</h5>
+      <ngx-charts-line-chart
+        [results]="lineChartData"
+        [scheme]="colorSchemeReservations"
+        [autoScale]="true"
+        [xAxis]="true"
+        [yAxis]="true"
+        [legend]="true">
+      </ngx-charts-line-chart>
+    </div>
+  </div>-->
+    </div>
+
+    <div class="row g-3">
+      <!-- Évolution des réservations -->
+      <div class="col-md-12 d-flex">
+        <div
+          class="bg-white p-3 rounded shadow-sm flex-fill w-100 d-flex flex-column"
+        >
+          <h5>Évolution des utilisateurs</h5>
+          <div class="flex-fill" style="min-height: 300px">
+            <ngx-charts-line-chart
+              [results]="lineChartData"
+              [scheme]="colorSchemeReservations"
+              [autoScale]="true"
+              [xAxis]="true"
+              [yAxis]="true"
+              [legend]="true"
+              [showXAxisLabel]="true"
+              [showYAxisLabel]="true"
+              [xAxisLabel]="'Mois'"
+              [yAxisLabel]="'Utilisateurs'"
+            >
+            </ngx-charts-line-chart>
+          </div>
+        </div>
+      </div>
+
+      <!-- Synthèse des appels de fonds -->
+      <!--<div class="col-md-6 d-flex">
+    <div class="bg-white p-3 rounded shadow-sm flex-fill w-100 d-flex flex-column">
+      <h5>Synthèse des appels de fonds</h5>
+      <div class="flex-fill" style="min-height: 300px;">
+        <ngx-charts-bar-vertical
+          [results]="callForChargeData"
+          [scheme]="colorScheme1"
+          [legend]="true"
+          [xAxis]="true"
+          [yAxis]="true"
+          [showXAxisLabel]="true"
+          [showYAxisLabel]="true"
+          [xAxisLabel]="'Statut'"
+          [yAxisLabel]="'Montant'">
+        </ngx-charts-bar-vertical>
+      </div>
+    </div>
+  </div>-->
+    </div>
+  </div>
+</div>

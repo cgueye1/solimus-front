@@ -1,0 +1,93 @@
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Liste des manifestants d'intêret</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismissAll()"></button>
+  </div>
+
+  <div class="modal-body">
+    <table class="table table__sm w-100">
+      <thead>
+        <th scope="col">Bien</th>
+        <th scope="col">Reservataire</th>
+        <th scope="col">Téléphone</th>
+        <th scope="col">Email</th>
+        <th scope="col">Adresse</th>
+        <th scope="col">STATUT</th>
+        <th scope="col">ACTIONS</th>
+      </thead>
+      <tbody>
+  <!-- Si le tableau n'est pas vide -->
+  <tr *ngFor="let item of data; let i = index">
+    <td>
+      <a href="javascript:(0)" class="dflex-start text-link">
+        <img class="img-thumbnail" width="80" [src]="item.bien.image" [alt]="item.bien.titre">
+        <span class="ml-2">{{ item.bien.titre }}</span>
+      </a>
+    </td>
+    <td>{{ item.prenom }} {{ item.nom | uppercase }}</td>
+    <td>{{ item.telephone }}</td>
+    <td>{{ item.email }}</td>
+    <td>{{ item.adresse }}</td>
+    <td>
+      <span [ngClass]="['status-badge', getStatusLot(item.status).class]">
+        {{ getStatusLot(item.status).text }}
+      </span>
+    </td>
+    <td>
+      <button class="button button-secondary" (click)="openModal(LOTCHOICEMODAL)">
+        Proposer un lot
+      </button>
+    </td>
+  </tr>
+
+  <!-- Si le tableau est vide -->
+  <tr *ngIf="!data || data.length === 0">
+    <td colspan="7" class="text-center p-4" style="color: #888; font-style: italic;">
+      Aucun enregistrement trouvé
+    </td>
+  </tr>
+</tbody>
+
+     <!--- <tbody>
+        <tr *ngFor="let item of data; let i = index">
+
+          <td>
+            <a href="javascript:(0)" class="dflex-start text-link">
+              <img class="img-thumbnail" width="80" [src]="item.bien.image" [alt]="item.bien.titre">
+              <span class="ml-2">{{ item.bien.titre }}</span>
+            </a>
+          </td>
+          <td>{{ item.prenom }} {{ item.nom | uppercase }}</td>
+          <td>{{ item.telephone }}</td>
+          <td>{{ item.email }}</td>
+          <td>{{ item.adresse }}</td>
+          <td>
+            <span [ngClass]="['status-badge', getStatusLot(item.status).class]">{{ getStatusLot(item.status).text }}</span>
+          </td>
+          <td>
+            <button class="button button-secondary" (click)="openModal(LOTCHOICEMODAL)">Proposer un lot</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>-->
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" (click)="modal.dismissAll()">Fermer</button>
+  </div>
+
+
+
+  <ng-template #LOTCHOICEMODAL let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Choisir les lots disponibles</h4>
+      <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <div class="modal-body">
+
+      <app-card-lot-selection [options]="lots" name="lots"></app-card-lot-selection>
+
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="button button-primary" (click)="onSave();modal.dismiss()">Enregistrer</button>
+    </div>
+  </ng-template>

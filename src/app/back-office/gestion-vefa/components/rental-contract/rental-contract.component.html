@@ -1,0 +1,262 @@
+<div class="contract-container py-5">
+  <!-- Espace supplémentaire en haut -->
+  <div class="mt-4"></div>
+
+  <!-- Header avec titre et bouton -->
+  <div class="d-flex justify-content-between align-items-center mb-5">
+    <h2 class="contract-title">Gestion des contrats de location</h2>
+    <div *ngIf="activeTab === 'ACTIVE' && singleLot?.recipient !== null" class="action-buttons">
+      <button class="btn-primary" (click)="openModal(ADD_CONTRACT, null)">
+        <i class="material-icons">add</i>
+        <span>Nouveau contrat</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Espace avant les tabs -->
+  <div class="mt-3"></div>
+
+  <!-- Tabs modernes -->
+  <div class="tabs-container mb-5">
+    <button
+      class="tab-button"
+      [class.active]="activeTab === 'ACTIVE'"
+      (click)="changeTab('ACTIVE')">
+      <i class="material-icons">description</i>
+      <span>Contrats actifs</span>
+      <span class="badge" [class.badge-active]="activeTab === 'ACTIVE'">{{ activeCount }}</span>
+    </button>
+
+    <button
+      class="tab-button"
+      [class.active]="activeTab === 'ARCHIVED'"
+      (click)="changeTab('ARCHIVED')">
+      <i class="material-icons">archive</i>
+      <span>Contrats archivés</span>
+      <span class="badge" [class.badge-archived]="activeTab === 'ARCHIVED'">{{ archivedCount }}</span>
+    </button>
+  </div>
+
+  <!-- Espace avant le contenu principal -->
+  <div class="mt-4"></div>
+
+  <!-- Loading spinner -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Chargement des contrats...</p>
+  </div>
+
+  <!-- Table des contrats -->
+  <div *ngIf="!loading && contracts.length > 0" class="table-container">
+    <table class="modern-table">
+      <thead>
+        <tr>
+          <th>Propriété</th>
+          <th>Bénéficiaire</th>
+          <th>Date début</th>
+          <th>Date fin</th>
+          <th>Statut</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let contract of contracts" class="table-row">
+          <td class="property-cell">
+            <div class="property-info">
+              <i class="material-icons">apartment</i>
+              <span>{{ contract.propertyName || singleLot?.name || 'N/A' }}</span>
+            </div>
+          </td>
+          <td>{{ contract.recipientName || 'Bénéficiaire' }}</td>
+          <td>
+            <div class="date-cell">
+              <i class="material-icons">event</i>
+              <span>{{ formatDate(contract.startDate) }}</span>
+            </div>
+          </td>
+          <td>
+            <div class="date-cell">
+              <i class="material-icons">event</i>
+              <span>{{ formatDate(contract.endDate) }}</span>
+            </div>
+          </td>
+          <td>
+            <span [class]="'status-badge ' + getStatusContract(contract.active, contract.archived).class">
+              <i class="material-icons" *ngIf="getStatusContract(contract.active, contract.archived).class === 'success'">check_circle</i>
+              <i class="material-icons" *ngIf="getStatusContract(contract.active, contract.archived).class === 'secondary'">archive</i>
+              <i class="material-icons" *ngIf="getStatusContract(contract.active, contract.archived).class === 'warning'">warning</i>
+              {{ getStatusContract(contract.active, contract.archived).text }}
+            </span>
+          </td>
+          <td>
+            <div class="action-icons">
+              <button
+                *ngIf="contract.contractFile"
+                class="icon-button view"
+                title="Voir le contrat"
+                (click)="openFile(contract.contractFile)">
+                <i class="material-icons">visibility</i>
+              </button>
+
+              <button
+                *ngIf="activeTab === 'ACTIVE' && !contract.archived"
+                class="icon-button archive"
+                title="Archiver"
+                (click)="archiveContract(contract.id)">
+                <i class="material-icons">archive</i>
+              </button>
+
+              <ng-container *ngIf="currentuser?.profil === ProfilEnum.PROMOTEUR || 
+                                   currentuser?.profil === ProfilEnum.AGENCY || 
+                                   currentuser?.profil === ProfilEnum.SYNDIC">
+                <button
+                  *ngIf="activeTab === 'ACTIVE' && !contract.contractFile"
+                  class="icon-button upload"
+                  title="Uploader le contrat"
+                  (click)="openModal(ADD_CONTRACT, contract)">
+                  <i class="material-icons">cloud_upload</i>
+                </button>
+              </ng-container>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Message vide -->
+  <div *ngIf="!loading && (!contracts || contracts.length === 0)" class="empty-state">
+    <div class="empty-icon">
+      <i class="material-icons">{{ getEmptyStateMessage().icon }}</i>
+    </div>
+    <h3>{{ getEmptyStateMessage().title }}</h3>
+    <p>{{ getEmptyStateMessage().message }}</p>
+  </div>
+  
+  <!-- Espace en bas -->
+  <div class="mb-5"></div>
+</div>
+
+<!-- Modal d'ajout de contrat amélioré -->
+<ng-template #ADD_CONTRACT let-modal>
+  <div class="modal-modern">
+    <div class="modal-header">
+      <div class="modal-header-content">
+        <i class="material-icons modal-icon">description</i>
+        <h4 class="modal-title">Nouveau contrat de location</h4>
+      </div>
+      <button class="modal-close" (click)="modal.dismiss()">
+        <i class="material-icons">close</i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <form [formGroup]="contractForm">
+        <!-- Informations de la propriété -->
+        <div class="info-card" *ngIf="singleLot">
+          <div class="info-icon">
+            <i class="material-icons">apartment</i>
+          </div>
+          <div class="info-content">
+            <span class="info-label">Propriété</span>
+            <span class="info-value">{{ singleLot.name || singleLot.designation }}</span>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <!-- Date de début -->
+          <div class="form-group">
+            <label class="form-label">
+              <i class="material-icons">event</i>
+              Date de début *
+            </label>
+            <input
+              type="date"
+              class="form-control"
+              formControlName="startDate"
+              [attr.min]="todayDate">
+            <div *ngIf="contractForm.get('startDate')?.invalid && contractForm.get('startDate')?.touched" 
+                 class="error-message">
+              La date de début est requise
+            </div>
+          </div>
+
+          <!-- Date de fin -->
+          <div class="form-group">
+            <label class="form-label">
+              <i class="material-icons">event</i>
+              Date de fin *
+            </label>
+            <input
+              type="date"
+              class="form-control"
+              formControlName="endDate"
+              [attr.min]="contractForm.get('startDate')?.value">
+            <div *ngIf="contractForm.get('endDate')?.invalid && contractForm.get('endDate')?.touched" 
+                 class="error-message">
+              La date de fin est requise
+            </div>
+          </div>
+        </div>
+
+        <!-- Upload de fichier amélioré -->
+        <div class="form-group">
+          <label class="form-label">
+            <i class="material-icons">attach_file</i>
+            Document du contrat *
+          </label>
+          
+          <div class="file-upload-area" 
+               [class.file-selected]="file"
+               (dragover)="$event.preventDefault()"
+               (drop)="handleFileDrop($event)">
+            
+            <input
+              #fileInput
+              type="file"
+              id="contractFile"
+              accept=".pdf,application/pdf"
+              (change)="onUpload($event)"
+              style="display: none;">
+            
+            <div *ngIf="!file" class="upload-placeholder" (click)="fileInput.click()">
+              <i class="material-icons upload-icon">cloud_upload</i>
+              <div class="upload-text">
+                <span class="upload-main">Cliquez pour sélectionner un fichier</span>
+                <span class="upload-hint">ou glissez-déposez ici</span>
+              </div>
+              <div class="file-info">
+                <i class="material-icons">info</i>
+                <span>PDF uniquement (max. 10 Mo)</span>
+              </div>
+            </div>
+
+            <div *ngIf="file" class="file-preview">
+              <div class="file-icon">
+                <i class="material-icons">picture_as_pdf</i>
+              </div>
+              <div class="file-details">
+                <span class="file-name">{{ file.name }}</span>
+                <span class="file-size">{{ (file.size / 1024 / 1024).toFixed(2) }} Mo</span>
+              </div>
+              <button type="button" class="remove-file" (click)="removeFile()" title="Supprimer">
+                <i class="material-icons">close</i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="modal.dismiss()">
+        <i class="material-icons">cancel</i>
+        Annuler
+      </button>
+      <button class="btn-primary" (click)="onSaveContract()" [disabled]="loading">
+        <i class="material-icons">{{ loading ? 'hourglass_empty' : 'save' }}</i>
+        <span>{{ loading ? 'Enregistrement...' : 'Enregistrer le contrat' }}</span>
+      </button>
+    </div>
+  </div>
+</ng-template>

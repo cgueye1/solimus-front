@@ -1,0 +1,459 @@
+<div class="py-3">
+  <div class="search__table dflex-between">
+    <!--<div class="search">
+      <div class="search-box">
+        <input class="search-box__input" type="text" placeholder="Rechercher" />
+        <button class="search-box__button" aria-label="Search">
+          <i class="material-icons">search</i>
+        </button>
+      </div>
+    </div>-->
+
+    <!-- Filtre mois -->
+    <input
+      type="month"
+      class="form-control w-auto"
+      [(ngModel)]="selectedMonth"
+      (change)="onMonthChange()"
+    />
+
+    <!-- Bouton Ajouter -->
+    <button
+      class="button button-outline-primary"
+      (click)="openFormModal(CreateForm)"
+    >
+      {{
+        singleLot.rental
+          ? "Ajouter un avis d'échéance "
+          : "Ajouter un appel de charge"
+      }}
+      <i class="material-icons">add</i>
+    </button>
+  </div>
+
+  <div *ngIf="loading" class="text-center my-3">
+    <div class="spinner-border text-primary"></div>
+  </div>
+
+
+  <div *ngIf="!loading && paymentCalls?.length === 0" class="text-center my-3">
+    <p>Pas de données</p>
+  </div>
+  
+    <app-payment-call-stats ></app-payment-call-stats>
+
+  <table class="table table__sm w-100" *ngIf="!loading">
+    <thead>
+      <tr>
+        <th>TITRE</th>
+
+        <th>MONTANT</th>
+        <th>DATE PRÉVU</th>
+        <th>STATUT</th>
+
+        <th>ACTIONS</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let item of paymentCalls">
+        <td>{{ item.titre }}</td>
+
+        <td>{{ formatPrix(item.price) }}</td>
+        <td>{{ formatDate(item.startDate) }}</td>
+
+        <td>
+          <span [ngClass]="['status-badge', getStatusLot(item.status).class]">
+            {{ getStatusLot(item.status).text }}
+          </span>
+        </td>
+
+        <td>
+          <div class="actions">
+            <!-- Switch paiement -->
+
+            <!-- Switch paiement -->
+            <div class="form-check form-switch form-check-inline">
+              <div class="custom-checkbox">
+                <input
+                  type="checkbox"
+                  class="form-check-input custom-switch"
+                  [checked]="item.status === 'COMPLETED'"
+                  (change)="onSwitchChange($event, item)"
+                />
+              </div>
+            </div>
+
+            <!-- Actions promoteur / agence -->
+            <ng-container>
+              <button
+                class="btn custom-border"
+                title="Modifier"
+                (click)="openFormModal(DETAILS, item)"
+              >
+                <i class="material-icons text-grey">visibility</i>
+              </button>
+
+              <button
+                class="btn custom-border"
+                title="Uploader"
+                (click)="openModal(ADD_FICHE, item)"
+              >
+                <i class="material-icons text-gray">attach_file</i>
+              </button>
+
+              <button
+                class="btn custom-border"
+                title="Uploader"
+                (click)="openModal(ADD_FORM_IMGS, item)"
+              >
+                <i class="material-icons text-gray">add_a_photo</i>
+              </button>
+              <!--- <ng-container *ngIf="item.status === 'PENDING'">
+                <button
+                  class="btn custom-border"
+                  title="Modifier"
+                  (click)="openFormModal(CreateForm, item)"
+                >
+                  <i class="material-icons text-grey">edit</i>
+                </button>
+
+                <button
+                  class="btn custom-border"
+                  title="Supprimer"
+                  (click)="onDelete(item)"
+                >
+                  <i class="material-icons text-danger">delete</i>
+                </button>
+              </ng-container>-->
+            </ng-container>
+
+            <!-- Actions réservataire / promoteur -->
+            <ng-container
+              *ngIf="
+                currentuser.profil === ProfilEnum.RESERVATAIRE ||
+                currentuser.profil === ProfilEnum.PROMOTEUR
+              "
+            >
+              <!-- Télécharger facture -->
+              <!----  <button
+                *ngIf="item.file != null"
+                class="btn custom-border"
+                title="Télécharger"
+                (click)="downloadInvoice(item)"
+              >
+                <i class="material-icons text-green">download</i>
+              </button>-->
+
+              <!-- Upload / Voir fichier -->
+              <ng-container>
+                <!----<button
+                  *ngIf="item.file != null"
+                  class="btn custom-border"
+                  title="Voir"
+                  (click)="openPdf(item.file)"
+                >
+                  <i class="material-icons text-gray">download</i>
+                </button>-->
+              </ng-container>
+            </ng-container>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Modal création / édition -->
+  <ng-template #CreateForm>
+     <app-appel-charge-form-syndic
+      [formData]="selectedAppelFond"
+      [isEditMode]="isEditMode"
+      [singleLot]="singleLot"
+      (formSubmit)="onFormSubmit($event)"
+    >
+    </app-appel-charge-form-syndic>
+  </ng-template>
+</div>
+
+<!-- Modal upload preuve -->
+<ng-template #ADD_FICHE let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">Ajouter un document</h4>
+    <button class="btn-close" (click)="modal.dismiss()"></button>
+  </div>
+
+  <div class="modal-body">
+    <form>
+    
+    
+      <div class="row g-3">
+      
+         <!-- Champ pour le label -->
+        <div class="col-md-12">
+          <label class="form-label">Titre</label>
+          <input
+            class="form-control"
+            type="text"
+            [(ngModel)]="fileLabel"
+            name="fileLabel"
+            placeholder="Entrez un label pour le document"
+          />
+        </div>
+
+        <div class="col-md-12">
+          <label class="form-label">Document joint</label>
+          <input class="form-control" type="file" (change)="onUpload($event)" />
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="modal-footer">
+    <button class="button button-primary" (click)="onSave()">
+      Enregistrer
+    </button>
+    <button class="button button-outline-primary" (click)="modal.dismiss()">
+      Annuler
+    </button>
+  </div>
+</ng-template>
+
+<!-- Modal details-->
+<ng-template #DETAILS let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title fw-bold">Détails</h4>
+    <button class="btn-close" (click)="modal.dismiss()"></button>
+  </div>
+
+  <div class="modal-body">
+    <div class="py-3">
+      <div class="card border-0 p-3 shadow-sm">
+        <!-- Header -->
+        <div
+          class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2"
+        >
+          <h5 class="mb-0">Statistiques des charges</h5>
+
+          <!-- Filtre mois -->
+          <div></div>
+        </div>
+
+        <!-- Grid : 2 par ligne -->
+        <div class="row g-3">
+          <div class="col-lg-6 col-md-6 col-sm-12">
+            <div class="stat-card">
+              <div class="icon bg-primary">
+                <i class="material-icons">description</i>
+              </div>
+              <div>
+                <p class="label">Nombre de factures</p>
+                <h4>{{ totalCalls }}</h4>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6 col-md-6 col-sm-12">
+            <div class="stat-card">
+              <div class="icon bg-warning">
+                <i class="material-icons">account_balance_wallet</i>
+              </div>
+              <div>
+                <p class="label">Montant total</p>
+                <h4>{{ totalAmount | number }} FCFA</h4>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6 col-md-6 col-sm-12">
+            <div class="stat-card">
+              <div class="icon bg-success">
+                <i class="material-icons">check_circle</i>
+              </div>
+              <div>
+                <p class="label">Montant collecté</p>
+                <h4>{{ collectedAmount | number }} FCFA</h4>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-6 col-md-6 col-sm-12">
+            <div class="stat-card">
+              <div class="icon bg-danger">
+                <i class="material-icons">hourglass_empty</i>
+              </div>
+              <div>
+                <p class="label">Montant en attente</p>
+                <h4>{{ pendingAmount | number }} FCFA</h4>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TITRE -->
+    <h5 class="fw-semibold mb-2">{{ work.titre }}</h5>
+
+    <!-- STATUS -->
+    <span
+      class="badge mb-3"
+      [ngClass]="{
+        'bg-success': work.status === 'COMPLETED',
+        'bg-warning text-dark': work.status === 'PENDING',
+        'bg-info': work.status === 'IN_PROGRESS'
+      }"
+    >
+      {{ work.status }}
+    </span>
+
+    <!-- DESCRIPTION -->
+    <p class="text-muted">
+      {{ work.description || "Aucune description" }}
+    </p>
+
+    <!-- INFOS -->
+    <div class="row g-3 mb-4">
+      <div class="col-6">
+        <div class="info-card">
+          <small>💰 Montant</small>
+          <strong>{{ work.price | number }} FCFA</strong>
+        </div>
+      </div>
+
+      <div class="col-6">
+        <div class="info-card">
+          <small>📅 Date </small>
+          <strong>{{ formatDate(work.startDate) }}</strong>
+        </div>
+      </div>
+
+      <!--<div class="col-6">
+        <div class="info-card">
+          <small>🚚 Livraison</small>
+          <strong>{{ work.deliveryDate }}</strong>
+        </div>
+      </div>-->
+    </div>
+
+    <!-- ALBUM PHOTO -->
+    <div *ngIf="work.pictures?.length; else noPhotos">
+      <h6 class="fw-semibold mb-2">📷 Photos</h6>
+
+      <div class="photo-grid">
+        <img
+          *ngFor="let img of work.pictures"
+          [src]="getFullImageUrl(img)"
+          class="photo-item"
+          (click)="openImage(img)"
+        />
+      </div>
+    </div>
+
+    <ng-template #noPhotos>
+      <div class="text-center text-muted fst-italic">
+        Aucune photo disponible
+      </div>
+    </ng-template>
+  </div>
+
+  <div class="files-section">
+    <h5 class="fw-semibold mb-3">📁 Documents</h5>
+
+    <!-- LISTE -->
+    <div *ngIf="files?.length; else emptyState" class="file-list">
+      <div class="file-card" *ngFor="let f of files">
+        <div class="file-left">
+          <div class="file-icon pdf">PDF</div>
+
+          <div class="file-info">
+            <div class="file-label">{{ f.label }}</div>
+            <!--<small class="text-muted">{{ f.file }}</small>-->
+          </div>
+        </div>
+
+        <a class="btn btn-outline-primary btn-sm" (click)="openImage(f.file)">
+          Ouvrir
+        </a>
+      </div>
+    </div>
+
+    <!-- EMPTY -->
+    <ng-template #emptyState>
+      <div class="empty-files">
+        <div class="icon">📄</div>
+        <p>Aucun document disponible</p>
+      </div>
+    </ng-template>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-secondary" (click)="modal.close()">Fermer</button>
+  </div>
+</ng-template>
+
+<!-- Ajoute des images du travaux  -->
+
+<!-- Form creation -->
+<ng-template #ADD_FORM_IMGS let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">
+      {{ "Ajout images " }}
+    </h4>
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Close"
+      (click)="modal.dismiss('Cross click')"
+    ></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="progressAlbuForm" (ngSubmit)="onSave()">
+      <div class="row g-3">
+        <div class="col-lg-12">
+          <label class="form-label">Images</label>
+          <input
+            type="file"
+            class="form-control"
+            multiple
+            (change)="onMultipleFilesSelected($event)"
+            accept="image/*"
+          />
+          <br />
+          <div class="col-md-12" *ngIf="pictures.controls.length > 0">
+            <div class="row">
+              <div
+                class="col-12 col-sm-6 col-md-4"
+                *ngFor="let picture of pictures.controls; let i = index"
+              >
+                <div class="position-relative">
+                  <img
+                    [src]="picture.value"
+                    class="img-fluid"
+                    alt="Image Preview"
+                  />
+                  <button
+                    type="button"
+                    class="btn btn-danger position-absolute"
+                    style="top: 5px; right: 5px"
+                    (click)="onDeleteGalleryImage(i)"
+                  >
+                    <i class="material-icons red-icon">close</i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button
+      type="button"
+      class="button button-primary"
+      (click)="onSaveImages()"
+    >
+      Enregistrer
+    </button>
+  </div>
+</ng-template>

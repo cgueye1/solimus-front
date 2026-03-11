@@ -1,0 +1,475 @@
+<!-- calendar.component.html -->
+<div class="calendar-container">
+  <div class="calendar-wrapper">
+    <!-- Header du calendrier -->
+    <div class="calendar-header">
+      <div class="header-left">
+        <h1 class="calendar-title">
+          <i class="material-icons">calendar_month</i>
+          Calendrier des réunions
+        </h1>
+        <div class="current-month-display">
+          <span class="month-name">{{ currentMonth | date: "MMMM yyyy" }}</span>
+          <button class="btn-today" (click)="goToToday()">
+            <i class="material-icons">event</i>
+            Aujourd'hui
+          </button>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <div class="header-actions">
+          <div class="month-navigation">
+            <button class="nav-btn" (click)="changeMonth(-1)">
+              <i class="material-icons">chevron_left</i>
+            </button>
+            <button class="nav-btn" (click)="changeMonth(1)">
+              <i class="material-icons">chevron_right</i>
+            </button>
+          </div>
+        </div>
+
+        <div class="user-info">
+          <span class="user-role" [ngClass]="currentUser?.profil?.toLowerCase()">
+            {{ getProfilLabel(currentUser?.profil) }}
+          </span>
+          <div class="user-avatar">
+            {{ getInitials(currentUser?.nom, currentUser?.prenom) }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Légende des statuts -->
+    <div class="calendar-legend">
+      <div class="legend-item">
+        <div class="legend-color past"></div>
+        <span>Terminées</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color today"></div>
+        <span>Aujourd'hui</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color upcoming"></div>
+        <span>À venir</span>
+      </div>
+    </div>
+
+    <!-- En-tête des jours de la semaine -->
+    <div class="calendar-weekdays">
+      <div class="weekday" *ngFor="let day of weekDays">
+        {{ day }}
+      </div>
+    </div>
+
+    <!-- Grille du calendrier -->
+    <div class="calendar-grid">
+      <div
+        *ngFor="let day of days"
+        class="calendar-day"
+        [ngClass]="{
+          today: isToday(day),
+          'past-day': isPastDay(day),
+          'other-month': !isCurrentMonth(day)
+        }"
+      >
+        <div class="day-header">
+          <div class="day-number">
+            {{ day | date: "d" }}
+            <span class="day-name">{{ getDayName(day) }}</span>
+          </div>
+
+          <button
+            *ngIf="!isPastDay(day) && currentUser?.profil === 'NOTAIRE'"
+            class="add-meeting-btn"
+            (click)="openAddMeetingModal(addMeetingModal, day)"
+          >
+            <i class="material-icons">add</i>
+          </button>
+        </div>
+
+        <!-- Réunions du jour -->
+        <div class="day-meetings">
+          <div
+            *ngFor="let meeting of getMeetingsForDay(day)"
+            class="meeting-item"
+            [ngClass]="getMeetingStatusClass(meeting)"
+            (click)="viewMeetingDetails(meeting, meetingDetailsModal)"
+          >
+            <div class="meeting-time">
+              <i class="material-icons">schedule</i>
+              {{ meeting.time }}
+            </div>
+
+            <div class="meeting-content">
+              <h4 class="meeting-title">{{ meeting.title }}</h4>
+
+              <div class="meeting-meta">
+                <span class="meeting-duration">
+                  <i class="material-icons">hourglass_bottom</i>
+                  {{ meeting.duration }} min
+                </span>
+
+                <span *ngIf="meeting.address" class="meeting-location">
+                  <i class="material-icons">place</i>
+                  {{ meeting.address }}
+                </span>
+              </div>
+
+              <!-- Participants -->
+              <div *ngIf="meeting.participants?.length" class="meeting-participants">
+                <div class="participant-avatars">
+                  <div
+                    *ngFor="let participant of meeting.participants.slice(0, 3)"
+                    class="participant-avatar"
+                    [title]="getParticipantName(participant)"
+                  >
+                    {{ getInitials(participant.nom, participant.prenom) }}
+                  </div>
+                  <div
+                    *ngIf="meeting.participants.length > 3"
+                    class="more-participants"
+                  >
+                    +{{ meeting.participants.length - 3 }}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="meeting-status-indicator"></div>
+          </div>
+
+          <!-- Indicateur de plus de réunions -->
+          <div *ngIf="getMeetingsForDay(day).length > 3" class="more-meetings">
+            <span>+{{ getMeetingsForDay(day).length - 3 }} autres réunions</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal pour ajouter une réunion -->
+  <ng-template #addMeetingModal let-modal>
+    <div class=" modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">
+            <i class="material-icons">add_calendar</i>
+            Nouvelle réunion
+          </h3>
+          <button
+            type="button"
+            class="btn-close"
+            (click)="modal.dismiss()"
+          ></button>
+        </div>
+
+        <div class="modal-body">
+          <form>
+            <!-- Sélection du lot -->
+            <div class="form-section">
+              <label class="form-label">Lien avec un lot</label>
+              <div class="property-search">
+                <div class="search-wrapper">
+                  <i class="material-icons">search</i>
+                  <input
+                    type="search"
+                    class="form-control"
+                    [(ngModel)]="searchQuery"
+                    name="searchQuery"
+                    [ngbTypeahead]="search"
+                    [resultTemplate]="rt"
+                    [inputFormatter]="formatter"
+                    (selectItem)="onSelect($event.item)"
+                    placeholder="Rechercher un lot (min 2 caractères)..."
+                    autocomplete="off"
+                  />
+                </div>
+
+                <!-- Lot sélectionné -->
+                <div *ngIf="singleBien" class="selected-property">
+                  <img
+                    [src]="getFullImageUrl(singleBien.plan)"
+                    class="property-image"
+                    (error)="onImageError($event)"
+                    alt="Image du lot"
+                  />
+                  <div class="property-info">
+                    <h6>{{ singleBien.name }}</h6>
+                    <span class="property-details">
+                      {{ singleBien.surface }} m² •
+                      {{ singleBien.price | currencyXof }}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    class="btn-remove"
+                    (click)="singleBien = null; searchQuery = ''"
+                  >
+                    <i class="material-icons">close</i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Détails de la réunion -->
+            <div class="form-section">
+              <label class="form-label">Détails de la réunion</label>
+
+              <div class="form-group">
+                <label>Titre *</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  [(ngModel)]="meetingTitle"
+                  name="meetingTitle"
+                  placeholder="Titre de la réunion"
+                  required
+                />
+              </div>
+
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label>Date *</label>
+                    <input
+                      type="date"
+                      class="form-control"
+                      [(ngModel)]="selectedDate"
+                      name="selectedDate"
+                      [min]="currentDate | date: 'yyyy-MM-dd'"
+                      required
+                    />
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label>Heure *</label>
+                    <input
+                      type="time"
+                      class="form-control"
+                      [(ngModel)]="meetingTime"
+                      name="meetingTime"
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label>Durée *</label>
+                    <select
+                      class="form-control"
+                      [(ngModel)]="selectedDuration"
+                      name="duration"
+                      required
+                    >
+                      <option *ngFor="let d of durations" [value]="d">
+                        {{ d }} minutes
+                      </option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <label>Lieu</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      [(ngModel)]="meetingAddress"
+                      name="address"
+                      placeholder="Adresse ou lien de visioconférence"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Participants (affichage) -->
+            <div *ngIf="singleBien?.clients?.length" class="form-section">
+              <label class="form-label">Participants ({{ singleBien.clients.length }})</label>
+              <div class="participants-list">
+                <div *ngFor="let client of singleBien.clients" class="participant-item">
+                  <div class="participant-avatar small">
+                    {{ getInitials(client.nom, client.prenom) }}
+                  </div>
+                  <div class="participant-info">
+                    <span class="participant-name">{{ getParticipantName(client) }}</span>
+                    <span class="participant-role">{{ getParticipantRole(client) }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-primary"
+            (click)="modal.dismiss()"
+          >
+            Annuler
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            [disabled]="!isMeetingFormValid()"
+            (click)="modal.close(true)"
+          >
+            <i class="material-icons">event_available</i>
+            Créer la réunion
+          </button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <!-- Modal pour voir les détails d'une réunion -->
+  <ng-template #meetingDetailsModal let-modal>
+    <div class="modal-dialog-centered" *ngIf="selectedMeeting">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">
+            <i class="material-icons">event</i>
+            Détails de la réunion
+          </h3>
+          <button
+            type="button"
+            class="btn-close"
+            (click)="modal.dismiss()"
+          ></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="meeting-details">
+            <!-- En-tête avec titre -->
+            <div class="detail-section meeting-title-section">
+              <h2>{{ selectedMeeting.title }}</h2>
+              <span class="meeting-id">#{{ selectedMeeting.id }}</span>
+            </div>
+
+            <!-- Informations principales -->
+            <div class="detail-section">
+              <h4>
+                <i class="material-icons">info</i>
+                Informations
+              </h4>
+              
+              <div class="info-grid">
+                <div class="info-item">
+                  <i class="material-icons">calendar_today</i>
+                  <div>
+                    <label>Date</label>
+                    <span>{{ selectedMeeting.formattedDate }}</span>
+                  </div>
+                </div>
+
+                <div class="info-item">
+                  <i class="material-icons">schedule</i>
+                  <div>
+                    <label>Heure</label>
+                    <span>{{ selectedMeeting.formattedTime }}</span>
+                  </div>
+                </div>
+
+                <div class="info-item">
+                  <i class="material-icons">hourglass_bottom</i>
+                  <div>
+                    <label>Durée</label>
+                    <span>{{ selectedMeeting.duration }} minutes</span>
+                  </div>
+                </div>
+
+                <div *ngIf="selectedMeeting.address" class="info-item">
+                  <i class="material-icons">place</i>
+                  <div>
+                    <label>Lieu</label>
+                    <span>{{ selectedMeeting.address }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Créateur -->
+            <div class="detail-section">
+              <h4>
+                <i class="material-icons">badge</i>
+                Organisateur
+              </h4>
+              
+              <div class="creator-info">
+                <div class="creator-avatar">
+                  {{ getInitials(selectedMeeting.creator?.nom, selectedMeeting.creator?.prenom) }}
+                </div>
+                <div class="creator-details">
+                  <span class="creator-name">{{ getParticipantName(selectedMeeting.creator) }}</span>
+                  <span class="creator-role">{{ getParticipantRole(selectedMeeting.creator) }}</span>
+                  <span class="creator-email">{{ selectedMeeting.creator?.email }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Participants -->
+            <div *ngIf="selectedMeeting.participants?.length" class="detail-section">
+              <h4>
+                <i class="material-icons">groups</i>
+                Participants ({{ selectedMeeting.participants.length }})
+              </h4>
+              
+              <div class="participants-full-list">
+                <div *ngFor="let participant of selectedMeeting.participants" 
+                     class="participant-full-item">
+                  <div class="participant-avatar">
+                    {{ getInitials(participant.nom, participant.prenom) }}
+                  </div>
+                  <div class="participant-details">
+                    <span class="participant-name">{{ getParticipantName(participant) }}</span>
+                    <span class="participant-role">{{ getParticipantRole(participant) }}</span>
+                    <span class="participant-contact">
+                      <i class="material-icons">email</i> {{ participant.email }}
+                      <span *ngIf="participant.telephone"> • <i class="material-icons">phone</i> {{ participant.telephone }}</span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-primary"
+            (click)="modal.dismiss()"
+          >
+            Fermer
+          </button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <!-- Template pour les suggestions de recherche -->
+  <ng-template #rt let-r="result" let-t="term">
+    <div class="typeahead-result">
+      <img 
+        [src]="getFullImageUrl(r.plan)" 
+        class="result-image" 
+        (error)="onImageError($event)"
+        alt="Image du lot"
+      />
+      <div class="result-content">
+        <div class="result-title">
+          <ngb-highlight [result]="r.name" [term]="t"></ngb-highlight>
+        </div>
+        <div class="result-details">
+          {{ r.surface }} m² • {{ r.price | currencyXof }}
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</div>

@@ -1,0 +1,126 @@
+<div
+  *ngIf="isSubActive != null && !isSubActive && !loading"
+  class="error-container"
+>
+  <img src="assets/sbrn.png" alt="Abonnement expiré" class="error-image" />
+
+  <h2>Accès restreint</h2>
+  <p>
+    Votre abonnement n’est plus actif. Activez-le ou renouvelez-le pour
+    continuer.
+  </p>
+
+  <button (click)="renewSubscription()" class="renew-button">
+    Activer / Renouveler l’abonnement
+  </button>
+</div>
+
+<div class="p-3" *ngIf="isSubActive">
+  <div
+    class="flex-row-between"
+    *ngIf="currentUser && currentUser.profil === ProfilEnum.SYNDIC"
+  >
+    <h3 class="title-bo">Gestion Copropriétaires</h3>
+    <button class="button button-primary" (click)="onCreate()" *ngIf="isCanAdd">
+      Créer un bien
+    </button>
+  </div>
+
+  <!-- Breadcrumb et Filtres sur une ligne -->
+  <div class="d-flex justify-content-between align-items-end flex-wrap mb-3">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="breadcrumb-bo mb-0">
+      <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item">
+          <a href="javascript:(0)">Gestion Copropriétaires</a>
+        </li>
+       <!---- <li class="breadcrumb-item active" aria-current="page">
+          Liste des biens
+        </li>-->
+      </ol>
+    </nav>
+
+    <!-- Filtres -->
+    <div
+      class="d-flex gap-3 align-items-end flex-wrap"
+      *ngIf="currentUser.profil === ProfilEnum.NOTAIRE"
+    >
+      <!-- Dropdown des statuts -->
+      <div>
+        <!---<label for="statusFilter" class="form-label">Filtrer par statut :</label>-->
+        <select
+          [(ngModel)]="statusFilter"
+          class="form-select"
+          id="statusFilter"
+        >
+          <option value="">Tous</option>
+          <option *ngFor="let s of statusOptions" [value]="s">
+            {{ translateStatus(s) }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Champ de recherche -->
+      <div>
+        <!--<label for="searchTextNotaire" class="form-label">Rechercher :</label>-->
+        <input
+          id="searchTextNotaire"
+          type="text"
+          [(ngModel)]="searchTextNotaire"
+          class="form-control"
+          placeholder="Nom, référence..."
+        />
+      </div>
+
+      <div>
+        <!--(click)="loadMorePropreties()"-->
+        <button
+          type="button"
+          class="btn btn-outline-primary"
+          (click)="onSearch()"
+        >
+          Rechercher
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+ <div class="text-center w-100 mt-5" *ngIf="bienList.length === 0">
+  <img src="assets/no-results.png" alt="Aucun bien" style="max-width: 150px; opacity: 0.6;" class="mb-4" />
+  <p class="text-muted fs-5 fw-semibold">Aucun bien trouvé pour le moment.</p>
+  <p class="text-secondary">Essayez d’ajuster vos filtres ou votre recherche.</p>
+</div>
+  <!-- Liste des biens -->
+  <div class="row gy-3">
+    <div class="col-lg-12" *ngFor="let bien of bienList">
+      <!-- Affichage pour les profils PROMOTEUR, NOTAIRE, AGENCY, BANK -->
+      <ng-container
+        *ngIf="
+          currentUser &&
+          currentUser.profil === ProfilEnum.SYNDIC
+        "
+      >
+        <app-card-bien-horiz-syndic
+         
+          [data]="bien"
+          (callback)="onView(bien)"
+        ></app-card-bien-horiz-syndic>
+      </ng-container>
+
+      <!-- Affichage pour le profil RESERVATAIRE -->
+      <ng-container
+        *ngIf="currentUser && currentUser.profil === ProfilEnum.RESERVATAIRE"
+      >
+        <app-card-bien-horiz-syndic
+          
+          [data]="bien.property"
+          (callback)="onView(bien.property)"
+        ></app-card-bien-horiz-syndic>
+      </ng-container>
+      
+        <!-- Affichage si la liste est vide -->
+
+    </div>
+  </div>
+</div>

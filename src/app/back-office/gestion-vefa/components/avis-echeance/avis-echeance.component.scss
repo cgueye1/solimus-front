@@ -1,0 +1,664 @@
+// Variables
+$primary-color: var(--primary-color);
+$primary-light: #eef2ff;
+$success-color: #2ecc71;
+$success-light: #e8f8f5;
+$warning-color: #f39c12;
+$warning-light: #fef5e7;
+$danger-color: #e74c3c;
+$danger-light: #fdeded;
+$secondary-color: #95a5a6;
+$secondary-light: #f8f9fa;
+$dark-color: #2c3e50;
+$light-color: #f8fafc;
+$border-color: #e2e8f0;
+$text-color: #1e293b;
+$text-light: #64748b;
+$white: #ffffff;
+$shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+$shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+$shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+$border-radius: 12px;
+$border-radius-sm: 8px;
+
+// Mixins
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin transition {
+  transition: all 0.3s ease;
+}
+
+// Styles principaux
+.echeance-container {
+  padding: 24px;
+  background: $light-color;
+  border-radius: $border-radius;
+  box-shadow: $shadow-sm;
+}
+
+// En-tête
+.echeance-header {
+  @include flex-between;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+
+  .search-section {
+    flex: 1;
+    max-width: 400px;
+
+    .search-wrapper {
+      position: relative;
+      width: 100%;
+
+      .search-icon {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: $text-light;
+        font-size: 20px;
+      }
+
+      .search-input {
+        width: 100%;
+        height: 44px;
+        padding: 0 16px 0 44px;
+        border: 1px solid $border-color;
+        border-radius: $border-radius-sm;
+        font-size: 14px;
+        color: $text-color;
+        background: $white;
+        @include transition;
+
+        &:focus {
+          outline: none;
+          border-color: $primary-color;
+          box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
+        }
+
+        &::placeholder {
+          color: $text-light;
+        }
+      }
+    }
+  }
+
+  .btn-add {
+    @include flex-center;
+    gap: 8px;
+    padding: 0 24px;
+    height: 44px;
+    background: $primary-color;
+    color: $white;
+    border: none;
+    border-radius: $border-radius-sm;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    @include transition;
+
+    i {
+      font-size: 20px;
+    }
+
+    &:hover {
+      background: $primary-color;
+      transform: translateY(-2px);
+      box-shadow: $shadow-md;
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+}
+
+// Wrapper du tableau
+.table-wrapper {
+  background: $white;
+  border-radius: $border-radius;
+  overflow: hidden;
+  box-shadow: $shadow-sm;
+}
+
+// Tableau moderne
+.modern-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+
+  thead {
+    background: $secondary-light;
+    border-bottom: 2px solid $border-color;
+
+    th {
+      padding: 16px 20px;
+      text-align: left;
+      font-weight: 600;
+      color: $text-color;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+
+      &.actions-header {
+        text-align: center;
+      }
+    }
+  }
+
+  tbody {
+    tr {
+      border-bottom: 1px solid $border-color;
+      @include transition;
+
+      &:hover {
+        background: $primary-light;
+      }
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+  }
+
+  td {
+    padding: 16px 20px;
+    color: $text-color;
+    vertical-align: middle;
+  }
+}
+
+// Cellules spécifiques
+.title-cell {
+  .title-text {
+    font-weight: 500;
+    color: $text-color;
+  }
+}
+
+.percentage-cell {
+  .percentage-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    background: $primary-light;
+    color: $primary-color;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 13px;
+  }
+}
+
+.amount-cell {
+  &.highlight {
+    .amount-text {
+      color: $primary-color;
+      font-weight: 600;
+    }
+  }
+
+  .amount-text {
+    font-weight: 500;
+    color: $text-color;
+  }
+}
+
+.tva-cell {
+  .tva-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    background: $secondary-light;
+    color: $text-light;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+}
+
+.date-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .date-icon {
+    font-size: 18px;
+    color: $text-light;
+  }
+
+  span {
+    color: $text-color;
+  }
+}
+
+// Badge de statut
+.status-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+
+  &.success {
+    background: $success-light;
+    color: $success-color;
+  }
+
+  &.warning {
+    background: $warning-light;
+    color: $warning-color;
+  }
+}
+
+// Cellule des actions
+.actions-cell {
+  .actions-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+}
+
+// Switch personnalisé
+.switch-container {
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+    margin: 0;
+
+    input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+
+      &:checked + .slider {
+        background-color: $success-color;
+      }
+
+      &:focus + .slider {
+        box-shadow: 0 0 1px $success-color;
+      }
+
+      &:checked + .slider:before {
+        transform: translateX(26px);
+      }
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: $secondary-color;
+      @include transition;
+
+      &:before {
+        position: absolute;
+        content: "";
+        height: 20px;
+        width: 20px;
+        left: 2px;
+        bottom: 2px;
+        background-color: $white;
+        @include transition;
+      }
+
+      &.round {
+        border-radius: 24px;
+
+        &:before {
+          border-radius: 50%;
+        }
+      }
+    }
+  }
+}
+
+// Boutons d'action
+.action-btn {
+  @include flex-center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: $border-radius-sm;
+  background: transparent;
+  cursor: pointer;
+  @include transition;
+
+  i {
+    font-size: 20px;
+    @include transition;
+  }
+
+  &.edit-btn {
+    color: $primary-color;
+
+    &:hover {
+      background: $primary-light;
+      transform: translateY(-2px);
+    }
+  }
+
+  &.delete-btn {
+    color: $danger-color;
+
+    &:hover {
+      background: $danger-light;
+      transform: translateY(-2px);
+    }
+  }
+
+  &.invoice-btn {
+    color: $success-color;
+
+    &:hover {
+      background: $success-light;
+      transform: translateY(-2px);
+    }
+  }
+
+  &.upload-btn {
+    color: $warning-color;
+
+    &:hover {
+      background: $warning-light;
+      transform: translateY(-2px);
+    }
+  }
+
+  &.view-btn {
+    color: $secondary-color;
+
+    &:hover {
+      background: $secondary-light;
+      transform: translateY(-2px);
+    }
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// État vide
+.empty-state {
+  text-align: center;
+  padding: 60px 20px !important;
+
+  .empty-state-content {
+    @include flex-center;
+    flex-direction: column;
+    gap: 16px;
+
+    .empty-icon {
+      font-size: 64px;
+      color: $text-light;
+      opacity: 0.5;
+    }
+
+    p {
+      color: $text-light;
+      font-size: 16px;
+      margin: 0;
+    }
+
+    .btn-add-empty {
+      @include flex-center;
+      gap: 8px;
+      padding: 0 20px;
+      height: 40px;
+      background: transparent;
+      color: $primary-color;
+      border: 2px dashed $border-color;
+      border-radius: $border-radius-sm;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      @include transition;
+
+      i {
+        font-size: 18px;
+      }
+
+      &:hover {
+        background: $primary-light;
+        border-color: $primary-color;
+        transform: translateY(-2px);
+      }
+    }
+  }
+}
+
+// Styles des modals
+.modal-modern {
+  padding: 0;
+
+  .modal-header-modern {
+    @include flex-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid $border-color;
+
+    .modal-title-modern {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 18px;
+      font-weight: 600;
+      color: $text-color;
+      margin: 0;
+
+      i {
+        color: $primary-color;
+      }
+    }
+
+    .btn-close-modern {
+      @include flex-center;
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: transparent;
+      border-radius: 50%;
+      cursor: pointer;
+      @include transition;
+
+      i {
+        font-size: 20px;
+        color: $text-light;
+      }
+
+      &:hover {
+        background: $danger-light;
+        
+        i {
+          color: $danger-color;
+        }
+      }
+    }
+  }
+
+  .modal-body-modern {
+    padding: 24px;
+
+    .upload-area {
+      @include flex-center;
+      flex-direction: column;
+      gap: 12px;
+      padding: 32px;
+      border: 2px dashed $border-color;
+      border-radius: $border-radius;
+      background: $secondary-light;
+      cursor: pointer;
+      @include transition;
+      position: relative;
+
+      &:hover {
+        border-color: $primary-color;
+        background: $primary-light;
+
+        .upload-icon {
+          color: $primary-color;
+        }
+      }
+
+      .file-input {
+        position: absolute;
+        width: 0;
+        height: 0;
+        opacity: 0;
+      }
+
+      .upload-icon {
+        font-size: 48px;
+        color: $text-light;
+        @include transition;
+      }
+
+      .upload-text {
+        font-size: 16px;
+        font-weight: 500;
+        color: $text-color;
+        margin: 0;
+      }
+
+      .upload-hint {
+        font-size: 12px;
+        color: $text-light;
+        margin: 0;
+      }
+
+      .file-name {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        background: $white;
+        border-radius: 20px;
+        font-size: 13px;
+        color: $text-color;
+        margin-top: 8px;
+
+        i {
+          color: $primary-color;
+        }
+      }
+    }
+  }
+
+  .modal-footer-modern {
+    @include flex-between;
+    padding: 20px 24px;
+    border-top: 1px solid $border-color;
+    gap: 12px;
+
+    .btn-cancel {
+      padding: 0 20px;
+      height: 40px;
+      background: transparent;
+      color: $text-light;
+      border: 1px solid $border-color;
+      border-radius: $border-radius-sm;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      @include transition;
+
+      &:hover {
+        background: $secondary-light;
+        color: $text-color;
+      }
+    }
+
+    .btn-save {
+      @include flex-center;
+      gap: 8px;
+      padding: 0 24px;
+      height: 40px;
+      background: $primary-color;
+      color: $white;
+      border: none;
+      border-radius: $border-radius-sm;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      @include transition;
+
+      i {
+        font-size: 18px;
+      }
+
+      &:hover:not(:disabled) {
+        background: $primary-color;
+        transform: translateY(-2px);
+        box-shadow: $shadow-md;
+      }
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 1024px) {
+  .modern-table {
+    display: block;
+    overflow-x: auto;
+    
+    td, th {
+      white-space: nowrap;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .echeance-header {
+    flex-direction: column;
+    
+    .search-section {
+      max-width: 100%;
+    }
+    
+    .btn-add {
+      width: 100%;
+    }
+  }
+}
+
+// Animations
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animated {
+  animation-duration: 0.3s;
+  animation-fill-mode: both;
+  
+  &.fadeInDown {
+    animation-name: fadeInDown;
+  }
+}

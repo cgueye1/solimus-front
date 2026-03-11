@@ -1,0 +1,451 @@
+<div class="project-creation-container">
+  <!-- Header avec breadcrumb -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">
+        <i class="material-icons">apartment</i>
+        Création de projet immobilier
+      </h1>
+      
+      <nav aria-label="breadcrumb" class="breadcrumb-nav">
+        <ol class="breadcrumb-list">
+          <li class="breadcrumb-item">
+            <a [routerLink]="['/gestion-vente-vefa']" [queryParams]="rental ? { rental: true } : null">
+              <i class="material-icons">home</i>
+              {{ rental ? "Gestion location" : "Gestion VEFA" }}
+            </a>
+          </li>
+          <li class="breadcrumb-item active" aria-current="page">
+            <i class="material-icons">chevron_right</i>
+            Création de bien immobilier
+          </li>
+        </ol>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Formulaire principal -->
+  <div class="form-container">
+    <form [formGroup]="realEstatePropertyForm" (ngSubmit)="onSave()">
+      <!-- Section Informations générales -->
+      <div class="form-section">
+        <div class="section-header">
+          <i class="material-icons section-icon">info</i>
+          <h2 class="section-title">Informations générales</h2>
+          <div class="section-line"></div>
+        </div>
+
+        <div class="form-grid">
+          <!-- Type de bien -->
+          <div class="form-field">
+            <label class="field-label">
+              Type de bien <span class="required-star">*</span>
+            </label>
+            <div class="select-wrapper">
+              <select class="form-select" formControlName="propertyTypeId">
+                <option value="" disabled selected>Sélectionner un type</option>
+                <option *ngFor="let type of propertyTypeList$ | async" [value]="type.id">
+                  {{ type.typeName }}
+                </option>
+              </select>
+              <i class="material-icons select-arrow">expand_more</i>
+            </div>
+            <div class="error-message" *ngIf="isFieldInvalid('propertyTypeId')">
+              Ce champ est requis
+            </div>
+          </div>
+
+          <!-- Surface -->
+          <div class="form-field">
+            <label class="field-label">
+              Surface (m²) <span class="required-star">*</span>
+            </label>
+            <input 
+              type="number" 
+              class="form-input" 
+              formControlName="area" 
+              placeholder="Ex: 150"
+              min="0"
+              step="0.1"
+            >
+            <div class="error-message" *ngIf="isFieldInvalid('area')">
+              Surface requise
+            </div>
+          </div>
+
+          <!-- Prix / Loyer -->
+          <div class="form-field">
+            <label class="field-label">
+              {{ rental ? "Montant du loyer" : "Prix (F CFA)" }}
+              <span class="required-star" *ngIf="!rental">*</span>
+            </label>
+            <div class="input-with-prefix">
+              <span class="input-prefix">FCFA</span>
+              <input 
+                type="text" 
+                class="form-input with-prefix" 
+                formControlName="price"
+                (input)="onPriceInput($event)"
+                placeholder="0"
+                [mask]="'separator.0'"
+                [thousandSeparator]="' '"
+              >
+            </div>
+            <div class="error-message" *ngIf="!rental && isFieldInvalid('price')">
+              Prix requis
+            </div>
+          </div>
+
+          <!-- Adresse avec autocomplete Google -->
+          <div class="form-field full-width">
+            <label class="field-label">
+              Adresse <span class="required-star">*</span>
+            </label>
+            <app-location-input
+              [apiKey]="googleMapsApiKey"
+              (locationSelected)="onLocationSelected($event)"
+              
+               [initialValue]="selectedLocation?.name ?? ''"
+              class="location-input-wrapper"
+            ></app-location-input>
+            <div class="error-message" *ngIf="!selectedLocation && formSubmitted">
+              Adresse requise
+            </div>
+          </div>
+
+          <!-- Frais de réservation (VEFA uniquement) -->
+          <div class="form-field" *ngIf="!rental">
+            <label class="field-label">
+              Frais de réservation (%) <span class="required-star">*</span>
+            </label>
+            <div class="select-wrapper">
+              <select 
+                class="form-select" 
+                formControlName="reservationFee"
+                (change)="onPercentageSelect($event)"
+              >
+                <option value="" disabled selected>Choisir un pourcentage</option>
+                <option *ngFor="let percentage of percentageOptions" [value]="percentage">
+                  {{ percentage }}%
+                </option>
+              </select>
+              <i class="material-icons select-arrow">expand_more</i>
+            </div>
+            <div class="error-message" *ngIf="isFieldInvalid('reservationFee')">
+              Pourcentage requis
+            </div>
+          </div>
+
+          <!-- Frais de dossier / Caution -->
+          <div class="form-field">
+            <label class="field-label">
+              {{ rental ? "Montant de la caution" : "Frais de dossier" }}
+              <span class="required-star">*</span>
+            </label>
+            <div class="input-with-prefix">
+              <span class="input-prefix">FCFA</span>
+              <input 
+                type="text" 
+                class="form-input with-prefix" 
+                formControlName="feesFile"
+                (input)="onFeesFileInput($event)"
+                placeholder="0"
+                [mask]="'separator.0'"
+                [thousandSeparator]="' '"
+              >
+            </div>
+            <div class="error-message" *ngIf="isFieldInvalid('feesFile')">
+              Ce champ est requis
+            </div>
+          </div>
+
+          <!-- Nombre de lots / chambres -->
+          <div class="form-field">
+            <label class="field-label">
+              {{ rental ? "Nombre de chambres" : "Nombre de lots" }}
+              <span class="required-star">*</span>
+            </label>
+            <input 
+              type="number" 
+              class="form-input" 
+              formControlName="numberOfLots" 
+              placeholder="Ex: 5"
+              min="1"
+            >
+            <div class="error-message" *ngIf="isFieldInvalid('numberOfLots')">
+              Nombre requis
+            </div>
+          </div>
+
+          <!-- Notaire (VEFA uniquement) -->
+          <div class="form-field" *ngIf="!rental">
+            <label class="field-label">Notaire <span class="required-star">*</span></label>
+            <div class="autocomplete-wrapper">
+              <input
+                type="text"
+                class="form-input"
+                [formControl]="notaireControl"
+                [matAutocomplete]="autoNotaire"
+                placeholder="Rechercher un notaire..."
+              >
+              <i class="material-icons search-icon">search</i>
+              
+              <mat-autocomplete 
+                #autoNotaire="matAutocomplete" 
+                [displayWith]="displayNotaireFn"
+                (optionSelected)="selectNotaire($event)"
+                class="custom-autocomplete"
+              >
+                <mat-option *ngFor="let option of filteredNotaires$ | async" [value]="option" class="autocomplete-option">
+                  <div class="option-content">
+                    <div class="option-avatar">
+                      <i class="material-icons">gavel</i>
+                    </div>
+                    <div class="option-details">
+                      <div class="option-name">{{ option.nom }} {{ option.prenom }}</div>
+                      <div class="option-sub">{{ option.telephone }}</div>
+                    </div>
+                  </div>
+                </mat-option>
+              </mat-autocomplete>
+            </div>
+            <div class="error-message" *ngIf="isFieldInvalid('notaryId')">
+              Notaire requis
+            </div>
+          </div>
+
+          <!-- Nom du bien -->
+          <div class="form-field">
+            <label class="field-label">
+              Nom du bien <span class="required-star">*</span>
+            </label>
+            <input 
+              type="text" 
+              class="form-input" 
+              formControlName="name" 
+              placeholder="Ex: Résidence Les Jardins"
+            >
+            <div class="error-message" *ngIf="isFieldInvalid('name')">
+              Nom requis
+            </div>
+          </div>
+
+          <!-- Banque (VEFA uniquement) -->
+          <div class="form-field" *ngIf="!rental">
+            <label class="field-label">Banque partenaire</label>
+            <div class="autocomplete-wrapper">
+              <input
+                id="bank-search"
+                type="search"
+                class="form-input"
+                [ngbTypeahead]="searchBanks"
+                [resultTemplate]="bankTemplate"
+                [inputFormatter]="bankFormatter"
+                (selectItem)="onBankSelect($event.item)"
+                placeholder="Rechercher une banque..."
+                [editable]="false"
+              >
+              <i class="material-icons search-icon">account_balance</i>
+            </div>
+          </div>
+
+          <!-- Agence (si utilisateur non agence) -->
+          <!--<div class="form-field" *ngIf="!rental && currentUser?.profil !== ProfilEnum.AGENCY">
+            <label class="field-label">Agence partenaire</label>
+            <div class="autocomplete-wrapper">
+              <input
+                id="agency-search"
+                type="search"
+                class="form-input"
+                [ngbTypeahead]="searchAgencies"
+                [resultTemplate]="agencyTemplate"
+                [inputFormatter]="agencyFormatter"
+                (selectItem)="onAgencySelect($event.item)"
+                placeholder="Rechercher une agence..."
+                [editable]="false"
+              >
+              <i class="material-icons search-icon">business</i>
+            </div>
+          </div>-->
+
+          <!-- Description -->
+          <div class="form-field full-width">
+            <label class="field-label">
+              Description <span class="required-star">*</span>
+            </label>
+            <textarea 
+              class="form-textarea" 
+              rows="4" 
+              formControlName="description"
+              placeholder="Décrivez votre bien en détail..."
+            ></textarea>
+            <div class="error-message" *ngIf="isFieldInvalid('description')">
+              Description requise
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section Équipements communs -->
+      <div class="form-section">
+        <div class="section-header">
+          <i class="material-icons section-icon">fitness_center</i>
+          <h2 class="section-title">Équipements communs</h2>
+          <div class="section-line"></div>
+        </div>
+
+        <div class="equipment-grid">
+          <div class="equipment-item" *ngFor="let equipment of equipmentList">
+            <label class="checkbox-card" [class.checked]="realEstatePropertyForm.get(equipment.control)?.value">
+              <input 
+                type="checkbox" 
+                class="hidden-checkbox" 
+                [formControlName]="equipment.control"
+              >
+              <div class="checkbox-content">
+                <i class="material-icons">{{ equipment.icon }}</i>
+                <span>{{ equipment.label }}</span>
+              </div>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section Documents (conditionnelle selon le type) -->
+      <div class="form-section" *ngIf="!rental">
+        <div class="section-header">
+          <i class="material-icons section-icon">description</i>
+          <h2 class="section-title">Documents</h2>
+          <div class="section-line"></div>
+        </div>
+
+        <div class="documents-grid">
+          <!-- Plan du bien -->
+          <div class="document-upload">
+            <label class="field-label">Plan du bien <span class="required-star">*</span></label>
+            <div class="upload-area" (click)="planInput.click()" [class.has-file]="plan">
+              <input #planInput type="file" hidden accept="image/*" (change)="onPlanSelected($event)">
+              
+              <div class="upload-content" *ngIf="!plan">
+                <i class="material-icons upload-icon">cloud_upload</i>
+                <span class="upload-text">Cliquez pour télécharger</span>
+                <span class="upload-hint">PNG, JPG, JPEG (max. 5 Mo)</span>
+              </div>
+
+              <div class="file-preview" *ngIf="plan">
+                <img [src]="previewUrl" alt="Plan preview" class="preview-image">
+                <div class="file-info">
+                  <i class="material-icons">insert_drive_file</i>
+                  <span class="file-name">{{ plan.name }}</span>
+                </div>
+                <button type="button" class="remove-file" (click)="deleteImage(); $event.stopPropagation()">
+                  <i class="material-icons">close</i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Statut juridique -->
+          <div class="document-upload">
+            <label class="field-label">Statut juridique</label>
+            <div class="upload-area" (click)="legalStatusInput.click()" [class.has-file]="legalStatusFile">
+              <input #legalStatusInput type="file" hidden accept=".pdf,.doc,.docx" (change)="onLegalStatusSelected($event)">
+              
+              <div class="upload-content" *ngIf="!legalStatusFile">
+                <i class="material-icons upload-icon">cloud_upload</i>
+                <span class="upload-text">Cliquez pour télécharger</span>
+                <span class="upload-hint">PDF, DOC (max. 10 Mo)</span>
+              </div>
+
+              <div class="file-preview" *ngIf="legalStatusFile">
+                <i class="material-icons file-icon">description</i>
+                <div class="file-info">
+                  <span class="file-name">{{ legalStatusFile.name }}</span>
+                </div>
+                <button type="button" class="remove-file" (click)="onDeleteLegalStatus(legalStatusInput); $event.stopPropagation()">
+                  <i class="material-icons">close</i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section Galerie d'images (pour location) -->
+      <div class="form-section" *ngIf="rental">
+        <div class="section-header">
+          <i class="material-icons section-icon">photo_library</i>
+          <h2 class="section-title">Galerie d'images</h2>
+          <div class="section-line"></div>
+        </div>
+
+        <div class="gallery-upload">
+          <div class="upload-area gallery-area" (click)="fileInput.click()">
+            <input #fileInput type="file" multiple hidden accept="image/*" (change)="onMultipleFilesSelected($event)">
+            <i class="material-icons upload-icon">add_photo_alternate</i>
+            <span class="upload-text">Ajouter des images</span>
+            <span class="upload-hint" *ngIf="images.length === 0">PNG, JPG, JPEG (max. 5 Mo par image)</span>
+            <span class="upload-hint" *ngIf="images.length > 0">{{ images.length }} image(s) sélectionnée(s)</span>
+          </div>
+
+          <div class="gallery-preview" *ngIf="pictures.controls.length > 0">
+            <div class="preview-item" *ngFor="let picture of pictures.controls; let i = index">
+              <img [src]="picture.value" class="preview-image" alt="Image preview">
+              <button type="button" class="remove-image" (click)="onDeleteGalleryImage(i)">
+                <i class="material-icons">close</i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Boutons d'action -->
+      <div class="form-actions">
+        <button 
+          type="submit" 
+          class="btn-primary" 
+          [disabled]="loading"
+          [class.loading]="loading"
+        >
+          <i class="material-icons" *ngIf="!loading">save</i>
+          <span class="spinner" *ngIf="loading"></span>
+          {{ loading ? 'Enregistrement...' : 'Sauvegarder' }}
+        </button>
+        
+        <button type="button" class="btn-secondary" (click)="onReset()" [disabled]="loading">
+          <i class="material-icons">close</i>
+          Annuler
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Templates pour les autocomplete -->
+<ng-template #bankTemplate let-r="result" let-t="term">
+  <div class="typeahead-item">
+    <div class="item-avatar">
+      <i class="material-icons">account_balance</i>
+    </div>
+    <div class="item-details">
+      <div class="item-title">
+        <ngb-highlight [result]="r.company.name" [term]="t"></ngb-highlight>
+      </div>
+      <div class="item-subtitle" *ngIf="r.company.email">{{ r.company.email }}</div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #agencyTemplate let-r="result" let-t="term">
+  <div class="typeahead-item">
+    <div class="item-avatar">
+      <i class="material-icons">business</i>
+    </div>
+    <div class="item-details">
+      <div class="item-title">
+        <ngb-highlight [result]="r.company.name" [term]="t"></ngb-highlight>
+      </div>
+      <div class="item-subtitle" *ngIf="r.company.email">{{ r.company.email }}</div>
+    </div>
+  </div>
+</ng-template>

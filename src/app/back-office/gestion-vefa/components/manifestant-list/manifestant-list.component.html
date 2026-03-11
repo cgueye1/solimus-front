@@ -1,0 +1,45 @@
+<div class="py-3">
+
+  <table class="table table__sm w-100">
+    <thead>
+      <th scope="col">Prenom et Nom</th>
+      <th scope="col">Téléphone</th>
+      <th scope="col">Email</th>
+      <th scope="col">Lot</th>
+      <th scope="col">STATUT</th>
+      <th scope="col">ACTIONS</th>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of  bienList; let i = index">
+        <td>{{ item.user.prenom }} {{ item.user.nom | uppercase }}</td>
+        <td>{{ item.user.telephone }}</td>
+        <td>{{ item.user.email }}</td>
+        <td>{{ item.property.name }}</td>
+        <td>
+          <span [ngClass]="['status-badge', getStatusLot(item.status).class]">{{ getStatusLot(item.status).text }}</span>
+        </td>
+        <td >
+          <button class="button button-secondary" (click)="openModal(LOTCHOICEMODAL,item.id,i)" 
+          *ngIf="currentUser && item.status==='PROSPECT'  && ((currentUser.profil === ProfilEnum.PROMOTEUR && singleBien.agency==null) ||currentUser.profil === ProfilEnum.AGENCY )">Proposer un lot</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>
+
+
+  <ng-template #LOTCHOICEMODAL let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-basic-title">Choisir les lots disponibles</h4>
+      <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <div class="modal-body">
+
+      <app-card-lot-selection [options]="lots" name="lots"   (selected)="onOptionSelected($event)"></app-card-lot-selection>
+
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="button button-primary" (click)="onSave();modal.dismiss()">Enregistrer</button>
+    </div>
+  </ng-template>

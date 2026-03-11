@@ -1,0 +1,194 @@
+<section class="pb-5" *ngIf="singleBien">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-12">
+        <div class="navigate__route__page">
+          <button class="button button-light" (click)="goReturn()">Retour</button>
+          <nav aria-label="breadcrumb">
+            <ol class="breadcrumb breadcrumb-fo">
+              <li class="breadcrumb-item"><a href="#" [routerLink]="['/accueil']" >Accueil</a></li>
+              <li class="breadcrumb-item"><a href="#" [routerLink]="['/biens']" >Biens immobilier</a></li>
+              <li class="breadcrumb-item active" aria-current="page">{{singleBien.propertyType.typeName}}</li>
+            </ol>
+          </nav>
+        </div>
+      </div>
+      <div class="col-lg-12" >
+       <div class="dflex-between">
+  <div>
+  <!--class="section__header"-->
+  
+    <h3 >{{ singleBien.name }}</h3>
+  </div>
+ <!--- <button class="btn" >Contacter</button>-->
+ </div>
+      
+      
+<p class="card-text description-property" [ngClass]="{ 'clamped': !showFullText }">
+  {{ singleBien.description }}
+</p>
+<a href="#" (click)="toggleText($event)" style="color: black;">
+  {{ showFullText ? 'Voir moins' : 'Voir plus' }}
+</a>
+
+             <!--<h3 class="card-title price-property tx-primary">{{  formatPrix(singleBien.price) }}</h3>-->
+
+
+        <!-- Image principale -
+        <div class="card mb-3 bg-light border-0">
+          <img class="card-img-big img-fluid" [src]="getFullImageUrl( this.selectedImage)" alt="Card image cap"
+            id="product-detail" />
+            
+            
+        </div>-->
+        <!-- Container image avec zoom -->
+<div class="image-display-wrapper">
+  <div class="image-zoom-container">
+    <img
+      [src]="getFullImageUrl(selectedImage)"
+      alt="Image principale"
+      class="zoomable-image"
+       (click)="openModal()"
+    />
+  </div>
+
+  <div class="carousel-vertical-thumbs">
+    <div class="thumb-wrapper" *ngFor="let image of pictures">
+      <img
+        [src]="getFullImageUrl(image)"
+        [class.active]="image === selectedImage"
+        (click)="showImage(image)"
+        
+      />
+    </div>
+  </div>
+</div>
+
+        <br>
+                <br>
+                     
+                     
+<div class="row g-4">
+  <!-- 1er Card : Informations -->
+  <div class="col-md-6">
+    <div class="card h-100 shadow-sm border-0 p-3">
+      <h4 class="mb-3">Informations</h4>
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item d-flex justify-content-between px-0 bg-transparent border-0">
+          <span>Superficie</span>
+         <span class="fw-medium">{{ singleBien.area }} m²</span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between px-0 bg-transparent border-0">
+          <span>Emplacement</span>
+          <span class="fw-medium">{{ singleBien.address }}</span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between px-0 bg-transparent border-0">
+          <span>Nombre de lots</span>
+          <span class="fw-medium">{{ singleBien.numberOfLots }}</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 2ème Card : Équipements -->
+  <div class="col-md-6">
+    <div class="card h-100 shadow-sm border-0 p-3">
+      <h4 class="mb-3">Équipements communs</h4>
+      <div class="row pt-2">
+        <div class="col-12" *ngFor="let equipement of displayedEquipements; let i = index">
+          <div class="item__surface d-flex align-items-start gap-3 mb-3">
+            <img [src]="equipement.icon" [alt]="equipement.label" width="40" height="40" />
+            <div class="block__text">
+              <h6 class="mb-1">{{ equipement.label }}</h6>
+              <small class="text-muted d-block">{{ equipement.desc }}</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-end mt-2" *ngIf="equipements.length > 3">
+      
+        
+        
+        
+        <a  (click)="toggleShowAllEquipements()"style="color: black;">
+    {{ showAllEquipements ? 'Voir moins' : 'Voir plus' }}
+</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+         
+
+
+
+     </div>
+   
+    </div>
+    
+    
+    
+    
+       <div class="room__grid" *ngIf="bienList.length>0">
+
+  <div class="room__card" *ngFor="let bien of bienList" (click)="onViewBien(bien.id)">
+    <div class="room__card__image">
+      <img [src]="getFullImageUrl(bien.plan)" alt="Phase 1" />
+    </div>
+    <div class="room__card__details">
+      <h4>{{ bien.name }}</h4>
+    
+        <p>{{ bien.description }}</p>
+      <div class="room__card__details__footer">
+        <h5 class="price">{{ bien.propertyType.typeName }} </h5>
+        <button class="btn">En savoir plus</button>
+      </div>
+    </div>
+  </div>
+</div>
+    
+  </div>
+  
+  
+  
+  
+  
+
+</section>
+
+
+
+
+ 
+
+
+   <!-- <div class="col-lg-4">
+        <div class="card__info__proprietaire sticky-top">
+          <h4 class="text-center">Contactez le propriétaire</h4>
+          <div class="dflex-start my-2">
+            <i class="material-icons">account_circle</i>
+            <div>
+              <h5> {{singleBien.promoter.prenom}}  {{singleBien.promoter.nom}}  </h5>
+              <small class="text-muted">{{singleBien.promoter.profil}} </small>
+            </div>
+          </div>
+          <button class="button button-primary" (click)="onManifest()">Manifestation d’intêret</button>
+        </div>
+      </div>-->
+      
+      
+      
+      <!-- Modal -->
+<div class="modal-backdrop" *ngIf="isModalOpen" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <img
+      [src]="getFullImageUrl(selectedImage)"
+      alt="Image"
+      class="modal-image"
+    />
+    <span class="close-btn" (click)="closeModal()">&times;</span>
+  </div>
+</div>
+

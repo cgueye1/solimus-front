@@ -1,0 +1,39 @@
+<div class="p-3">
+
+  <div class="flex-row-between">
+    <h3 class="title-bo" *ngIf="singleBien">{{singleBien.propertyType.typeName }}</h3>
+    <div style="display: flex; gap: 10px;">
+      <button class="button button-outline-primary" (click)="onDelete()">Supprimer</button>
+    
+      <button class="button button-primary" (click)="onView(singleBien.id)" *ngIf="user && user.profil === 'PROMOTEUR'">
+        Modifier le bien
+      </button>
+    </div>
+    
+  </div>
+
+  <nav aria-label="breadcrumb" class="breadcrumb-bo">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="javascript:(0)" [routerLink]="['/gestion-vente-vefa']">Gestion Vente VEFA</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+        Détails bien
+      </li>
+    </ol>
+  </nav>
+
+
+ <div class="row g-4">
+  <!-- Detail du bien -->
+  <div class="col-lg-4">
+    <app-card-bien-vertical [data]="singleBien"></app-card-bien-vertical>
+  </div>
+
+  <!-- Liste des lots -->
+  <div class="col-lg-8" *ngIf="singleBien != undefined">
+    <app-list-lot [data]="singleBien"></app-list-lot>
+  </div>
+  
+ </div>
+</div>

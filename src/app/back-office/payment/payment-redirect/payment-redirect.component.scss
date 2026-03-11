@@ -1,0 +1,338 @@
+
+
+
+/*plan dabonnement */
+
+.plans-modal {
+  .tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+
+    button {
+      padding: 8px 20px;
+      border-radius: 20px;
+      border: none;
+      background: #e3ded8;
+      cursor: pointer;
+      font-weight: 600;
+
+      &.active {
+        background: #D4AF37,;
+        color: #fff;
+      }
+    }
+  }
+
+  .plans-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+
+    .plan-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.2s;
+
+      &:hover {
+        transform: translateY(-5px);
+      }
+
+      h5 {
+        font-size: 18px;
+        margin-bottom: 10px;
+      }
+
+      .description {
+        font-size: 14px;
+        color: #8c857c;
+        margin-bottom: 10px;
+      }
+
+      p {
+        font-size: 14px;
+        margin: 4px 0;
+      }
+
+      .btn-select {
+        margin-top: 10px;
+        background: #D4AF37,;
+        color: #000000;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-weight: 600;
+
+        &:hover {
+          background: #D4AF37,;
+        }
+      }
+    }
+  }
+}
+
+
+
+
+/* PLAN D'ABONNEMENT - MODAL */
+.plans-modal {
+  padding: 20px 30px;
+
+  .modal-header {
+    border-bottom: 1px solid #e3ded8;
+    margin-bottom: 20px;
+
+    h4 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #483c32;
+    }
+
+    .btn-close {
+      font-size: 1.2rem;
+    }
+  }
+
+  /* -------------------
+     Tabs / Filtre
+  ------------------- */
+  .tabs {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+
+    button {
+      padding: 10px 25px;   /* +padding pour l’air */
+      border-radius: 25px;
+      border: 1px solid #ccc; /* outline léger */
+      background: #f7f5f2;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+
+      &:hover {
+        background: #eae6de;
+      }
+
+      &.active {
+        background: #D4AF37,;
+        color: #000000;
+        border-color: #D4AF37,;
+      }
+    }
+  }
+
+  /* -------------------
+     Plans Cards
+  ------------------- */
+  .plans-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 24px;
+
+    .plan-card {
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.25s, box-shadow 0.25s;
+
+      &:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+      }
+
+      h5 {
+        font-size: 19px;
+        font-weight: 700;
+        margin-bottom: 10px;
+        color: #483c32;
+      }
+
+      .description {
+        font-size: 14px;
+        color: #8c857c;
+        margin-bottom: 12px;
+        min-height: 40px; /* pour alignement uniforme */
+      }
+
+      p {
+        font-size: 14px;
+        margin: 4px 0;
+        color: #2e2a26;
+
+        strong {
+          color: #483c32;
+        }
+      }
+
+      /* -------------------
+         Bouton Choisir Plan (outline)
+      ------------------- */
+      .btn-select {
+        margin-top: 14px;
+        background: transparent;
+        color: #483c32;
+        border: 2px solid #483c32;
+        padding: 8px 14px;
+        border-radius: 12px;
+        cursor: pointer;
+        font-weight: 600;
+        text-align: center;
+        transition: all 0.2s;
+
+        &:hover {
+          background: #483c32;
+          color: #fff;
+          border-color: #3a3028;
+        }
+      }
+    }
+  }
+}
+
+/* SWITCH Annuel / Mensuel */
+.installment-switch {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+  gap: 8px;
+
+  span {
+    font-size: 12px;
+    font-weight: 600;
+    color: #483c32;
+  }
+
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+
+    input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      border-radius: 34px;
+      transition: 0.4s;
+
+      &:before {
+        position: absolute;
+        content: '';
+        height: 20px;
+        width: 20px;
+        left: 2px;
+        bottom: 2px;
+        background-color: white;
+        border-radius: 50%;
+        transition: 0.4s;
+      }
+    }
+
+    input:checked + .slider {
+      background-color: #483c32;
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+  }
+}
+
+
+
+
+
+
+
+.subscription-cta {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 40px 0;
+
+  button {
+    padding: 14px 28px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 14px;
+    background: #483c32;
+    color: #fff;
+    border: none;
+    box-shadow: 0 10px 25px rgba(72, 60, 50, 0.3);
+    transition: all 0.25s ease;
+
+    &:hover {
+      background: #3a3028;
+      transform: translateY(-2px);
+    }
+  }
+}
+
+
+
+
+
+
+
+.plans-loader,
+.plans-empty {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #57524c;
+}
+
+.plans-loader p {
+  margin-top: 1rem;
+  font-weight: 500;
+}
+
+.spinner {
+  width: 45px;
+  height: 45px;
+  border: 4px solid #ddd;
+  border-top: 4px solid #57524c;
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+  margin: auto;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.plans-empty i {
+  font-size: 2.5rem;
+  margin-bottom: 0.75rem;
+  display: block;
+  color: #57524c;
+}
+
+.plans-empty p {
+  font-size: 1rem;
+  opacity: 0.8;
+}

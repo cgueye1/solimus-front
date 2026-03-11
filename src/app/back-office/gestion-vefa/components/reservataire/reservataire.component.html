@@ -1,0 +1,180 @@
+<div class="p-3">
+  <div class="dflex-between">
+    <h6>Informations</h6>
+
+    <!-- Bouton pour ouvrir le modal -->
+
+    <div style="display: flex; gap: 10px">
+      <button
+        *ngIf="
+          (currentuser?.profil === ProfilEnum.PROMOTEUR ||
+            currentuser?.profil === ProfilEnum.AGENCY ||
+          currentuser?.profil === ProfilEnum.PROPRIETAIRE) && 
+          singleLot?.recipient !== null
+        "
+        class="button button-outline-primary"
+        (click)="onDelete()"
+      >
+        Annuler
+      </button>
+      <button
+        *ngIf="
+          singleLot?.recipient &&
+          (currentuser?.profil === ProfilEnum.PROMOTEUR ||
+            currentuser?.profil === ProfilEnum.AGENCY ||
+          currentuser?.profil === ProfilEnum.PROPRIETAIRE) && 
+          singleLot?.recipient !== null
+        "
+        class="button button-outline-primary"
+        (click)="onEdit(singleLot.recipient)"
+      >
+        Modifier
+      </button>
+      <button
+        *ngIf="
+          (currentuser?.profil === ProfilEnum.PROMOTEUR ||
+          currentuser?.profil === ProfilEnum.AGENCY ||
+          currentuser?.profil === ProfilEnum.PROPRIETAIRE ) && 
+          singleLot?.recipient === null
+        "
+        class="button button-primary"
+        (click)="openFormModal(formUserModal)"
+      >
+        Ajouter
+      </button>
+    </div>
+  </div>
+
+  <hr />
+
+  <div *ngIf="singleLot?.recipient == null">
+    <div class="text-center py-5 empty-state">
+      <!--<img
+        src="assets/icons/empty-box.svg"
+        alt="Aucun résultat"
+        width="80"
+        class="mb-3 opacity-75"
+      />-->
+      <p class="mb-1 fw-semibold">Aucun élément à afficher</p>
+      <small class="text-muted">
+        Les données apparaîtront ici dès qu’elles seront disponibles.
+      </small>
+    </div>
+  </div>
+
+  <!-- Détails de l'utilisateur -->
+  <div class="row g-4" *ngIf="singleLot?.recipient !== null">
+    <div class="col-lg-6">
+      <div class="detail__item">
+        <h6>Prénom</h6>
+        <span>{{ singleLot?.recipient?.prenom }}</span>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="detail__item">
+        <h6>Nom</h6>
+        <span>{{ singleLot?.recipient?.nom }}</span>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="detail__item">
+        <h6>Téléphone</h6>
+        <span>{{ singleLot?.recipient?.telephone }}</span>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="detail__item">
+        <h6>Email</h6>
+        <span>{{ singleLot?.recipient?.email }}</span>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="detail__item">
+        <h6>Adresse</h6>
+        <span>{{ singleLot?.recipient?.adress }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Template -->
+<ng-template #formUserModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">
+      {{ isEditMode ? "Modifier" : "Créer un réservataire" }}
+    </h5>
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Close"
+      (click)="modal.dismiss('close')"
+    ></button>
+  </div>
+
+  <div class="modal-body">
+    <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+      <div class="row g-3">
+        <div class="col-md-12">
+          <label class="form-label">Prénom</label>
+          <input
+            class="form-control"
+            formControlName="prenom"
+            placeholder="Prénom"
+          />
+        </div>
+        <div class="col-md-12">
+          <label class="form-label">Nom</label>
+          <input class="form-control" formControlName="nom" placeholder="Nom" />
+        </div>
+        <div class="col-md-12">
+          <label class="form-label">Téléphone</label>
+          <div class="input-group">
+            <select class="form-select" formControlName="indicatif">
+              <option
+                *ngFor="let indicatif of indicatifs"
+                [value]="indicatif.code"
+              >
+                ({{ indicatif.code }})
+              </option>
+            </select>
+            <input
+              class="form-control"
+              placeholder="Saisir"
+              formControlName="telephone"
+            />
+          </div>
+          <div
+            *ngIf="
+              userForm.get('telephone')?.invalid &&
+              userForm.get('telephone')?.touched
+            "
+            class="text-danger"
+          >
+            Téléphone est requis
+          </div>
+        </div>
+        <div class="col-md-12">
+          <label class="form-label">Email</label>
+          <input
+            class="form-control"
+            formControlName="email"
+            placeholder="Email"
+            type="email"
+          />
+        </div>
+        <div class="col-md-12">
+          <label class="form-label">Adresse</label>
+          <input
+            class="form-control"
+            formControlName="adress"
+            placeholder="Adresse"
+          />
+        </div>
+      </div>
+
+      <div class="col-md-12 mt-3">
+        <button type="submit" class="btn btn-primary w-100">Soumettre</button>
+      </div>
+    </form>
+  </div>
+</ng-template>-->

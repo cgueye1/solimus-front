@@ -1,0 +1,98 @@
+<div class="dashboard-container">
+  <!-- En-tête compact -->
+  <div class="dashboard-header">
+    <h2>Appels de fonds</h2>
+    <!--<span class="update-badge">
+    
+              <i class="material-icons">sync-alt</i>
+    </span>-->
+  </div>
+
+  <!-- Grille 2x2 compacte -->
+  <div class="counters-grid">
+    <!-- Compteur 1 - Montant total -->
+    <div class="counter-card">
+      <div class="counter-icon total-icon">
+      <i class="material-icons">account_balance_wallet</i>
+      </div>
+      <div class="counter-content">
+        <span class="counter-label">Total</span>
+        <span class="counter-value"
+          >{{ formatAmount(callState.totalAmount) }} <small>FCFA</small></span
+        >
+      </div>
+    </div>
+
+    <!-- Compteur 2 - Montant payé -->
+    <div class="counter-card">
+      <div class="counter-icon paid-icon">
+      <i class="material-icons">check_circle</i>
+      </div>
+      <div class="counter-content">
+        <span class="counter-label">Payé</span>
+        <span class="counter-value"
+          >{{ formatAmount(callState.paidAmount) }} <small>FCFA</small></span
+        >
+        <div class="mini-progress">
+          <div class="progress-bar">
+            <div
+              class="progress-fill paid-fill"
+              [style.width.%]="getPaidPercentage()"
+            ></div>
+          </div>
+          <span class="progress-text">{{ getPaidPercentage() }}%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Compteur 3 - Montant restant -->
+    <div class="counter-card">
+      <div class="counter-icon remaining-icon">
+      <i class="material-icons">hourglass_empty</i>
+      </div>
+      <div class="counter-content">
+        <span class="counter-label">Restant</span>
+        <span class="counter-value"
+          >{{ formatAmount(callState.remainingAmount) }}
+          <small>FCFA</small></span
+        >
+        <div class="mini-progress">
+          <div class="progress-bar">
+            <div
+              class="progress-fill remaining-fill"
+              [style.width.%]="callState.remainingPercentage"
+            ></div>
+          </div>
+          <span class="progress-text"
+            >{{ callState.remainingPercentage }}%</span
+          >
+        </div>
+      </div>
+    </div>
+
+    <!-- Compteur 4 - Avancement -->
+    <div class="counter-card">
+      <div class="counter-icon percentage-icon">
+       <i class="material-icons">show_chart</i>
+      </div>
+      <div class="counter-content">
+        <div class="content-wrapper">
+          <div class="text-content">
+            <span class="counter-label">Avancement</span>
+            <span class="counter-value"
+              >{{ 100 - callState.remainingPercentage }}<small>%</small></span
+            >
+          </div>
+          <div class="mini-circle">
+            <div
+              class="circle-progress"
+              [style.background]="getCircularProgressStyle()"
+            >
+              <span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,253 @@
+<div class="p-3" *ngIf="currentUser">
+  <div class="flex-row-between">
+    <h1 class="title-bo">Mon compte</h1>
+    <button class="button button-yellow px-3" mat-button (click)="openModal()">
+      Réinitialiser mon mot de passe
+    </button>
+  </div>
+  <nav aria-label="breadcrumb" class="breadcrumb-bo">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="javascript:(0)">Mon compte</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">Edit compte</li>
+    </ol>
+  </nav>
+
+  <div class="row g-4">
+    <div class="col-lg-4">
+      <div class="container_page mb-3">
+        <!-- header -->
+        <div class="container_page-header">
+          <h3 class="subtitle-bo">Mon profil</h3>
+        </div>
+
+        <div class="card-user-box">
+          <div class="card-user-icon">
+            <!-- <i class="fa fa-user-circle"></i> -->
+            <img
+              src="assets/images/avatar.jpg"
+              width="120"
+              class="rounded-pill img-fluid"
+              alt="Mon compte"
+            />
+          </div>
+          <div class="card-info-user" *ngIf="currentUser">
+            <h3>{{ currentUser.prenom }} {{ currentUser.nom }}</h3>
+            <p>{{ translateProfilEnum(currentUser.profil) }}</p>
+          </div>
+        </div>
+      </div>
+      <!--- <div class="container_page" *ngIf="currentUser.profil === ProfilEnum.NOTAIRE || currentUser.profil === ProfilEnum.PROMOTEUR">
+          <!-- header 
+          <div class="container_page-header mb-3">
+            <h3 class="subtitle-bo">Personnalisation</h3>
+          </div>
+
+              <label for="primary-color" class="form-label d-block">Couleur primaire</label>
+              <input type="color" id="primary-color" [value]="primaryColor" (change)="onPrimaryColorChange($event)">
+
+              <label for="secondary-color" class="form-label d-block">Couleur secondaire</label>
+              <input type="color" id="secondary-color" [value]="secondaryColor" (change)="onSecondaryColorChange($event)">
+
+             <div class="dflex-start mt-3">
+              <button (click)="applyColors()" class="button button-primary w-100">Appliquer</button>
+              <!-- Button to restore default colors --
+              <button (click)="restoreDefaultColors()" class="button button-outline-primary w-100">Restaurer les couleurs par defaut</button>
+             </div>
+
+        </div>-->
+        
+        
+      <!--<div class="container_sub" *ngIf="subscriptions.length > 0">
+        <div class="profile-switcher">
+          <h3>Changer de profil</h3>
+          <p class="subtitle">
+            Sélectionnez l’abonnement avec lequel vous souhaitez utiliser
+            l’application
+          </p>
+
+          <div class="profiles-grid">
+            <div
+              class="profile-card"
+              *ngFor="let sub of subscriptions"
+              [class.active]="sub.subscriptionPlans.name === currentUser.profil"
+              (click)="switchProfile(sub.subscriptionPlans.name)"
+            >
+              <div
+                class="badge-active"
+                *ngIf="sub.subscriptionPlans.name === currentUser.profil"
+              >
+                Profil actif
+              </div>
+
+              <h4>{{ formatPlanName(sub.subscriptionPlans.name) }}</h4>
+              <span class="label">{{ sub.subscriptionPlans.label }}</span>
+
+              <div class="meta">
+                <span *ngIf="sub.subscriptionPlans.unlimitedProjects">
+                  Projets illimités
+                </span>
+                <span *ngIf="!sub.subscriptionPlans.unlimitedProjects">
+                  {{ sub.subscriptionPlans.projectLimit }} projet(s)
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>-->
+    </div>
+    
+    
+    <div class="col-lg-8">
+      <div class="card__content bg-white" *ngIf="currentUser">
+        <div class="container_page-header">
+          <h3 class="subtitle-bo">{{ getTabTitle() }}</h3>
+        </div>
+
+        <mat-tab-group
+          mat-align-tabs="start"
+          [selectedIndex]="activeTabIndex"
+          (selectedIndexChange)="onTabChange($event)"
+        >
+          <mat-tab label="Informations personnelles">
+            <app-infos-pers></app-infos-pers>
+          </mat-tab>
+          <mat-tab
+            label="Abonnements"
+            *ngIf="
+              currentUser.profil === ProfilEnum.SYNDIC ||
+          
+              currentUser.profil === ProfilEnum.PROMOTEUR ||
+              currentUser.profil === ProfilEnum.BANK ||
+              currentUser.profil === ProfilEnum.AGENCY ||
+              currentUser.profil === ProfilEnum.PROPRIETAIRE
+            "
+          >
+            <app-abonnements></app-abonnements>
+          </mat-tab>
+          <mat-tab
+            label="{{
+              currentUser.profil === ProfilEnum.BANK ? 'Banque' : 'Logo'
+            }}"
+            *ngIf="
+              currentUser.profil === ProfilEnum.BANK ||
+              currentUser.profil === ProfilEnum.AGENCY ||
+              currentUser.profil === ProfilEnum.PROMOTEUR
+            "
+          >
+            <app-logo></app-logo>
+          </mat-tab>
+          <mat-tab
+            label="Fiche de renseignement"
+            *ngIf="currentUser.profil === ProfilEnum.NOTAIRE"
+          >
+            <app-fiche-renseignement></app-fiche-renseignement>
+          </mat-tab>
+        </mat-tab-group>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<ng-template #formDialog let-modal>
+  <div class="modal-header">
+    <h1 class="modal-title fs-5" id="filterAvancerLabel">
+      Réinitialisation du mot de passe
+    </h1>
+  </div>
+  <div class="modal-body py-md-3">
+    <form [formGroup]="userForm" (ngSubmit)="updatePassword()">
+      <div class="row g-3">
+        <div class="col-sm-12">
+          <label class="form-label">Mot de passe actuel</label>
+          <div class="input-group input-group-custom" #password>
+            <input
+              type="password"
+              autocomplete="off"
+              class="form-control"
+              placeholder="*******"
+              formControlName="password"
+            />
+          </div>
+        </div>
+
+        <div class="col-sm-12">
+          <label class="form-label">Nouveau mot de passe</label>
+          <div class="input-group input-group-custom">
+            <input
+              [type]="hide ? 'password' : 'text'"
+              autocomplete="on"
+              class="form-control form-control-custom"
+              placeholder="*******"
+              formControlName="newPassword"
+            />
+            <button
+              type="button"
+              class="toggle-password"
+              (click)="hide = !hide"
+              [attr.aria-label]="'Hide password'"
+              [attr.aria-pressed]="hide"
+            >
+              <i
+                class="material-icons"
+                [title]="
+                  hide ? 'Afficher le mot de passe' : 'Cacher le mot de passe'
+                "
+                >{{ hide ? "visibility_off" : "visibility" }}</i
+              >
+            </button>
+          </div>
+        </div>
+
+        <div class="col-sm-12">
+          <label class="form-label">Confirmez mot de passe</label>
+          <div class="input-group input-group-custom">
+            <input
+              [type]="hideConfirmPassword ? 'password' : 'text'"
+              autocomplete="on"
+              class="form-control form-control-custom"
+              placeholder="*******"
+              formControlName="confirmPassword"
+            />
+            <button
+              type="button"
+              class="toggle-password"
+              (click)="hideConfirmPassword = !hideConfirmPassword"
+              [attr.aria-label]="'Hide password'"
+              [attr.aria-pressed]="hide"
+            >
+              <i
+                class="material-icons"
+                [title]="
+                  hideConfirmPassword
+                    ? 'Afficher le mot de passe'
+                    : 'Cacher le mot de passe'
+                "
+                >{{ hideConfirmPassword ? "visibility_off" : "visibility" }}</i
+              >
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div class="modal-footer">
+    <button
+      type="button"
+      class="button button-primary"
+      (click)="updatePassword()"
+    >
+      Modifier
+    </button>
+    <button
+      type="button"
+      class="button button-outline-primary"
+      (click)="modal.close('Save click')"
+    >
+      Annuler
+    </button>
+  </div>
+</ng-template>

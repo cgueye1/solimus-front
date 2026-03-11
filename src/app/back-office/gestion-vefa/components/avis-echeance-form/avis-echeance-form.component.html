@@ -1,0 +1,128 @@
+<div class="modal-header">
+  <h4 class="modal-title" id="modal-basic-title">
+    {{
+      singleLot.rental
+        ? isEditMode
+          ? "Modifier avis d'échéance"
+          : "Ajouter avis d'échéance"
+        : isEditMode
+          ? "Modifier Appel de fonds"
+          : "Ajouter Appel de fonds"
+    }}
+  </h4>
+  <button
+    type="button"
+    class="btn-close"
+    aria-label="Close"
+    (click)="modal.dismissAll()"
+  ></button>
+</div>
+
+<div class="modal-body">
+  <form [formGroup]="appelFondForm" (ngSubmit)="onSubmit()">
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Désignation</label>
+        <div class="input-wrapper">
+          <input
+            formControlName="label"
+            class="form-control"
+            placeholder="Ex: Premier appel de fonds"
+          />
+        </div>
+      </div>
+
+      <div class="form-group" *ngIf="!singleLot.rental">
+        <label class="form-label">Pourcentage appelé (%)</label>
+        <div class="input-wrapper">
+          <input
+            type="number"
+            step="0.01"
+            min="0"
+            max="100"
+            formControlName="percentage"
+            class="form-control"
+            placeholder="Ex: 25.5"
+            (input)="onPercentageChange()"
+          />
+        </div>
+        <small class="field-hint">Entre 0 et 100%</small>
+      </div>
+
+      <div class="form-group" *ngIf="!singleLot.rental">
+        <label class="form-label">Montant (FCFA)</label>
+        <div class="input-wrapper">
+          <input
+            type="text"
+            formControlName="amount"
+            class="form-control"
+            placeholder="Ex: 1 500 000"
+            (input)="onAmountChange()"
+          />
+        </div>
+      </div>
+      
+      <div class="form-group" *ngIf="singleLot.rental">
+        <label class="form-label">Loyer (FCFA)</label>
+        <div class="input-wrapper">
+          <input
+            type="text"
+            formControlName="amount"
+            class="form-control"
+            placeholder="Ex: 250 000"
+            (input)="formatAmount()"
+          />
+        </div>
+      </div>
+
+      <div class="form-group" *ngIf="singleLot.rental">
+        <label class="form-label">Provision T.O.M (FCFA)</label>
+        <div class="input-wrapper">
+          <input
+            type="text"
+            formControlName="tom"
+            class="form-control"
+            placeholder="Ex: 15 000"
+            (input)="formatAmountTOM()"
+          />
+        </div>
+        <small class="field-hint">Taxe d'ordures ménagères</small>
+      </div>
+
+      <div class="form-group" *ngIf="singleLot.rental">
+        <label class="form-label">TVA (%)</label>
+        <div class="input-wrapper">
+          <input
+            type="number"
+            step="0.01"
+            min="0"
+            max="100"
+            formControlName="tva"
+            class="form-control"
+            placeholder="Ex: 18"
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Date prévue</label>
+        <div class="input-wrapper">
+          <input
+            type="date"
+            formControlName="expectedDate"
+            class="form-control"
+          />
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="button button-outline-primary" (click)="modal.dismissAll()">
+        Annuler
+      </button>
+      <button type="submit" class="button button-primary" [disabled]="appelFondForm.invalid">
+        {{ isEditMode ? "Modifier" : "Enregistrer" }}
+      </button>
+    </div>
+  </form>
+</div>

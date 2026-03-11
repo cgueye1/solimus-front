@@ -1,0 +1,160 @@
+.button {
+  white-space: nowrap;
+  text-align: center;
+  text-decoration: none;
+  font-weight: normal;
+  background: 0 0;
+  font-family: "Be Vietnam Pro", sans-serif !important;
+  font-size: 16px;
+  line-height: 24px;
+  cursor: pointer;
+  transition: all .3s ease-in-out;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+
+  padding: .5rem 1rem;
+  border-radius: 5px;
+  border: 1.5px solid transparent;
+
+}
+
+.button i.material-icons {
+  margin: 0;
+  padding: 0;
+}
+
+.button.focus-visible {
+  -webkit-box-shadow: 0 0 0 2px var(--primary-color);
+  box-shadow: 0 0 0 2px var(--primary-color);
+}
+
+.button:focus:not(:disabled) {
+  outline: 0;
+}
+
+
+a.button-primary,
+button.button-primary {
+  background: var(--primary-color);
+  color: var(--color-white);
+  border: 2px solid var(--primary-color);
+}
+
+a.button-primary:hover,
+button.button-primary:hover {
+  background-color: var(--primary-color-20);
+}
+
+
+a.button-secondary,
+button.button-secondary {
+  background: var(--secondary-color);
+  color: var(--color-white);
+  border: 2px solid var(--secondary-color);
+}
+
+a.button-secondary:hover,
+button.button-secondary:hover {
+  background-color: var(--secondary-color-20);
+}
+
+/* BUTTON DISABLED EFFECT */
+button:disabled {
+  pointer-events: none;
+  cursor: not-allowed;
+  opacity: 0.65;
+  filter: alpha(opacity=65);
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+
+a.button-light,
+button.button-light {
+  background-color: rgba(249, 250, 251, 1);
+  border-color: rgba(209, 213, 219, 1);
+  color: rgba(48, 47, 46, 1);
+}
+
+
+a.button-light:hover,
+button.button-light:hover {
+  background-color: rgba(209, 213, 219, .5);
+  border-color: rgba(209, 213, 219, 1);
+  color: rgba(48, 47, 46, 1);
+}
+
+
+a.button-red,
+button.button-red {
+  background: var(--color-red);
+  color: white !important;
+}
+a.button-red:hover,
+button.button-red:hover {
+  background: rgb(215, 56, 59);
+}
+
+a.button-outline-red,
+button.button-outline-red {
+  color: var(--color-red) !important;
+  background: white;
+  border: solid 1px var(--color-red) !important;
+}
+
+a.button-outline-red:hover,
+button.button-outline-red:hover {
+  background-color: rgb(255, 77, 79, .1);
+}
+
+a.button-outline-primary,
+button.button-outline-primary {
+  color: var(--primary-color) !important;
+  background: transparent;
+  border: solid 1px var(--primary-color) !important;
+}
+a.button-outline-primary:hover,
+button.button-outline-primary:hover{
+background-color: var(--primary-color-90);
+}
+/* button white */
+a.button-white,
+button.button-white {
+  background: #fff;
+  color: var(--pantone-black);
+}
+
+a.button-white:hover,
+button.button-white:hover {
+  background-color: #F2F5F9;
+}
+
+
+a.button-black,
+button.button-black {
+  background: var(--pantone-black);
+  color: #fff !important;
+}
+
+a.button-black:hover,
+button.button-black:hover {
+  background-color: rgb(29, 24, 25);
+}
+
+a.button-yellow-light,
+button.button-yellow-light {
+  background: rgba(249, 194, 10, .05);
+  color: var(--pantone-yellow) !important;
+}
+
+a.button-yellow-light:hover,
+button.button-yellow-light:hover,
+a.button-yellow-light:active,
+button.button-yellow-light:active {
+  background-color: rgba(249, 194, 10, .2) !important;
+}

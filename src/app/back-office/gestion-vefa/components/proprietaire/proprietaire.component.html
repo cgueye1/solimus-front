@@ -1,0 +1,42 @@
+
+<div class="p-3" *ngIf="getPromoter() as promoter">
+  <h6>Informations sur le promoteur</h6>
+  <hr>
+
+  <div class="row g-4">
+    <div class="col-lg-6">
+      <div class="detail__item">
+        <h6>Prénom</h6>
+        <span>{{ promoter.prenom }}</span>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      <div class="detail__item">
+        <h6>Nom</h6>
+        <span>{{ promoter.nom }}</span>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      <div class="detail__item">
+        <h6>Téléphone</h6>
+        <span>{{ promoter.telephone }}</span>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      <div class="detail__item">
+        <h6>Email</h6>
+        <span>{{ promoter.email }}</span>
+      </div>
+    </div>
+
+    <div class="col-lg-6">
+      <div class="detail__item">
+        <h6>Adresse</h6>
+        <span>{{ promoter.adress }}</span>
+      </div>
+    </div>
+  </div>
+</div>

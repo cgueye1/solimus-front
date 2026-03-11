@@ -1,0 +1,646 @@
+// Variables
+$primary-color: var(--primary-color);
+$success-color: #2ecc71;
+$warning-color: #f39c12;
+$danger-color: #e74c3c;
+$secondary-color: #95a5a6;
+$dark-color: #2c3e50;
+$light-color: #ecf0f1;
+$text-color: #34495e;
+$border-color: #e0e0e0;
+
+// Mixins
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin transition {
+  transition: all 0.3s ease;
+}
+
+// Container principal
+.contract-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: #f8fafc;
+  min-height: 100vh;
+}
+
+// Titre
+.contract-title {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: $dark-color;
+  margin: 0;
+  position: relative;
+  
+  &:after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background: $primary-color;
+    border-radius: 2px;
+  }
+}
+
+// Bouton primaire
+.btn-primary {
+  background: $primary-color;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 500;
+  @include flex-center;
+  gap: 0.5rem;
+  cursor: pointer;
+  @include transition;
+  
+  i {
+    font-size: 1.2rem;
+  }
+  
+  &:hover:not(:disabled) {
+    background: var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba($primary-color, 0.3);
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+// Bouton secondaire
+.btn-secondary {
+  background: white;
+  color: $text-color;
+  border: 2px solid $border-color;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 500;
+  @include flex-center;
+  gap: 0.5rem;
+  cursor: pointer;
+  @include transition;
+  
+  &:hover {
+    background: $light-color;
+    border-color: darken($border-color, 10%);
+  }
+}
+
+// Tabs
+.tabs-container {
+  display: flex;
+  gap: 1rem;
+  background: white;
+  padding: 0.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.tab-button {
+  flex: 1;
+  padding: 1rem;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  font-weight: 500;
+  color: $text-color;
+  cursor: pointer;
+  @include flex-center;
+  gap: 0.5rem;
+  @include transition;
+  
+  i {
+    font-size: 1.2rem;
+  }
+  
+  .badge {
+    background: $light-color;
+    color: $text-color;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    margin-left: 0.5rem;
+  }
+  
+  &.active {
+    background: $primary-color;
+    color: white;
+    
+    .badge {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      
+      &.badge-active, &.badge-archived {
+        background: rgba(255, 255, 255, 0.2);
+      }
+    }
+  }
+  
+  &:hover:not(.active) {
+    background: $light-color;
+  }
+}
+
+// Loading
+.loading-container {
+  @include flex-center;
+  flex-direction: column;
+  padding: 4rem;
+  gap: 1rem;
+  
+  .spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid $light-color;
+    border-top-color: $primary-color;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  
+  p {
+    color: $text-color;
+    font-size: 1.1rem;
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+// Table moderne
+.table-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.modern-table {
+  width: 100%;
+  border-collapse: collapse;
+  
+  th {
+    background: $light-color;
+    color: $dark-color;
+    font-weight: 600;
+    padding: 1.2rem 1rem;
+    text-align: left;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  td {
+    padding: 1rem;
+    border-bottom: 1px solid $border-color;
+    color: $text-color;
+  }
+  
+  .table-row {
+    @include transition;
+    
+    &:hover {
+      background: rgba($primary-color, 0.02);
+    }
+  }
+}
+
+.property-cell {
+  .property-info {
+    @include flex-center;
+    gap: 0.5rem;
+    justify-content: flex-start;
+    
+    i {
+      color: $primary-color;
+    }
+  }
+}
+
+.date-cell {
+  @include flex-center;
+  gap: 0.5rem;
+  justify-content: flex-start;
+  
+  i {
+    color: $secondary-color;
+    font-size: 1rem;
+  }
+}
+
+// Status badges
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  
+  i {
+    font-size: 1rem;
+  }
+  
+  &.success {
+    background: rgba($success-color, 0.1);
+    color: $success-color;
+  }
+  
+  &.secondary {
+    background: rgba($secondary-color, 0.1);
+    color: $secondary-color;
+  }
+  
+  &.warning {
+    background: rgba($warning-color, 0.1);
+    color: $warning-color;
+  }
+}
+
+// Action icons
+.action-icons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.icon-button {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: none;
+  @include flex-center;
+  cursor: pointer;
+  @include transition;
+  background: transparent;
+  
+  i {
+    font-size: 1.2rem;
+  }
+  
+  &.view {
+    color: $primary-color;
+    
+    &:hover {
+      background: rgba($primary-color, 0.1);
+    }
+  }
+  
+  &.archive {
+    color: $secondary-color;
+    
+    &:hover {
+      background: rgba($secondary-color, 0.1);
+    }
+  }
+  
+  &.upload {
+    color: $success-color;
+    
+    &:hover {
+      background: rgba($success-color, 0.1);
+    }
+  }
+}
+
+// Empty state
+.empty-state {
+  @include flex-center;
+  flex-direction: column;
+  padding: 5rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+  
+  .empty-icon {
+    width: 100px;
+    height: 100px;
+    background: $light-color;
+    border-radius: 50%;
+    @include flex-center;
+    margin-bottom: 1.5rem;
+    
+    i {
+      font-size: 3rem;
+      color: $secondary-color;
+    }
+  }
+  
+  h3 {
+    color: $dark-color;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+  }
+  
+  p {
+    color: $secondary-color;
+    margin: 0;
+  }
+}
+
+// Modal moderne
+.modal-modern {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  
+  .modal-header {
+    background: linear-gradient(135deg, $primary-color, var(--primary-color));
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    
+    .modal-header-content {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      
+      .modal-icon {
+        color: white;
+        font-size: 2rem;
+      }
+      
+      .modal-title {
+        color: white;
+        margin: 0;
+        font-size: 1.3rem;
+        font-weight: 500;
+      }
+    }
+    
+    .modal-close {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      @include flex-center;
+      cursor: pointer;
+      @include transition;
+      
+      i {
+        color: white;
+      }
+      
+      &:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+    }
+  }
+  
+  .modal-body {
+    padding: 2rem;
+  }
+  
+  .modal-footer {
+    padding: 1.5rem;
+    background: $light-color;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+  }
+}
+
+// Info card
+.info-card {
+  background: rgba($primary-color, 0.05);
+  border: 1px solid rgba($primary-color, 0.1);
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  
+  .info-icon {
+    width: 48px;
+    height: 48px;
+    background: white;
+    border-radius: 10px;
+    @include flex-center;
+    
+    i {
+      color: $primary-color;
+      font-size: 1.5rem;
+    }
+  }
+  
+  .info-content {
+    display: flex;
+    flex-direction: column;
+    
+    .info-label {
+      font-size: 0.85rem;
+      color: $secondary-color;
+      margin-bottom: 0.2rem;
+    }
+    
+    .info-value {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: $dark-color;
+    }
+  }
+}
+
+// Formulaire
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+  
+  .form-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+    color: $dark-color;
+    margin-bottom: 0.5rem;
+    
+    i {
+      color: $primary-color;
+      font-size: 1.2rem;
+    }
+  }
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border: 2px solid $border-color;
+  border-radius: 8px;
+  font-size: 1rem;
+  @include transition;
+  
+  &:focus {
+    outline: none;
+    border-color: $primary-color;
+    box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
+  }
+  
+  &.is-invalid {
+    border-color: $danger-color;
+  }
+}
+
+.error-message {
+  color: $danger-color;
+  font-size: 0.85rem;
+  margin-top: 0.3rem;
+}
+
+// File upload amélioré
+.file-upload-area {
+  border: 2px dashed $border-color;
+  border-radius: 12px;
+  padding: 1rem;
+  @include transition;
+  background: $light-color;
+  
+  &:hover {
+    border-color: $primary-color;
+    background: rgba($primary-color, 0.02);
+  }
+  
+  &.file-selected {
+    border-color: $success-color;
+    background: rgba($success-color, 0.02);
+  }
+}
+
+.upload-placeholder {
+  text-align: center;
+  padding: 2rem;
+  cursor: pointer;
+  
+  .upload-icon {
+    font-size: 3rem;
+    color: $primary-color;
+    margin-bottom: 1rem;
+  }
+  
+  .upload-text {
+    margin-bottom: 1rem;
+    
+    .upload-main {
+      display: block;
+      font-weight: 500;
+      color: $dark-color;
+      margin-bottom: 0.3rem;
+    }
+    
+    .upload-hint {
+      color: $secondary-color;
+      font-size: 0.9rem;
+    }
+  }
+  
+  .file-info {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: white;
+    padding: 0.3rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    color: $secondary-color;
+    
+    i {
+      font-size: 1rem;
+    }
+  }
+}
+
+.file-preview {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 8px;
+  
+  .file-icon {
+    i {
+      font-size: 2rem;
+      color: $danger-color;
+    }
+  }
+  
+  .file-details {
+    flex: 1;
+    
+    .file-name {
+      display: block;
+      font-weight: 500;
+      color: $dark-color;
+      margin-bottom: 0.2rem;
+    }
+    
+    .file-size {
+      font-size: 0.85rem;
+      color: $secondary-color;
+    }
+  }
+  
+  .remove-file {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    border: none;
+    background: rgba($danger-color, 0.1);
+    color: $danger-color;
+    @include flex-center;
+    cursor: pointer;
+    @include transition;
+    
+    &:hover {
+      background: $danger-color;
+      color: white;
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .contract-container {
+    padding: 1rem;
+  }
+  
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .modern-table {
+    display: block;
+    overflow-x: auto;
+  }
+  
+  .tabs-container {
+    flex-direction: column;
+  }
+  
+  .modal-footer {
+    flex-direction: column;
+    
+    button {
+      width: 100%;
+    }
+  }
+}

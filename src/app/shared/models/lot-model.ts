@@ -1,0 +1,12 @@
+export interface ILot{
+  id: string;
+  image: string;
+  title: string;
+  price: string;
+  location: string;
+  area: string;
+  lots: string;
+  description: string;
+  promoter: string;
+  status: string
+}

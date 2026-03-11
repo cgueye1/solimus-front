@@ -1,0 +1,181 @@
+<div class="py-3">
+  <!-- Bouton pour ouvrir le modal -->
+  <div style="display: flex; justify-content: flex-end; gap: 10px">
+    <button
+      class="btn-create "
+      (click)="openFormModal(formUserModal)"
+    >
+      Ajouter
+    </button>
+  </div>
+
+  <hr />
+
+  <div *ngIf="loading" class="text-center my-3">
+    <div class="spinner-border text-primary"></div>
+  </div>
+
+  <div *ngIf="!loading && bienList?.length === 0" class="text-center my-3">
+    <p>.......</p>
+  </div>
+  <table
+    class="table table__sm w-100"
+    *ngIf="!loading && bienList?.length !== 0"
+  >
+    <thead>
+      <th scope="col">Prenom et Nom</th>
+      <th scope="col">Téléphone</th>
+      <th scope="col">Email</th>
+      <th scope="col">Lot</th>
+      <th scope="col">Surface (m²)</th>
+
+      <th scope="col">ACTIONS</th>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of bienList; let i = index">
+        <td>{{ item.prenom }} {{ item.nom | uppercase }}</td>
+        <td>{{ item.telephone }}</td>
+        <td>{{ item.email }}</td>
+        <td>
+          <ng-container *ngFor="let al of item.adressLots">
+            <span *ngIf="al.propertyId === singleBien.id">
+              {{ al.lot }}
+            </span>
+          </ng-container>
+        </td>
+
+       <td> <ng-container *ngFor="let al of item.adressLots">
+            <span *ngIf="al.propertyId === singleBien.id">
+              {{ al.area }}
+            </span>
+          </ng-container></td>
+        <td>
+          <div class="d-flex gap-2">
+            <button
+              class="btn-create "
+              title="Factures"
+              (click)="openModal(LOTCHOICEMODAL, item.id, i)"
+            >
+              <i class="material-icons text-white">visibility</i>
+            </button>
+
+            <button
+              title="supprime"
+              class="btn-delete "
+              (click)="onDeleteUser(item)"
+            >
+              <i class="material-icons text-white">delete</i>
+            </button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<ng-template #LOTCHOICEMODAL let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Appels de charges</h4>
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Close"
+      (click)="modal.dismiss('close')"
+    ></button>
+  </div>
+
+  <app-appel-fond-syndic
+    [singleLot]="singleBien"
+    [ownerId]="ownerId"
+  ></app-appel-fond-syndic>
+</ng-template>
+
+<!-- Modal Template -->
+<ng-template #formUserModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">Ajouter un propriétaire</h5>
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Close"
+      (click)="modal.dismiss('close')"
+    ></button>
+  </div>
+
+  <div class="modal-body">
+    <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+      <div class="row g-3">
+        <div class="col-md-12">
+          <label class="form-label">Prénom *</label>
+          <input
+            class="form-control"
+            formControlName="prenom"
+            placeholder="Prénom"
+          />
+        </div>
+        <div class="col-md-12">
+          <label class="form-label">Nom *</label>
+          <input class="form-control" formControlName="nom" placeholder="Nom" />
+        </div>
+        <div class="col-md-12">
+          <label class="form-label">Téléphone *</label>
+          <div class="input-group">
+            <select class="form-select" formControlName="indicatif">
+              <option
+                *ngFor="let indicatif of indicatifs"
+                [value]="indicatif.code"
+              >
+                ({{ indicatif.code }})
+              </option>
+            </select>
+            <input
+              class="form-control"
+              placeholder="Saisir"
+              formControlName="telephone"
+            />
+          </div>
+          <div
+            *ngIf="
+              userForm.get('telephone')?.invalid &&
+              userForm.get('telephone')?.touched
+            "
+            class="text-danger"
+          >
+            Téléphone est requis
+          </div>
+        </div>
+        <div class="col-md-12">
+          <label class="form-label">Email</label>
+          <input
+            class="form-control"
+            formControlName="email"
+            placeholder="Email"
+            type="email"
+          />
+        </div>
+
+        <div class="col-lg-12">
+          <label class="form-label">Surface du lot (m²) *</label>
+          <input
+            type="number"
+            class="form-control"
+            formControlName="area"
+            placeholder="Saisir"
+          />
+        </div>
+        <div class="col-md-12">
+          <label class="form-label">Lot *</label>
+          <input
+            class="form-control"
+            formControlName="adress"
+            placeholder="Lot"
+          />
+        </div>
+      </div>
+
+      <div class="col-md-12 mt-3">
+        <button type="submit" class="btn btn-create w-100">Soumettre</button>
+      </div>
+    </form>
+  </div>
+</ng-template>

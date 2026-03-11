@@ -1,0 +1,50 @@
+.custom-border {
+    background-color: transparent; /* Retire le fond du bouton */
+    border: 2px solid  var(--primary-color-front);
+    border-radius: 4px; /* Donne des bords arrondis */
+    padding: 5px 10px; /* Ajuste le padding à ta convenance */
+    color: var(--primary-color-front);
+    transition: background-color 0.3s ease, color 0.3s ease; /* Ajoute une transition pour l'effet au survol */
+    margin-right: 10px; 
+  }
+  
+  .custom-border i {
+    font-size: 20px; /* Ajuste la taille de l'icône si nécessaire */
+  }
+  
+  .custom-border:hover {
+    background-color:  var(--primary-color-front);
+    color: white; /* Change la couleur du texte et de l'icône au survol */
+  }
+  
+  .custom-border:focus {
+    outline: none; /* Retire le contour par défaut du focus */
+  }
+  .custom-border:last-child {
+    margin-right: 0; /* Enlève la marge pour le dernier bouton */
+  }
+  
+  
+  
+  
+.custom-switch {
+  margin-top: 0 !important;   // ⬅️ IMPORTANT (Bootstrap override)
+  width: 3rem;
+  height: 1.5rem;
+  border: 2px solid #0d6efd;
+  cursor: pointer;
+}
+
+.custom-switch:checked {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+}
+
+.switch-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0d6efd;
+  line-height: 1;
+  display: flex;
+  align-items: center;   // ⬅️ texte parfaitement centré
+}

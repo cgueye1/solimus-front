@@ -1,0 +1,26 @@
+<div class="card__content">
+  <div class="dflex-between">
+    <h3>Liste des lots({{lots.length}})</h3>
+    <button class="button button-outline-primary" (click)="onCreateLot()" *ngIf="user && (user.profil === 'PROMOTEUR'||user.profil === 'AGENCY'  ) ">Créer un lot</button>
+  </div>
+
+  <hr />
+
+  <!-- list des biens -->
+<div class="row gy-3">
+  <ng-container *ngIf="lots.length > 0; else noLots">
+    <div class="col-lg-12" *ngFor="let lot of lots">
+      <app-card-lot [data]="lot" (callback)="onViewLot(lot)"></app-card-lot>
+    </div>
+  </ng-container>
+
+  <ng-template #noLots>
+    <div class="col-12">
+      <div style="background-color: #e0f3ff; padding: 16px; border-radius: 8px; text-align: center; color: #0d6efd;">
+        Aucun lot disponible pour le moment.
+      </div>
+    </div>
+  </ng-template>
+</div>
+
+</div>

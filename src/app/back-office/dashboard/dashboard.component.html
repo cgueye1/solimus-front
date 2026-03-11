@@ -1,0 +1,165 @@
+<!-- Message d'abonnement expiré -->
+<div *ngIf="isSubActive != null && !isSubActive && !loading" class="subscription-error">
+  <div class="error-card">
+    <img src="assets/sbrn.png" alt="Abonnement expiré" class="error-image" />
+    <h2>Accès restreint</h2>
+    <p>Votre abonnement n'est plus actif. Activez-le ou renouvelez-le pour continuer à accéder à toutes les fonctionnalités.</p>
+    <button class="btn-renew" (click)="renewSubscription()">
+      <i class="material-icons">refresh</i>
+      Activer / Renouveler l'abonnement
+    </button>
+  </div>
+</div>
+
+<!-- Dashboard principal -->
+<div class="dashboard" *ngIf="isSubActive">
+  <!-- Header avec titre et contrôles -->
+  <div class="dashboard-header">
+    <div class="header-left">
+      <h1 class="dashboard-title">Tableau de bord</h1>
+      <span class="dashboard-subtitle">Aperçu de vos performances</span>
+    </div>
+    
+    <div class="header-controls">
+      <!-- Sélecteur d'année -->
+      <div class="year-selector">
+        <label for="yearSelect">Année</label>
+        <select id="yearSelect" [(ngModel)]="selectedYear" (change)="onYearChange()" class="select-year">
+          <option *ngFor="let year of years" [value]="year">{{ year }}</option>
+        </select>
+      </div>
+      
+      <!-- Bouton d'export Excel -->
+      <button class="btn-export" (click)="exportToExcel()">
+        <i class="material-icons">download</i>
+        <span>Exporter</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Cartes de statistiques -->
+  <div class="stats-grid">
+    <div class="stat-card" *ngFor="let indicateur of indicateurs" (click)="onClick(indicateur)">
+      <div class="stat-card-header">
+        <div class="stat-icon" [style.background]="indicateur.color + '15'">
+          <i class="material-icons" [style.color]="indicateur.color">{{ indicateur.icon }}</i>
+        </div>
+        <div class="stat-value" [style.color]="indicateur.color">
+          {{ animatedValue[indicateur.id] | number }}
+        </div>
+      </div>
+      
+      <div class="stat-card-body">
+        <h3 class="stat-label">{{ indicateur.label }}</h3>
+        <div class="stat-footer" *ngIf="indicateur.evolution">
+          <span class="stat-trend positive">
+            <i class="material-icons">trending_up</i>
+            {{ indicateur.evolution }}%
+          </span>
+          <span class="stat-suffix">{{ indicateur.suffix }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Graphiques principaux -->
+  <div class="charts-grid" *ngIf="chartVisible">
+    <!-- Graphique des ventes -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <h3>Statistiques des ventes</h3>
+        <span class="chart-period">{{ selectedYear }}</span>
+      </div>
+      <div class="chart-container">
+        <ngx-charts-bar-vertical
+          [results]="barChartData"
+          [scheme]="colorSchemeVentes"
+          [xAxis]="true"
+          [yAxis]="true"
+          [legend]="true"
+          [showXAxisLabel]="true"
+          [showYAxisLabel]="true"
+          [showDataLabel]="true"
+          [view]="[500, 300]"
+          [animations]="true"
+        >
+        </ngx-charts-bar-vertical>
+      </div>
+    </div>
+
+    <!-- Graphique de répartition -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <h3>Répartition des lots</h3>
+        <span class="chart-period">
+        en %
+        <!--Total: {{ totalLots }} lots-->
+        
+        </span>
+      </div>
+      <div class="chart-container pie-container">
+        <ngx-charts-pie-chart
+          [results]="pieChartData"
+          [scheme]="colorScheme"
+          [legend]="true"
+          [labels]="true"
+          [doughnut]="true"
+          [view]="[500, 300]"
+          [animations]="true"
+        >
+        </ngx-charts-pie-chart>
+      </div>
+    </div>
+  </div>
+
+  <!-- Graphiques supplémentaires -->
+  <div class="charts-grid" *ngIf="chartVisible">
+    <!-- Évolution des réservations -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <h3>Évolution des réservations</h3>
+        <span class="chart-period">{{ selectedYear }}</span>
+      </div>
+      <div class="chart-container">
+        <ngx-charts-line-chart
+          [results]="lineChartData"
+          [scheme]="colorSchemeReservations"
+          [xAxis]="true"
+          [yAxis]="true"
+          [legend]="true"
+          [showXAxisLabel]="true"
+          [showYAxisLabel]="true"
+          [xAxisLabel]="'Mois'"
+          [yAxisLabel]="'Réservations'"
+          [view]="[500, 300]"
+          [autoScale]="true"
+        >
+        </ngx-charts-line-chart>
+      </div>
+    </div>
+
+    <!-- Synthèse des appels de fonds -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <h3>Synthèse des appels de fonds</h3>
+        <span class="chart-period">Montants (CFA)</span>
+      </div>
+      <div class="chart-container">
+        <ngx-charts-bar-vertical
+          [results]="callForChargeData"
+          [scheme]="colorScheme1"
+          [xAxis]="true"
+          [yAxis]="true"
+          [legend]="true"
+          [showXAxisLabel]="true"
+          [showYAxisLabel]="true"
+          [xAxisLabel]="'Statut'"
+          [yAxisLabel]="'Montant'"
+          [view]="[500, 300]"
+          [showDataLabel]="true"
+        >
+        </ngx-charts-bar-vertical>
+      </div>
+    </div>
+  </div>
+</div>

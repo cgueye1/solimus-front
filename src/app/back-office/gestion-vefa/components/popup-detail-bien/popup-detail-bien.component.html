@@ -1,0 +1,360 @@
+<div class="modal-header">
+  <h4 class="modal-title" id="modal-basic-title">
+    {{ singleBien.rental ? singleBien.propertyType.typeName : singleBien.name }}
+  </h4>
+  <button
+    type="button"
+    class="btn-close"
+    aria-label="Close"
+    (click)="modal.dismissAll()"
+  ></button>
+</div>
+
+<div class="modal-body">
+  <div class="card border-0">
+    <div class="row g-4">
+      <div class="col-lg-4">
+        <figure id="img-responsive">
+          <img
+            [src]="getFullImageUrl(singleBien.plan && singleBien.plan !== '' ? singleBien.plan : singleBien.pictures?.[0])"
+            class="img-fluid rounded-start"
+            style="width: 100%"
+            [alt]="singleBien.propertyType.typeName"
+          />
+        </figure>
+      </div>
+      <div class="col-lg-8">
+        <mat-tab-group mat-align-tabs="start">
+          <mat-tab label="Informations générales">
+            <div class="card-body">
+              <h3 class="card-title title-property">
+                {{
+                  singleBien.rental
+                    ? singleBien.propertyType.typeName
+                    : singleBien.name
+                }}
+              </h3>
+
+              <p class="card-text description-property">
+                {{ singleBien.description }}
+              </p>
+
+              <h3
+                class="card-title price-property tx-primary"
+                *ngIf="
+                  currentUser && (currentUser.profil === ProfilEnum.PROMOTEUR || currentUser.profil === ProfilEnum.AGENCY) "
+              >
+                {{ formatPrix(singleBien.price) }}
+              </h3>
+
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item d-flex dflex-between px-0">
+                  <span>Promoteur</span>
+                  <span class="fw-medium"
+                    >{{ singleBien.promoter.prenom }}
+                    {{ singleBien.promoter.nom }}</span
+                  >
+                </li>
+                <li class="list-group-item d-flex dflex-between px-0">
+                  <span>Superficie</span>
+                  <span class="fw-medium">{{ singleBien.area }} m²</span>
+                </li>
+                <li class="list-group-item d-flex dflex-between px-0">
+                  <span>Emplacement</span>
+                  <span class="fw-medium">{{ singleBien.address }}</span>
+                </li>
+                <li class="list-group-item d-flex dflex-between px-0">
+                  <span>Nombre de lots</span>
+                  <span class="fw-medium">{{ singleBien.numberOfLots }}</span>
+                </li>
+              </ul>
+
+              <br />
+              <h4 *ngIf="!singleBien.rental">Équipements communs</h4>
+              <div class="row g-4 pt-2" *ngIf="!singleBien.rental">
+                <div class="col-lg-6" *ngIf="singleBien.hasHall">
+                  <div class="item__surface">
+                    <img src="assets/icons/hall.svg" alt="Hall d’entrée" />
+                    <div class="block__text">
+                      <h6>Hall d’entrée</h6>
+                      <small class="text-muted"
+                        >Espace d’accueil de l’immeuble</small
+                      >
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-lg-6" *ngIf="singleBien.hasElevator">
+                  <div class="item__surface">
+                    <img
+                      src="assets/icons/escalier.svg"
+                      alt="Escaliers et ascenseurs"
+                    />
+                    <div class="block__text">
+                      <h6>Escaliers et ascenseurs</h6>
+                      <small class="text-muted"
+                        >Zones permettant d’accéder aux différents
+                        niveaux</small
+                      >
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-lg-6">
+                  <div class="item__surface">
+                    <img src="assets/icons/couloirs.svg" alt="Couloirs" />
+                    <div class="block__text">
+                      <h6>Couloirs</h6>
+                      <small class="text-muted"
+                        >Espaces de circulation entre les différentes
+                        unités</small
+                      >
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-lg-6" *ngIf="singleBien.hasGarden">
+                  <div class="item__surface">
+                    <img
+                      src="assets/icons/gardens.svg"
+                      alt="Jardin ou cour commune"
+                    />
+                    <div class="block__text">
+                      <h6>Jardin ou cour commune</h6>
+                      <small class="text-muted"
+                        >Espaces extérieurs accessibles à tous</small
+                      >
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-lg-6" *ngIf="singleBien.hasSharedTerrace">
+                  <div class="item__surface">
+                    <img
+                      src="assets/icons/terrace.svg"
+                      alt="Terrasse commune"
+                    />
+                    <div class="block__text">
+                      <h6>Terrasse commune</h6>
+                      <small class="text-muted"
+                        >Espaces extérieurs accessibles à tous</small
+                      >
+                    </div>
+                  </div>
+                </div>
+                <!--- <div class="col-lg-6"  *ngIf="singleBien.hasSharedTerrace">
+                  <div class="item__surface">
+                    <img src="assets/icons/local.svg" alt="Locaux techniques">
+                    <div class="block__text">
+                      <h6>Locaux techniques</h6>
+                      <small class="text-muted">Espaces dédiés aux installations (chaufferie,...)</small>
+                    </div>
+                  </div>
+                </div>-->
+                <div class="col-lg-6" *ngIf="singleBien.hasParking">
+                  <div class="item__surface">
+                    <img
+                      src="assets/icons/ph_garage-light.svg"
+                      alt="Parkings communs"
+                    />
+                    <div class="block__text">
+                      <h6>Parkings communs</h6>
+                      <small class="text-muted"
+                        >Espaces de stationnement partagés</small
+                      >
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-lg-6" *ngIf="singleBien.hasSwimmingPool">
+                  <div class="item__surface">
+                    <img
+                      src="assets/icons/pool-sharp.svg"
+                      alt="Piscine commune"
+                    />
+                    <div class="block__text">
+                      <h6>Piscine commune</h6>
+                      <small class="text-muted">
+                        Installation aquatique partagée par plusieurs résidents
+                        d'un immeuble ou d'une communauté pour la baignade et
+                        les loisirs.</small
+                      >
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-lg-6" *ngIf="singleBien.hasGym">
+                  <div class="item__surface">
+                    <img
+                      src="assets/icons/games.svg"
+                      alt="Salle de sport commun"
+                    />
+                    <div class="block__text">
+                      <h6>Salle de sport commun</h6>
+                      <small class="text-muted"
+                        >Espace d'entraînement partagé par plusieurs résidents
+                        d'un immeuble ou d'une communauté, offrant divers
+                        équipements et activités physiques..</small
+                      >
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-lg-6" *ngIf="singleBien.hasPlayground">
+                  <div class="item__surface">
+                    <img
+                      src="assets/icons/gym.svg"
+                      alt="Aire de jeux commune"
+                    />
+                    <div class="block__text">
+                      <h6>Aire de jeux commune</h6>
+                      <small class="text-muted"
+                        >Espace extérieur partagé par plusieurs enfants d'un
+                        quartier ou d'une communauté, équipé de structures
+                        ludiques et de jeux pour le divertissement.</small
+                      >
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-lg-6" *ngIf="singleBien.hasSecurityService">
+                  <div class="item__surface">
+                    <img
+                      src="assets/icons/security-worker.svg"
+                      alt="Service de sécurité (gardiennage)"
+                    />
+                    <div class="block__text">
+                      <h6>Service de sécurité (gardiennage)</h6>
+                      <small class="text-muted"
+                        >Dispositif de protection assurant la surveillance et la
+                        sécurité des biens et des personnes dans un bâtiment ou
+                        une zone spécifique</small
+                      >
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-lg-6" *ngIf="singleBien.hasLaundryRoom">
+                  <div class="item__surface">
+                    <img
+                      src="assets/icons/roomslaundryroom.svg"
+                      alt="Buanderie commune"
+                    />
+                    <div class="block__text">
+                      <h6>Buanderie commune</h6>
+                      <small class="text-muted"
+                        >Espace partagé dans un immeuble ou une communauté,
+                        équipé de machines à laver et de sèche-linge, permettant
+                        aux résidents de laver leurs vêtements.</small
+                      >
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-lg-6" *ngIf="singleBien.hasStorageRooms">
+                  <div class="item__surface">
+                    <img
+                      src="assets/icons/vaadin_storage.svg"
+                      alt="Caves ou locaux de stockage"
+                    />
+                    <div class="block__text">
+                      <h6>Caves ou locaux de stockage</h6>
+                      <small class="text-muted"
+                        >Espaces dédiés au rangement et à la conservation
+                        d'objets personnels, souvent situés en sous-sol ou dans
+                        des zones spécifiques d'un immeuble.</small
+                      >
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-lg-6" *ngIf="singleBien.hasBicycleStorage">
+                  <div class="item__surface">
+                    <img src="assets/icons/bike.svg" alt="Local pour vélos" />
+                    <div class="block__text">
+                      <h6>Local pour vélos</h6>
+                      <small class="text-muted"
+                        >Espace sécurisé dédié au rangement et à la protection
+                        des vélos des résidents d'un immeuble ou d'une
+                        communauté.</small
+                      >
+                    </div>
+                  </div>
+                </div>
+
+                <!--<div class="box-frais__reservation">
+                  <div class="dflex-start">
+                    <img src="assets/icons/frais-reservation.svg" alt="Frais de réservation">
+                    <div class="block__text">
+                      <h5>Frais de réservation</h5>
+                      <p class="text-muted"> {{formatPrix(calculatePercentage(singleBien.price, singleBien.reservationFee))}} </p>
+                    </div>
+                  </div>
+                  <div class="percent" >
+                    {{singleBien.reservationFee}}%
+                  </div>
+                </div>-->
+              </div>
+            </div>
+          </mat-tab>
+
+          <mat-tab
+            [label]="
+              singleBien.rental
+                ? 'État des lieux et contrat'
+                : 'État d’avancement'
+            "
+          >
+            <app-etat-avancement [singleLot]="singleBien"></app-etat-avancement>
+          </mat-tab>
+
+       
+
+          <mat-tab
+            label="Manifestants d'intêret"
+            *ngIf="currentUser && (currentUser.profil === ProfilEnum.PROMOTEUR || currentUser.profil === ProfilEnum.AGENCY)"
+          >
+            <app-manifestant-list
+               *ngIf="singleBien"
+              [singleBien]="singleBien"
+            ></app-manifestant-list>
+          </mat-tab>
+          <!-- <mat-tab label="Documents">
+            <div class="py-3">
+              <ul class="list-group list-group-flush">
+                <li class="list-group-item d-flex dflex-between px-0">
+                  <div class="dflex-start">
+                    <img src="assets/icons/file__icon.svg" alt="Details">
+                    <div class="dflex-column">
+                      <p class="p-0 m-0">
+                        Fiche de renseignement
+                      </p>
+                      <span class="text-black-50">22/09/2024</span>
+                    </div>
+                  </div>
+                  <div class="dflex-start">
+                    <button class="button button-outline-primary"><i class="material-icons">download</i></button>
+                  </div>
+                </li>
+                <li class="list-group-item d-flex dflex-between px-0">
+                  <div class="dflex-start">
+                    <img src="assets/icons/file__icon.svg" alt="Details">
+                    <div class="dflex-column">
+                      <p class="p-0 m-0">
+                        État droit réel
+                      </p>
+                      <span class="text-black-50">22/09/2024</span>
+                    </div>
+                  </div>
+                  <div class="dflex-start">
+                    <button class="button button-outline-primary"><i class="material-icons">download</i></button>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </mat-tab>-->
+        </mat-tab-group>
+      </div>
+    </div>
+  </div>
+</div>

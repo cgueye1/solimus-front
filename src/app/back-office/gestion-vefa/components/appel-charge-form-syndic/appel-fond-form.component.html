@@ -1,0 +1,76 @@
+<div class="modal-header">
+  <h4 class="modal-title" id="modal-basic-title">
+    {{
+      singleLot.rental
+        ? isEditMode
+          ? "Modifier avis d'échéance"
+          : "Ajouter avis d'échéance"
+        : isEditMode
+        ? "Modifier Appel de charges"
+        : "Ajouter Appel de charges"
+    }}
+  </h4>
+  <button
+    type="button"
+    class="btn-close"
+    aria-label="Close"
+    (click)="modal.dismissAll()"
+  ></button>
+</div>
+
+<div class="modal-body">
+  <form [formGroup]="appelFondForm" (ngSubmit)="onSubmit()">
+    <div class="row g-4">
+      <div class="col-lg-12">
+        <label class="form-label">Titre</label>
+        <input
+          formControlName="titre"
+          class="form-control"
+          placeholder="Saisir"
+        />
+      </div>
+
+      <div class="col-lg-12">
+        <label class="form-label">Description *</label>
+        <textarea
+          class="form-control"
+          rows="3"
+          formControlName="description"
+          placeholder="Saisir"
+        ></textarea>
+      </div>
+      <div class="col-lg-12">
+        <label class="form-label">Montant total</label>
+        <input
+          type="text"
+          formControlName="price"
+          class="form-control"
+          placeholder="Saisir le montant"
+          (input)="onPriceChange()"
+        />
+      </div>
+
+      <div class="col-lg-12">
+        <label class="form-label">Date Prévue</label>
+        <input
+          type="date"
+          formControlName="startDate"
+          class="form-control"
+        />
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button type="submit" class="button button-primary">
+        {{ isEditMode ? "Modifier" : "Enregistrer" }}
+      </button>
+      <button
+        class="button button-outline-primary"
+        type="button"
+        (click)="modal.dismissAll()"
+      >
+        Annuler
+      </button>
+    </div>
+  </form>
+</div>

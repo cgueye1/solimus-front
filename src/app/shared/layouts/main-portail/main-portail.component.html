@@ -1,0 +1,22 @@
+<div id="wrapper__page">
+
+    <!-- Menu -->
+  <div class="header w-100 bg-white shadow-sm sticky-top py-0">
+    <app-menu-portail [isDark]="true"></app-menu-portail>
+  </div>
+
+  <main>
+    <router-outlet></router-outlet>
+  </main>
+
+  <!-- footer -->
+<app-footer-portail></app-footer-portail>
+
+</div>
+
+<!-- Btn scroll -->
+<div class="container">
+  <button id="btnScrollToTop" type="button" (click)="scrollToTop()">
+    <i class="material-icons">arrow_upward</i>
+  </button>
+</div>

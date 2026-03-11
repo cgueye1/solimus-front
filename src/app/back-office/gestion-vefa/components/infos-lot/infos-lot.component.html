@@ -1,0 +1,98 @@
+<div class="py-3">
+  <div class="card border-0">
+  
+    <!--<div class="card-header dflex-between bg-transparent border-0">
+      Statut lot:
+
+      <div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="statutLot" id="reserved" value="reserved">
+          <label class="form-check-label" for="reserved">Réservé</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="statutLot" id="sold" value="sold">
+          <label class="form-check-label" for="sold">Vendu</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="radio" name="statutLot" id="available" value="available" checked>
+          <label class="form-check-label" for="available">Disponible</label>
+        </div>
+      </div>
+    </div>-->
+    <!--<img
+    [src]="getFullImageUrl(singleLot.plan && singleLot.plan !== '' ? singleLot.plan : singleLot.pictures?.[0])"
+     
+      class="card-img-top"
+     
+      [alt]="singleLot.title"
+    />-->
+    
+    <div class="album-wrapper">
+
+  <!-- Image principale -->
+  <div class="main-image">
+    <img
+      [src]="getFullImageUrl(selectedImage)"
+      [alt]="singleLot.title"
+      (click)="openPreview(selectedImage)"
+    />
+  </div>
+
+  <!-- Thumbnails à droite -->
+  <div class="thumbnails" *ngIf="galleryImages.length > 1">
+    <div
+      class="thumb"
+      *ngFor="let img of galleryImages"
+      [class.active]="img === selectedImage"
+      (click)="selectedImage = img"
+    >
+      <img [src]="getFullImageUrl(img)" alt="preview" />
+    </div>
+  </div>
+
+</div>
+
+
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-center px-0">
+        <div class="d-flex flex-column">
+          <h3 class="card-title title-property">{{ singleLot.name }}</h3>
+          <p>{{ singleLot.propertyType.typeName}}</p>
+        </div>
+
+        <span [ngClass]="['status-lot', getStatusLot(singleLot.status).class]">
+          {{ getStatusLot(singleLot.status).text }}
+        </span>
+      </div>
+
+      <p class="card-text description-property">{{ singleLot.description }}</p>
+
+      <h3 class="card-title price-property tx-primary">
+        {{  formatPrix(singleLot.price)}} {{singleLot.rental?"/ mois":"" }} 
+      </h3>
+
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item d-flex dflex-between px-0">
+          <span>Surface</span>
+          <span class="fw-medium">{{ singleLot.area }} m²</span>
+        </li>
+        <li class="list-group-item d-flex dflex-between px-0">
+          <span>Niveau</span>
+          <span class="fw-medium">{{ singleLot.mezzanine?'Mezzanine':singleLot.level }}</span>
+        </li>
+        <li class="list-group-item d-flex dflex-between px-0" *ngIf="singleLot.numberOfRooms > 0" >
+          <span>Nombre de chambres</span>
+          <span class="fw-medium">{{ singleLot.numberOfRooms }}</span>
+        </li>
+        <li class="list-group-item d-flex dflex-between px-0">
+          <span>Adresse</span>
+          <span class="fw-medium">{{ singleLot.address }}</span>
+        </li>
+      </ul>
+
+      <button class="button button-primary mt-3" (click)="sold()" *ngIf="currentUser &&  currentUser.profil===ProfilEnum.NOTAIRE" >
+      {{singleLot.status==='SOLD'?'Annuler la vente':'Valider la vente'}}
+      </button>
+    </div>
+  </div>
+</div>

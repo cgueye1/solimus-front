@@ -1,0 +1,257 @@
+<div class="subscription-container">
+  <div class="subscription-container-header">
+    <h3>Plans d'abonnement</h3>
+    <button class="btn btn-primary" (click)="openCreate()" [disabled]="loading">
+      <ng-container *ngIf="!loading; else loadingTpl"> + Ajouter </ng-container>
+      <ng-template #loadingTpl>
+        <span
+          class="spinner-border spinner-border-sm me-2"
+          role="status"
+          aria-hidden="true"
+        ></span>
+        Chargement...
+      </ng-template>
+    </button>
+  </div>
+
+  <!-- Loader global -->
+  <div class="text-center mt-4" *ngIf="loading && plans.length === 0">
+    <span class="spinner-border" role="status"></span>
+    <p class="mt-2">Chargement des plans...</p>
+  </div>
+
+  <!-- Message liste vide -->
+  <div
+    class="alert alert-info text-center mt-4"
+    *ngIf="!loading && plans.length === 0"
+  >
+    Aucun plan d'abonnement n'est disponible pour le moment.
+  </div>
+
+  <table class="table table-striped" *ngIf="plans.length && !loading">
+    <thead>
+      <tr>
+        <th>Profil</th>
+        <th>Type d’abonnement</th>
+        <th style="min-width: 200px; max-width: 300px;">Description</th>
+        <th>Prix</th>
+        <th>Mensualités</th>
+        <th>Limite projets</th>
+        <th>Illimité</th>
+        <th>Remise annuelle</th>
+        <th>Statut</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let p of plans">
+        <td>{{ displayProfil(p.name) }}</td>
+        <td>{{ displayPlanType(p) }}</td>
+        <td style="max-width: 300px;">
+          <div *ngIf="p.description && p.description.length > 100; else shortDesc" 
+               class="description-cell">
+            <div class="description-text">{{ p.description | slice:0:100 }}...</div>
+            
+            <div  (click)="showFullDescription(p.description)">
+              Voir plus
+            </div>
+          </div>
+          <ng-template #shortDesc>
+            <div class="description-cell">
+              <div class="description-text">{{ p.description || '-' }}</div>
+            </div>
+          </ng-template>
+        </td>
+        <td>{{ p.totalCost | number }} CFA</td>
+        <td>{{ p.installmentCount }} Mois</td>
+        <td>{{ p.unlimitedProjects ? 'Illimité' : (p.projectLimit || 0) }}</td>
+        <td>
+          <span class="badge" [ngClass]="p.unlimitedProjects ? 'bg-success' : 'bg-secondary'">
+            {{ p.unlimitedProjects ? "Oui" : "Non" }}
+          </span>
+        </td>
+        <td>{{ p.yearlyDiscountRate }}%</td>
+        <td>
+          <span class="badge" [ngClass]="p.active ? 'bg-success' : 'bg-danger'">
+            {{ p.active ? "Actif" : "Inactif" }}
+          </span>
+        </td>
+        <td>
+          <button class="icon-btn" (click)="openEdit(p)">
+            <i class="material-icons text-warning">edit</i>
+          </button>
+          <button class="icon-btn" (click)="delete(p)">
+            <i class="material-icons text-danger">delete</i>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Modal pour afficher la description complète -->
+<ng-template #descriptionModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">Description complète</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+  <p class="description-full" [innerHTML]="safeText(selectedDescription)"></p>
+
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.close()">Fermer</button>
+  </div>
+</ng-template>
+
+
+<!-- MODAL -->
+<ng-template #planModal>
+  <div class="modal-header">
+    <h5 class="modal-title">{{ editing ? "Modifier" : "Créer" }} un plan</h5>
+    <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
+  </div>
+
+  <form [formGroup]="planForm" (ngSubmit)="submit()" class="modal-body">
+    <div class="row g-3">
+      <!-- Profil -->
+      <div class="col-md-6">
+        <label class="form-label">Profil *</label>
+        <select class="form-select" formControlName="name" [class.is-invalid]="planForm.get('name')?.invalid && planForm.get('name')?.touched">
+          <option value="">Sélectionner un profil</option>
+          <option *ngFor="let p of profils" [value]="p">
+            {{ profilLabels[p] }}
+          </option>
+        </select>
+        <div *ngIf="planForm.get('name')?.invalid && planForm.get('name')?.touched" class="invalid-feedback">
+          Le profil est obligatoire
+        </div>
+      </div>
+
+      <!-- Type de plan -->
+      <div class="col-md-6">
+        <label class="form-label">Type d’abonnement *</label>
+        <select class="form-select" formControlName="id" 
+                [class.is-invalid]="planForm.get('id')?.invalid && planForm.get('id')?.touched">
+          <option value="">Sélectionner un type</option>
+          <option *ngFor="let type of planTypes" [value]="type.id">
+            {{ type.label }}
+          </option>
+        </select>
+        <div *ngIf="planForm.get('id')?.invalid && planForm.get('id')?.touched" class="invalid-feedback">
+          Le type de plan est obligatoire
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="col-12">
+        <label class="form-label">Description</label>
+        <textarea
+          class="form-control"
+          formControlName="description"
+          rows="2"
+          placeholder="Description du plan..."
+        ></textarea>
+      </div>
+
+      <!-- Coût mensuel -->
+      <div class="col-md-6">
+        <label class="form-label">Coût mensuel (CFA) *</label>
+        <input
+          type="text"
+          class="form-control"
+          formControlName="totalCost"
+          (input)="formatCFA()"
+          [class.is-invalid]="planForm.get('totalCost')?.invalid && planForm.get('totalCost')?.touched"
+          placeholder="0"
+        />
+        <div *ngIf="planForm.get('totalCost')?.invalid && planForm.get('totalCost')?.touched" class="invalid-feedback">
+          Le coût est obligatoire et doit être positif
+        </div>
+      </div>
+
+      <!-- Mensualités -->
+      <div class="col-md-6">
+        <label class="form-label">Mensualités</label>
+        <input
+          type="number"
+          class="form-control"
+          formControlName="installmentCount"
+          readonly
+          [disabled]="true"
+        />
+        <small class="text-muted">Fixé à 1 mois</small>
+      </div>
+
+      <!-- Limite projets -->
+      <div class="col-md-6">
+        <label class="form-label">Limite de projets</label>
+        <input
+          type="number"
+          class="form-control"
+          formControlName="projectLimit"
+          [disabled]="planForm.get('unlimitedProjects')?.value"
+          [class.is-invalid]="planForm.get('projectLimit')?.invalid && planForm.get('projectLimit')?.touched"
+          [min]="0"
+        />
+        <div *ngIf="planForm.get('projectLimit')?.invalid && planForm.get('projectLimit')?.touched" class="invalid-feedback">
+          La limite doit être positive
+        </div>
+      </div>
+
+      <!-- Projets illimités -->
+      <div class="col-md-6">
+        <label class="form-label">Projets illimités</label>
+        <select class="form-select" formControlName="unlimitedProjects" (change)="onUnlimitedProjectsChange()">
+          <option [value]="false">Non</option>
+          <option [value]="true">Oui</option>
+        </select>
+      </div>
+
+      <!-- Remise annuelle -->
+      <div class="col-md-6">
+        <label class="form-label">Remise annuelle (%)</label>
+        <input
+          type="number"
+          class="form-control"
+          formControlName="yearlyDiscountRate"
+          [class.is-invalid]="planForm.get('yearlyDiscountRate')?.invalid && planForm.get('yearlyDiscountRate')?.touched"
+          [min]="0"
+          [max]="100"
+        />
+        <div *ngIf="planForm.get('yearlyDiscountRate')?.invalid && planForm.get('yearlyDiscountRate')?.touched" class="invalid-feedback">
+          La remise doit être entre 0% et 100%
+        </div>
+      </div>
+
+      <!-- Statut -->
+      <div class="col-md-6">
+        <label class="form-label">Statut</label>
+        <select class="form-select" formControlName="active">
+          <option [value]="true">Actif</option>
+          <option [value]="false">Inactif</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Boutons d'action -->
+    <div class="modal-footer mt-4">
+      <button type="button" class="btn btn-secondary" (click)="closeModal()">
+        Annuler
+      </button>
+      <button type="submit" class="btn btn-primary" [disabled]="loading || (planForm.invalid && !editing ) ">
+        <ng-container *ngIf="!loading; else btnLoading">
+          {{ editing ? 'Mettre à jour' : 'Créer' }}
+        </ng-container>
+        <ng-template #btnLoading>
+          <span
+            class="spinner-border spinner-border-sm me-2"
+            role="status"
+            aria-hidden="true"
+          ></span>
+          Enregistrement...
+        </ng-template>
+      </button>
+    </div>
+  </form>
+</ng-template>

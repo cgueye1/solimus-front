@@ -1,0 +1,62 @@
+<div class="card" >
+
+
+
+
+  <div class="card-header" *ngIf="isActions">
+    Détails
+    <!-- <div class="dropdown">
+      <button class="btn btn-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+       <i class="material-icons">more_vert</i>
+      </button>
+      <ul class="dropdown-menu">
+        <li><a class="dropdown-item" href="javascript:(0)" (click)="openDetailModal()">Voir détails</a></li>
+        <li><a class="dropdown-item" href="javascript:(0)" (click)="openManifesantsModal()">Liste des manifestants</a></li>
+        <li><a class="dropdown-item" href="javascript:(0)">Télécharger le fiche de renseignement</a></li>
+      </ul>
+    </div> -->
+  </div>
+
+  <img    [src]="getFullImageUrl(data.plan && data.plan !== '' ? data.plan : data.pictures?.[0])"class="card-img-top" style="height: auto" [alt]="data.name" (click)="openDetailModal()">
+
+
+  <div class="card-body">
+    <div class="dflex-between">
+      <h3 class="card-title title-property">{{  data.name }}</h3>
+      <h3 class="card-title price-property"  *ngIf="currentuser && currentuser.profil === ProfilEnum.PROMOTEUR" >{{ formatPrix(data.price )}} {{ data.rental?"/ Mois" :""}} </h3>
+    </div>
+
+    <ul class="list-unstyled dflex-start">
+      <li class="dflex-center text-black-50">
+        <i class="material-icons">map</i>
+        <span>{{ data.address }}</span>
+      </li>
+      <li class="dflex-center text-black-50">
+        <i class="material-icons">square_foot</i>
+        <span>{{  formatSurface(data.area) }}</span>
+      </li>
+      <li class="dflex-center text-black-50">
+        <i class="material-icons">view_module</i>
+        <span>{{ data.numberOfLots===0? 
+          data. numberOfRooms:
+          data.numberOfLots }} Lots</span>
+      </li>
+    </ul>
+
+    <p class="card-text description-property">{{ data.description }}</p>
+
+    <p class="dflex-center">
+      <span class="dflex-center text-black-50 me-2">
+        <i class="material-icons">person</i>
+       <i> {{"Syndic: "}} </i>
+      </span>
+      <span>{{ data.promoter.prenom }} {{ data.promoter.nom }}</span>
+    </p>
+
+   <!--- <button class="button button-primary w-100" (click)="openDetailModal()"  *ngIf="!data.rental"  >En savoir plus</button>
+    
+    
+<button class="button button-outline-primary w-100 mt-3"   (click)="openPdf()"  *ngIf="!data.rental"   >Télécharger le fiche de renseignement </button>-->
+  </div>
+
+</div>

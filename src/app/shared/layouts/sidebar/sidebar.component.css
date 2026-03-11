@@ -1,0 +1,28 @@
+#sidebar-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+  
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 10px;
+    text-align: center;
+  }
+  
+  .portal-link {
+    text-decoration: none;
+    color: #ffffff;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: underline;
+  }
+  
+  .portal-link:hover {
+    text-decoration: underline;
+    color: #000;
+  }
+  
+  
+  
+  

@@ -1,0 +1,239 @@
+// Variables compactes
+$primary: #2563eb;
+$success: #10b981;
+$warning: #f59e0b;
+$info: #6366f1;
+$light-gray: #f3f4f6;
+$border-light: #e5e7eb;
+$text-dark: #1f2937;
+$text-light: #6b7280;
+
+// Container sans padding vertical excessif
+.dashboard-container {
+  padding: 0.75rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: transparent;
+}
+
+// Header compact
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  
+  h2 {
+    color: $text-dark;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+  }
+  
+  .update-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid $border-light;
+    color: $text-light;
+    font-size: 0.75rem;
+    
+    i {
+      font-size: 0.7rem;
+    }
+  }
+}
+
+// Grille 2x2 sans espacement excessif
+.counters-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+}
+
+// Cartes très compactes
+.counter-card {
+  background: white;
+  border-radius: 10px;
+  padding: 0.65rem;
+  border: 1px solid $border-light;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  min-height: 70px; // Hauteur fixe pour uniformité
+  transition: all 0.15s ease;
+  
+  &:hover {
+    border-color: #d1d5db;
+  }
+  
+  .counter-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+    
+    i {
+      font-size: 0.9rem;
+    }
+    
+    &.total-icon {
+      background: rgba($primary, 0.1);
+      color: $primary;
+    }
+    
+    &.paid-icon {
+      background: rgba($success, 0.1);
+      color: $success;
+    }
+    
+    &.remaining-icon {
+      background: rgba($warning, 0.1);
+      color: $warning;
+    }
+    
+    &.percentage-icon {
+      background: rgba($info, 0.1);
+      color: $info;
+    }
+  }
+  
+  .counter-content {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    
+    .counter-label {
+      display: block;
+      color: $text-light;
+      font-size: 0.65rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      margin-bottom: 0.2rem; // Espace ajouté entre label et valeur
+    }
+    
+    .counter-value {
+      display: block;
+      font-size: 1rem;
+      font-weight: 700;
+      color: $text-dark;
+      line-height: 1.2;
+      margin-bottom: 0.3rem; // Espace avant la progress bar
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      
+      small {
+        font-size: 0.6rem;
+        font-weight: 500;
+        color: $text-light;
+        margin-left: 0.15rem;
+      }
+    }
+    
+    // Pour le dernier compteur avec cercle
+    .content-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      height: 100%;
+      
+      .text-content {
+        flex: 1;
+        
+        .counter-label {
+          margin-bottom: 0.2rem;
+        }
+        
+        .counter-value {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+}
+
+// Mini progression
+.mini-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: auto; // Pousse vers le bas si nécessaire
+  
+  .progress-bar {
+    flex: 1;
+    height: 4px;
+    background: $light-gray;
+    border-radius: 2px;
+    overflow: hidden;
+    
+    .progress-fill {
+      height: 100%;
+      border-radius: 2px;
+      
+      &.paid-fill {
+        background: $success;
+      }
+      
+      &.remaining-fill {
+        background: $warning;
+      }
+    }
+  }
+  
+  .progress-text {
+    font-size: 0.6rem;
+    font-weight: 600;
+    color: $text-dark;
+    min-width: 30px;
+    text-align: right;
+  }
+}
+
+// Mini cercle aligné à droite
+.mini-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 0.5rem;
+  flex-shrink: 0;
+  
+  .circle-progress {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    span {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: white;
+    }
+  }
+}
+
+// Aucun espace vide en bas
+:host {
+  display: block;
+  line-height: 0;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}

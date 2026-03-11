@@ -1,0 +1,70 @@
+<ul class="sidebar-nav" >
+  @for (menu of menuItems; track menu.menId) {
+  <li class="nav-item"   >
+    <ng-container *ngIf="!menu.childrens || menu.childrens.length === 0">
+      <a
+        class="nav-link"
+        [routerLink]="[menu.menPath]"
+       [class.active]="isMenuActive(menu)"
+         [queryParams]="menu.menQueryParams"
+      >
+        <i class="material-icons">{{menu.menIconType}}</i>
+        <span>{{ menu.menTitle }}</span>
+      </a>
+    </ng-container>
+    <ng-container *ngIf="menu.childrens && menu.childrens.length > 0">
+      <a
+        class="nav-link nav-link-sub"
+        data-bs-toggle="collapse"
+        [attr.href]="'#subMenu-' + menu.menPath"
+        role="button"
+        aria-expanded="false"
+        [ngClass]="{ active: isSubMenuActive(menu) }"
+        [attr.aria-controls]="'subMenu-' + menu.menPath"
+        (click)="toggleSubMenu(menu)"
+      >
+        <div class="icon_text">
+         <i class="material-icons">{{menu.menIconType}}</i>
+          <span>{{ menu.menTitle }}</span>
+        </div>
+
+        <i class="material-icons">{{ isSubMenuActive(menu) || menuState[menu.menPath] ? 'keyboard_arrow_up' :
+        'chevron_right'
+        }}</i>
+      </a>
+
+
+      <ul
+        class="navs collapse sub-menu"
+        [id]="'subMenu-' + menu.menPath"
+        [ngClass]="{ show: isSubMenuActive(menu) || menuState[menu.menPath] }"
+      >
+        <li class="nav-item" *ngFor="let subMenu of menu.childrens">
+          <a
+            class="nav-link sub"
+            [routerLink]="subMenu.menPath"
+            routerLinkActive="active"
+            (click)="closeMenuIfNotSubMenu($event, menu)"
+          >
+            <span>{{ subMenu.menTitle }}</span>
+          </a>
+        </li>
+      </ul>
+    </ng-container>
+  </li>
+  }
+    <!-- Mon compte -->
+    <span class="spacer-menu">Mon compte</span>
+
+    <li class="nav-item mt-2">
+      <a class="nav-link" routerLink="/settings/accounts" routerLinkActive="active">
+        <i class="material-icons">person</i>
+      Mon compte</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" (click)="logOut()">
+        <i class="material-icons">logout</i>
+      Se déconnecter</a>
+    </li>
+
+</ul>

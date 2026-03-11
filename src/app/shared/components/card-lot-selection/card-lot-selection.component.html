@@ -1,0 +1,21 @@
+
+
+
+<div class="grid-container">
+  <div *ngFor="let option of options" class="grid-item">
+    <input 
+      type="radio" 
+      [name]="name" 
+      class="btn-check" 
+      [id]="option.id" 
+      (change)="onSelect(option.id)">
+    <label class="btn-choice" [for]="option.id">
+      <div class="image-container">
+        <img [src]="getFullImageUrl(option.plan)" alt="{{ option.name }}">
+        <div class="overlay">
+          <span class="text">{{ option.name }} </span>
+        </div>
+      </div>
+    </label>
+  </div>
+</div>

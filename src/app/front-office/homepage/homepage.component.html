@@ -1,0 +1,519 @@
+<header class="header">
+  <div class="header__content">
+    <app-menu-portail></app-menu-portail>
+    <div class="section__container header__container" id="home">
+      <p>Votre futur chez vous commence ici</p>
+      <h1>
+        Trouvez le bien idéal<br />parmi nos sélections <span>exclusives</span>.
+      </h1>
+    </div>
+  </div>
+</header>
+<section class="section__container booking__container">
+  <form class="booking__form" [formGroup]="searchForm" (ngSubmit)="onSearch()">
+    <div class="input__group">
+      <span><i class="material-icons">location_on</i></span>
+      <div class="w-100">
+        <label for="check-in">Localisation</label>
+        
+             
+      <app-location-input
+        [apiKey]="googleMapsApiKey"
+        (locationSelected)="onLocationSelected($event)"
+        [initialValue]="existingAddress"
+      ></app-location-input>
+      
+        <!--<input
+          type="text"
+          class="form-control"
+          [formControl]="myControl"
+          [matAutocomplete]="auto"
+          placeholder="Rechercher par lieu"
+        />
+        <mat-autocomplete #auto="matAutocomplete">
+          <mat-option
+            *ngFor="let option of filteredOptions | async"
+            [value]="option.name"
+          >
+            {{ option.name }}
+          </mat-option>
+        </mat-autocomplete>-->
+      </div>
+    </div>
+
+    <div class="input__group">
+      <span><i class="material-icons">house</i></span>
+      <div class="w-100">
+        <label for="check-out">Type de bien</label>
+        <select class="form-select" formControlName="propertyTypeId">
+          <option value="">Sélectionner</option>
+          <option *ngFor="let type of propertyTypeList" [value]="type.id">
+            {{ type.typeName }}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <div class="input__group">
+      <span><i class="material-icons">label</i></span>
+      <div class="w-100">
+        <label for="minPrice">Nom du projet</label>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Rechercher par nom"
+          formControlName="name"
+        />
+      </div>
+    </div>
+
+    <div class="input__group input__btn">
+      <button class="btn btn-primary w-100" type="submit">Rechercher</button>
+    </div>
+  </form>
+</section>
+
+<section class="section__container room__container" id="explore">
+  <div class="dflex-between">
+    <div>
+      <p class="section__subheader">Découvrir nos offres Vefa</p>
+      <h2 class="section__header">Offres du Moment</h2>
+    </div>
+
+    <button class="btn" (click)="onViewAllBiens(false)">Voir plus</button>
+  </div>
+
+  <div class="room__grid">
+    <div
+      class="room__card"
+      *ngFor="let bien of bienList"
+      (click)="onViewBien(bien.id)"
+    >
+      <div class="room__card__image">
+        <img [src]="getFullImageUrl(bien.plan)" alt="Phase 1" />
+      </div>
+      <div class="room__card__details">
+        <h4>{{ bien.name }}</h4>
+
+        <p>{{ bien.description }}</p>
+        <div class="room__card__details__footer">
+          <h5 class="price">
+            <i class="material-icons">location_on</i>{{ bien.address }}
+          </h5>
+          <!---- <button class="btn">En savoir plus</button>-->
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!--<section
+  class="section__container room__container"
+  id="explore"
+  *ngIf="bienListLoc && bienListLoc.length > 0"
+>
+  <div class="dflex-between">
+    <div>
+      <p class="section__subheader">Découvrir nos offres location</p>
+      <h2 class="section__header">Biens en location</h2>
+    </div>
+
+    <button class="btn" (click)="onViewAllBiens(true)">Voir plus</button>
+  </div>
+
+  <div class="room__grid">
+    <div
+      class="room__card"
+      *ngFor="let bien of bienListLoc"
+      (click)="onViewBienLoc(bien.id)"
+    >
+      <div class="room__card__image">
+        <img
+          [src]="getFullImageUrl(bien.plan && bien.plan !== '' ? bien.plan : bien.pictures?.[0])"
+          alt="Phase 1"
+        />
+      </div>
+      <div class="room__card__details">
+        <h4>{{ bien.propertyType.typeName }}</h4>
+
+        <p>{{ bien.description }}</p>
+        <div class="room__card__details__footer">
+          <h5 class="price">
+            <i class="material-icons">location_on</i>{{ bien.address }}
+          </h5>
+    
+        </div>
+      </div>
+    </div>
+  </div>
+</section>-->
+
+
+
+
+
+<section class="service" id="service">
+  <div class="section__container service__container">
+    <div class="service__content">
+      <p class="section__subheader">Découvrir nos services</p>
+      <h2 class="section__header">Services Populaires</h2>
+      <ul class="service__list">
+        <li>
+          <span><i class="material-icons">payments</i></span>
+          <div>
+            Simulateur d’acquisition
+            <small class="small__text"
+              >Simulez vos appels de fonds et visualisez en un clin d’œil ce
+              qu’il vous reste à payer pour votre bien.</small
+            >
+          </div>
+        </li>
+        <li>
+          <span><i class="material-icons">book_online</i></span>
+
+          <div>
+            Suivi de Réservation
+            <small class="small__text"
+              >Permettant aux utilisateurs de suivre l’avancement de leur achat,
+              de la réservation à la livraison</small
+            >
+          </div>
+        </li>
+        <li>
+          <span><i class="material-icons">support_agent</i></span>
+
+          <div>
+            Support et Maintenance
+            <small class="small__text"
+              >Un problème ? Nous sommes là pour vous aider</small
+            >
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+
+
+
+
+
+
+<!---
+<section class="section__container">
+  <div class="row g-4">
+   
+    <div class="col-md-6 col-lg-3">
+      <div class="card card-hover" (click)="toggleCard($event)">
+        <img
+          src="assets/images/reservataire_.png"
+          class="card-img-top"
+          alt="Client immobilier"
+        />
+        <div class="card-img-overlay d-flex align-items-end p-0">
+          <div class="card-title-overlay w-100 text-center py-2">
+            <h5>Vous êtes client ?</h5>
+          </div>
+        </div>
+        <div class="card-body card-body-hidden">
+          <p>
+            Accédez facilement à vos démarches immobilières, que ce soit pour
+            louer ou acheter un bien en toute transparence.
+          </p>
+          <ul>
+            <li>
+              <strong>Trouvez le bien idéal :</strong> Consultez les biens
+              disponibles à la vente ou à la location.
+            </li>
+            <li>
+              <strong>Réservez ou louez en ligne :</strong> Manifestez votre
+              intérêt, réservez un bien ou lancez une location simplement.
+            </li>
+            <li>
+              <strong>Suivi de vos démarches :</strong> Gérez vos réservations,
+              contrats de location et achats depuis votre espace personnel.
+            </li>
+            <li>
+              <strong>Accès aux documents :</strong> Consultez vos contrats,
+              paiements et documents en toute sécurité.
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    
+    <div class="col-md-6 col-lg-3">
+      <div class="card card-hover" (click)="toggleCard($event)">
+        <img src="assets/images/vefa_.png" class="card-img-top" alt="VEFA" />
+        <div class="card-img-overlay d-flex align-items-end p-0">
+          <div class="card-title-overlay w-100 text-center py-2">
+            <h5>VEFA</h5>
+          </div>
+        </div>
+        <div class="card-body card-body-hidden">
+          <p>
+            Gérez efficacement vos projets VEFA depuis la réservation jusqu’à la
+            livraison, avec un suivi clair, structuré et sécurisé.
+          </p>
+          <ul>
+            <li>
+              <strong>Gestion des programmes VEFA :</strong> Suivez l’avancement
+              des projets, des lots et des étapes de construction.
+            </li>
+            <li>
+              <strong>Gestion des réservations :</strong> Centralisez les
+              réservations des clients et suivez leur évolution en temps réel.
+            </li>
+            <li>
+              <strong>Gestion des appels de fonds :</strong> Planifiez et
+              sécurisez les appels de fonds selon l’avancement des travaux.
+            </li>
+            <li>
+              <strong>Suivi contractuel et documentaire :</strong> Centralisez
+              les contrats, documents et historiques liés à chaque lot.
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="col-md-6 col-lg-3">
+      <div class="card card-hover" (click)="toggleCard($event)">
+        <img
+          src="assets/images/syndic_.png"
+          class="card-img-top"
+          alt="Syndic"
+        />
+        <div class="card-img-overlay d-flex align-items-end p-0">
+          <div class="card-title-overlay w-100 text-center py-2">
+            <h5>Syndic de copropriété</h5>
+          </div>
+        </div>
+        <div class="card-body card-body-hidden">
+          <p>
+            Administrez et gérez vos copropriétés en toute transparence grâce à
+            des outils conçus pour simplifier la gestion quotidienne.
+          </p>
+          <ul>
+            <li>
+              <strong>Gestion des copropriétés :</strong> Centralisez les
+              informations des immeubles, lots et copropriétaires.
+            </li>
+            <li>
+              <strong>Gestion financière :</strong> Suivez les charges, budgets,
+              appels de fonds et paiements.
+            </li>
+            <li>
+              <strong>Gestion des assemblées et décisions :</strong> Organisez
+              les assemblées générales et suivez les résolutions.
+            </li>
+            <li>
+              <strong>Traçabilité et documents :</strong> Archivez et partagez
+              les documents en toute sécurité avec les copropriétaires.
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  
+    <div class="col-md-6 col-lg-3">
+      <div class="card card-hover" (click)="toggleCard($event)">
+        <img
+          src="assets/images/promoter_.png"
+          class="card-img-top"
+          alt="Promoteur immobilier"
+        />
+        <div class="card-img-overlay d-flex align-items-end p-0">
+          <div class="card-title-overlay w-100 text-center py-2">
+            <h5>Promoteur immobilier</h5>
+          </div>
+        </div>
+        <div class="card-body card-body-hidden">
+          <p>
+            Pilotez l’ensemble de vos projets immobiliers depuis une seule
+            plateforme, en toute simplicité et en toute sécurité.
+          </p>
+          <ul>
+            <li>
+              <strong>Gestion des projets et des biens :</strong> Suivez vos
+              programmes immobiliers (VEFA, location) et l’état de chaque lot.
+            </li>
+            <li>
+              <strong>Gestion des réservations :</strong> Centralisez et
+              contrôlez les réservations de vos clients en temps réel.
+            </li>
+            <li>
+              <strong>Gestion des appels de fonds :</strong> Planifiez, suivez
+              et sécurisez vos appels de fonds et paiements.
+            </li>
+            <li>
+              <strong>Gestion locative :</strong> Administrez vos biens en
+              location et le suivi des locataires.
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>-->
+
+
+
+
+<section class="section__container subPlan" id="pricing">
+  <div class="plans-modal">
+    <!-- Header -->
+     <!--- <div class="modal-header">
+      <h4>Nos plans d'abonnement</h4>
+    <button
+        type="button"
+        class="btn-close"
+        aria-label="Close"
+        (click)="modal.dismiss()"
+      ></button>
+    </div>-->
+
+    <!-- Tabs pour filtrer par name 
+    <div class="tabs">
+      <button
+        *ngFor="let name of planNames"
+        [class.active]="selectedPlanName === name"
+        (click)="selectedPlanName = name"
+      >
+        {{ formatPlanName(name) }}
+      </button>
+    </div>-->
+
+    <!-- Plans cards -->
+    <div class="plans-cards">
+      <div class="plan-card" *ngFor="let plan of plansByName[selectedPlanName]">
+        <!-- Switch Annuel / Mensuel -->
+        <div class="installment-switch">
+          <label class="switch">
+            <input
+              type="checkbox"
+              [checked]="planInstallments[plan.id] === 12"
+              (change)="toggleInstallment(plan.id, $event)"
+            />
+            <span class="slider"></span>
+          </label>
+          <span>{{
+            planInstallments[plan.id] === 12 ? "Annuel" : "Mensuel"
+          }}</span>
+        </div>
+
+        <!-- Contenu du plan -->
+        <h5>{{ plan.label }}</h5>
+        
+        
+          <div *ngIf="plan.description && plan.description.length > 100; else shortDesc" 
+               class="description-cell">
+            <div class="description-text description" >{{ plan.description | slice:0:100 }}...</div>
+            
+            <div  (click)="showFullDescription( plan.description)">
+              Voir plus
+            </div>
+          </div>
+          <ng-template #shortDesc>
+            <div class="description-cell">
+              <div class="description-text description">{{ plan.description || '-' }}</div>
+            </div>
+          </ng-template>
+          <br>
+          
+        <!--<p description  class="description-text description" >{{ plan.description || "—" }}</p>-->
+        <p><strong>Montant:</strong> {{ getPlanPrice(plan) | number }} XOF</p>
+        <p>
+          <strong>Projets:</strong>
+          {{ plan.unlimitedProjects ? "Illimités" : plan.projectLimit }}
+        </p>
+        <p *ngIf="plan.installmentCount > 1">
+          <strong>Installments:</strong> {{ plan.installmentCount }}
+        </p>
+        <p *ngIf="plan.yearlyDiscountRate">
+          <strong>Réduction annuelle:</strong> {{ plan.yearlyDiscountRate }}%
+        </p>
+
+        <!-- Bouton Choisir Plan -->
+        <button class="btn-select" (click)="selectPlan(plan)">
+          Choisir ce plan
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!--<section class="section__container banner__containerx">
+  <div class="banner__content">
+    <div class="banner__card">
+      <i class="material-icons banner__icon">person</i>
+      <h4>{{ promoterCount }}+</h4>
+      <p>Promoteurs</p>
+    </div>
+    <div class="banner__card">
+      <i class="material-icons banner__icon">group</i>
+      <h4>{{ reservataireCount }}+</h4>
+      <p>Réservataires</p>
+    </div>
+    <div class="banner__card">
+      <i class="material-icons banner__icon">apartment</i>
+      <h4>{{ bienCount }}+</h4>
+      <p>Projets</p>
+    </div>
+    <div class="banner__card">
+      <i class="material-icons banner__icon">home</i>
+      <h4>{{ ownerCount }}+</h4>
+      <p>Propriétaires</p>
+    </div>
+    <div class="banner__card">
+      <i class="material-icons banner__icon">supervisor_account</i>
+      <h4>{{ syndicCount }}+</h4>
+      <p>Syndics</p>
+    </div>
+    <div class="banner__card">
+      <i class="material-icons banner__icon">business</i>
+      <h4>{{ agencyCount }}+</h4>
+      <p>Agences</p>
+    </div>
+  </div>
+  
+  
+</section>-->
+
+<div class="container">
+  <button id="btnScrollToTop" type="button" (click)="scrollToTop()">
+    <i class="material-icons">arrow_upward</i>
+  </button>
+</div>
+
+<!--<app-standalone-pacs-viewer accessionNumber="BDY-IMG-2026-850121000" ></app-standalone-pacs-viewer>-->
+
+
+<!-- footer -->
+
+<app-footer-portail id="contact"></app-footer-portail>
+
+
+
+
+
+
+<!-- Modal pour afficher la description complète -->
+<ng-template #descriptionModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">Description complète</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+  <p class="description-full" [innerHTML]="safeText(selectedDescription)"></p>
+
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.close()">Fermer</button>
+  </div>
+</ng-template>

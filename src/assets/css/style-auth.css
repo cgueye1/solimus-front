@@ -1,0 +1,139 @@
+body,
+.wrapper__auth {
+  min-height: 100vh;
+  height: auto;
+  overflow: auto;
+}
+
+.wrapper__auth {
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  background-image: url('../images/immo3.avif');
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding-top: 50px;
+}
+
+.wrapper__auth::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, .5);
+  z-index: 1;
+}
+
+.wrapper__auth .container {
+  z-index: 2;
+}
+
+
+.wrapper__auth .form-content {
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 30px;
+  /* min-width: 450px; */
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.wrapper__auth .form-content img {
+  display: block;
+  margin: 0 auto;
+}
+
+.wrapper__auth .form-content .title {
+  margin-top: 30px;
+  margin-bottom: 30px;
+  color: #231F20;
+  text-align: center;
+  font-family: 'Be Vietnam Pro', sans-serif;
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.wrapper__auth h1#text-title {
+  color: var(--color-white);
+  font-size: 2.5rem;
+  line-height: 3.5rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.wrapper__auth p#logo-text {
+  color: var(--color-white);
+  font-size: 1rem;
+}
+
+
+.wrapper__auth p#logo-text span {
+  color: var(--primary-color);
+  font-size: 2rem;
+}
+
+@media (max-width: 768px) {
+  .wrapper__auth {
+    padding-top: 20px;
+    padding-bottom: 50px;
+  }
+}
+
+/* Customize the input-group */
+.input-group-custom {
+  display: flex;
+  align-items: center;
+  border-radius: 8px;
+  background: var(--bg-input);
+  margin: 10px 0;
+  transition: box-shadow 0.3s ease;
+}
+
+ .input-group-custom input {
+  border: none;
+  border-radius: 8px 0 0 8px;
+  margin: 0;
+  box-shadow: none !important;
+  background: none !important;
+  flex: 1;
+}
+ .input-group-custom:focus-within {
+  /* Style appliqué quand l'input à l'intérieur est focus */
+  box-shadow: 0 0 0 2px var(--primary-color);
+  /* Exemple avec un contour */
+  outline: none;
+}
+
+ .input-group-custom input:focus {
+  outline: none !important;
+  border: none;
+}
+
+
+ .input-group-custom .toggle-password {
+  border: none;
+  background: none;
+  padding: 10px 15px;
+  border-radius: 0 8px 8px 0;
+  cursor: pointer;
+  color: #231F20;
+}
+
+ .input-group-custom .toggle-password:focus {
+  outline: none;
+}

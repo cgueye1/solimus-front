@@ -1,0 +1,386 @@
+<div class="py-3">
+  <div
+    *ngIf="subscriptionDetails && !loadingSubDetails"
+    class="subscription-card"
+  >
+    <div class="card-header">
+      <div>
+        <h3>{{ subscriptionDetails.subscriptionPlans.label }}</h3>
+        <span class="plan-name">
+          {{ subscriptionDetails.subscriptionPlans.name }}
+        </span>
+      </div>
+
+      <span
+        class="status-badge"
+        [class.active]="subscriptionDetails.active"
+        [class.inactive]="!subscriptionDetails.active"
+      >
+        {{ subscriptionDetails.active ? "Actif" : "Inactif" }}
+      </span>
+    </div>
+
+    <div class="card-body">
+      <div class="info-row">
+        <span>Début</span>
+        <strong>{{ formatDate(subscriptionDetails.startDate) }}</strong>
+      </div>
+
+      <div class="info-row">
+        <span>Fin</span>
+        <strong>{{ formatDate(subscriptionDetails.endDate) }}</strong>
+      </div>
+
+      <div class="info-row">
+        <span>Montant payé</span>
+        <strong>{{ subscriptionDetails.paidAmount | number }} FCFA</strong>
+      </div>
+
+      <div class="info-row">
+        <span>Statut paiement</span>
+        <strong>{{ getStatusLabel(subscriptionDetails.status) }}</strong>
+      </div>
+
+      <div class="info-row">
+        <span>Projets</span>
+        <strong>
+          {{
+            subscriptionDetails.subscriptionPlans.unlimitedProjects
+              ? "Illimités"
+              : subscriptionDetails.remainingProjects
+          }}
+        </strong>
+      </div>
+    </div>
+
+    <div class="card-footer">
+      <button
+        *ngIf="subscriptionDetails && !subscriptionDetails.active"
+        class="btn-primary"
+        (click)="renewSubscription()"
+      >
+        Renouveler l’abonnement
+      </button>
+
+      <!--<span *ngIf="!subscriptionDetails.active" class="valid-text">
+        Abonnement valide jusqu’au
+        {{ formatDate(subscriptionDetails.endDate) }}
+      </span>-->
+
+      <button
+        *ngIf="subscriptionDetails && subscriptionDetails.active"
+        class="btn-primary"
+        (click)="openPlansModal()"
+      >
+        Voir tous les plans d'abonnement
+      </button>
+    </div>
+  </div>
+
+  <div
+    class="subscription-cta"
+    *ngIf="!subscriptionDetails && !loadingSubDetails"
+  >
+    <div class="cta-box">
+      <h4>Vous n’avez pas encore d’abonnement</h4>
+      <p>Choisissez un plan pour accéder à toutes les fonctionnalités</p>
+
+      <button class="btn-primary" (click)="openPlansModal()">
+        Découvrir les plans
+      </button>
+    </div>
+  </div>
+
+  <br />
+
+  <!--<table class="table table__sm w-100">
+    <thead>
+      <th scope="col">N° FACTURE</th>
+      <th scope="col">ÉCHEANCE</th>
+      <th scope="col">MONTANT</th>
+      <th scope="col">STATUT</th>
+      <th scope="col">ACTIONS</th>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of data; let i = index">
+        <td>{{ item.id }}</td>
+        <td>{{ item.startDate | date: "dd/MM/yyyy" }}</td>
+        <td>
+          {{ item.subscriptionPlan.totalCost * item.installmentCount }} XOF
+        </td>
+        <td>
+          <span [ngClass]="['status-badge', getStatusLot(item.status).class]">{{
+            getStatusLot(item.status).text
+          }}</span>
+        </td>
+        <td>
+          <div class="dflex-start">
+            <button
+              class="btn btn-success btn-sm"
+              type="button"
+              (click)="openModal(PAY, item)"
+              *ngIf="item.status === 'PENDING'"
+            >
+              Payer
+            </button>
+            <!--<button class="btn btn-success btn-sm" type="button"  (click)="openModal(PAY,item)"  >Payer</button>
+
+            <!--<button class="btn btn-success btn-sm" type="button" (click)="openModal(ADD_FICHE)">Charger reçu</button>-
+            <button
+              class="btn btn-secondary btn-sm"
+              *ngIf="item.status === 'PAID'"
+              (click)="downloadInvoice(item)"
+            >
+              Télécharger
+            </button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>-->
+
+  <div *ngIf="!loading && invoices.length === 0" class="text-center p-4">
+    <p>Aucune facture trouvée</p>
+  </div>
+
+  <table class="table table__sm w-100" *ngIf="invoices.length > 0">
+    <thead>
+      <tr>
+        <th>N° FACTURE</th>
+        <th>DATE</th>
+        <th>MONTANT</th>
+        <th>STATUT</th>
+        <th>ACTIONS</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let item of invoices">
+        <td>{{ item.invoiceNumber }}</td>
+
+        <td>{{ item.createdAt }}</td>
+
+        <td>{{ item.amount | number }} XOF</td>
+
+        <td>
+          <span class="status-badge" [ngClass]="item.paid ? 'paid' : 'pending'">
+            {{ item.paid ? "Payée" : "En attente" }}
+          </span>
+        </td>
+
+        <td>
+          <div class="dflex-start gap-2">
+            <button
+              class="btn btn-success btn-sm"
+              *ngIf="!item.paid"
+              (click)="openModal(PAY, item)"
+            >
+              Payer
+            </button>
+
+            <button
+              class="btn  button-primary"
+              *ngIf="item.paid"
+              (click)="downloadInvoice(item)"
+            >
+              Télécharger
+            </button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <button
+    class="btn btn-outline-primary w-100"
+    *ngIf="!dataEnded && !loading && invoices.length > 0"
+    (click)="loadMoreInvoices()"
+  >
+    Charger plus
+  </button>
+</div>
+
+<ng-template #ADD_FICHE let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Justificatif</h4>
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Close"
+      (click)="modal.dismiss()"
+    ></button>
+  </div>
+  <div class="modal-body">
+    <form>
+      <div class="row g-3">
+        <div class="col-md-12">
+          <label class="form-label">Document joint</label>
+          <input class="form-control" type="file" />
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="button button-primary" (click)="onSave()">
+      Enregistrer
+    </button>
+    <button
+      type="button"
+      class="button button-outline-primary"
+      (click)="modal.dismiss()"
+    >
+      Annuler
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #PAY let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Payer votre abonnement</h4>
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Close"
+      (click)="modal.dismiss()"
+    ></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="form" (ngSubmit)="onPay()">
+      <select
+        class="form-select"
+        [formControlName]="'installmentCount'"
+        (change)="onInstallationSelect($event)"
+      >
+        <option value="0" disabled selected>
+          Sélectionner le nombre de mois
+        </option>
+        <option
+          *ngFor="let installation of installationOptions"
+          [value]="installation"
+        >
+          {{ installation }} mois
+        </option>
+      </select>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="button button-primary" (click)="onPay()">
+      Payer
+    </button>
+    <!--<button type="button" class="button button-primary" (click)="onSave();">Payer</button>-->
+    <button
+      type="button"
+      class="button button-outline-primary"
+      (click)="modal.dismiss()"
+    >
+      Annuler
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #plansModal let-modal>
+  <div class="plans-modal">
+    <!-- Header -->
+    <div class="modal-header">
+      <h4>Nos plans d'abonnement</h4>
+      <button
+        type="button"
+        class="btn-close"
+        aria-label="Close"
+        (click)="modal.dismiss()"
+      ></button>
+    </div>
+
+    <!-- Tabs pour filtrer par name -->
+    <!--<div class="tabs" *ngIf="subscriptionDetails !== null">
+      <button
+        *ngFor="let name of planNames"
+        [class.active]="selectedPlanName === name"
+        (click)="selectedPlanName = name"
+      >
+        {{ formatPlanName(name) }}
+      </button>
+    </div>-->
+
+    <!-- Plans cards -->
+    <div class="plans-cards">
+      <div class="plan-card" *ngFor="let plan of plansByName[selectedPlanName]">
+        <!-- Switch Annuel / Mensuel -->
+        <div class="installment-switch">
+          <label class="switch">
+            <input
+              type="checkbox"
+              [checked]="planInstallments[plan.id] === 12"
+              (change)="toggleInstallment(plan.id, $event)"
+            />
+            <span class="slider"></span>
+          </label>
+          <span>{{
+            planInstallments[plan.id] === 12 ? "Annuel" : "Mensuel"
+          }}</span>
+        </div>
+
+        <!-- Contenu du plan -->
+        <h5>{{ plan.label }}</h5>
+
+        <div
+          *ngIf="
+            plan.description && plan.description.length > 100;
+            else shortDesc
+          "
+          class="description-cell"
+        >
+          <div class="description-text description">
+            {{ plan.description | slice: 0 : 100 }}...
+          </div>
+
+          <div (click)="showFullDescription(plan.description)">Voir plus</div>
+        </div>
+        <ng-template #shortDesc>
+          <div class="description-cell">
+            <div class="description-text description">
+              {{ plan.description || "-" }}
+            </div>
+          </div>
+        </ng-template>
+        <br />
+        <!--<p class="description">{{ plan.description || "—" }}</p>-->
+        <p><strong>Montant:</strong> {{ getPlanPrice(plan) | number }} XOF</p>
+        <p>
+          <strong>Projets:</strong>
+          {{ plan.unlimitedProjects ? "Illimités" : plan.projectLimit }}
+        </p>
+        <p *ngIf="plan.installmentCount > 1">
+          <strong>Installments:</strong> {{ plan.installmentCount }}
+        </p>
+        <p *ngIf="plan.yearlyDiscountRate">
+          <strong>Réduction annuelle:</strong> {{ plan.yearlyDiscountRate }}%
+        </p>
+
+        <!-- Bouton Choisir Plan -->
+        <button class="btn-select" (click)="selectPlan(plan)">
+          Choisir ce plan
+        </button>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+
+
+
+
+
+<!-- Modal pour afficher la description complète -->
+<ng-template #descriptionModal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title">Description complète</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+  <p class="description-full" [innerHTML]="safeText(selectedDescription)"></p>
+
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.close()">Fermer</button>
+  </div>
+</ng-template>

@@ -1,0 +1,127 @@
+<div class="p-3">
+  <div class="flex-row-between">
+    <h3 class="title-bo">
+      {{ singleBien.name }}
+    </h3>
+  </div>
+
+  <nav aria-label="breadcrumb" class="breadcrumb-bo">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="javascript:void(0)" [routerLink]="['/gestion-syndic']"
+          >{{ "Gestion Copropriétaires" }}
+        </a>
+      </li>
+
+      <li class="breadcrumb-item">
+        <a href="javascript:void(0)" (click)="goReturn()">
+          {{ singleBien.propertyType.typeName }}
+        </a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">Détails</li>
+    </ol>
+  </nav>
+
+  <div class="row g-4">
+    <!-- Detail du bien -->
+    <div class="col-lg-4">
+      <app-card-bien-vertical-syndic
+        [data]="singleBien"
+      ></app-card-bien-vertical-syndic>
+    </div>
+
+    <!-- Liste des lots -->
+    <div
+      [ngClass]="singleBien.rental ? 'col-lg-12' : 'col-lg-8'"
+      *ngIf="singleBien"
+    >
+      <div class="card__content bg-white">
+        <div class="container_page-header">
+          <h3 class="subtitle-bo">{{ getTabTitle() }}</h3>
+        </div>
+
+        <mat-tab-group
+          mat-align-tabs="start"
+          [selectedIndex]="activeTabIndex"
+          (selectedIndexChange)="onTabChange($event)"
+        >
+          <mat-tab label="Tableau de bord">
+            <app-infos-lot-syndic
+              *ngIf="activeTabIndex == 0"
+              [singleLot]="singleBien"
+            ></app-infos-lot-syndic>
+          </mat-tab>
+
+          <mat-tab label="Propriétaires">
+            <app-owner-list
+              [singleBien]="singleBien"
+              *ngIf="activeTabIndex == 1"
+            ></app-owner-list>
+          </mat-tab>
+          
+           <mat-tab label="Appels de charges">
+            <app-appel-charge-work
+              [singleLot]="singleBien"
+              *ngIf="activeTabIndex == 2"
+            ></app-appel-charge-work>
+          </mat-tab>
+            <mat-tab label="Réunions">
+            <app-meet-syndic
+               [propertyId]="singleBien.id"
+              *ngIf="activeTabIndex == 3"
+            ></app-meet-syndic>
+          </mat-tab>
+
+          <!---  <mat-tab
+            label="Liste d’attente"
+            *ngIf="
+              (currentUser.profil === ProfilEnum.PROMOTEUR &&
+                !singleBien.parentProperty?.agency) ||
+              currentUser.profil === ProfilEnum.AGENCY 
+            "
+          >
+            <app-list-attente [singleLot]="singleBien"></app-list-attente>
+          </mat-tab>
+
+       <mat-tab
+            *ngIf="singleBien.rental"
+            [label]="
+              singleBien.rental
+                ? 'État des lieux et contrat'
+                : 'État d’avancement'
+            "
+          >
+            <app-etat-avancement [singleLot]="singleBien"></app-etat-avancement>
+          </mat-tab>
+          <mat-tab
+            [label]="
+              singleBien.rental ? 'Avis d’échéance de loyer' : 'Appel de fonds'
+            "
+          >
+            <app-appel-fond [singleLot]="singleBien"></app-appel-fond>
+          </mat-tab>
+
+          <mat-tab
+           
+              [label]="
+              singleBien.rental ? 'Proprietaire' : 'Promoteur'
+            "
+            *ngIf="currentUser.profil !== ProfilEnum.PROMOTEUR"
+          >
+            <app-proprietaire [singleLot]="singleBien"></app-proprietaire>
+          </mat-tab>
+
+          <mat-tab
+            [label]="singleBien.rental ? 'Locataire' : 'Réservataire'"
+            *ngIf="currentUser.profil === ProfilEnum.PROMOTEUR"
+          >
+            <app-reservataire
+              [singleLot]="singleBien"
+              [currentuser]="currentUser"
+            ></app-reservataire>
+          </mat-tab>-->
+        </mat-tab-group>
+      </div>
+    </div>
+  </div>
+</div>

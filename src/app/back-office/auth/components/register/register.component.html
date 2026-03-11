@@ -1,0 +1,277 @@
+<div class="wrapper__auth">
+  <div class="container">
+    <div class="col-md-10 mx-auto">
+      <div class="row justify-content-center align-items-center g-3">
+        <div class="col-lg-5">
+          <h1 id="text-title">Inscrivez-vous pour rejoindre la plateforme</h1>
+          <p id="logo-text">SOLIMUS</p>
+        </div>
+        <div class="col-lg-7">
+          <div class="form-content">
+            <form [formGroup]="userForm">
+              <img
+                src="assets/images/logo-app-black.svg"
+                alt="E.IMMO"
+                class="img-fluid"
+                width="220"
+              />
+              <h2 class="title">Inscription</h2>
+
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">Prénom</label>
+                  <input
+                    class="form-control"
+                    placeholder="Saisir"
+                    formControlName="prenom"
+                  />
+                  <div
+                    *ngIf="
+                      userForm.get('prenom')?.invalid &&
+                      userForm.get('prenom')?.touched
+                    "
+                    class="text-danger"
+                  >
+                    Prénom est requis
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Nom</label>
+                  <input
+                    class="form-control"
+                    placeholder="Saisir"
+                    formControlName="nom"
+                  />
+                  <div
+                    *ngIf="
+                      userForm.get('nom')?.invalid &&
+                      userForm.get('nom')?.touched
+                    "
+                    class="text-danger"
+                  >
+                    Nom est requis
+                  </div>
+                </div>
+
+                <!-- Téléphone amélioré avec indicatif réduit -->
+                <div class="col-md-6">
+                  <label class="form-label">Téléphone</label>
+                  <div class="input-group">
+                    <select
+                      class="form-select"
+                      formControlName="indicatif"
+                      style="max-width: 85px"
+                    >
+                      <option
+                        *ngFor="let indicatif of indicatifs"
+                        [value]="indicatif.code"
+                      >
+                        {{ indicatif.code }}
+                      </option>
+                    </select>
+                    <input
+                      class="form-control"
+                      placeholder="XX XXX XX XX"
+                      formControlName="telephone"
+                    />
+                  </div>
+                  <div
+                    *ngIf="
+                      userForm.get('telephone')?.invalid &&
+                      userForm.get('telephone')?.touched
+                    "
+                    class="text-danger"
+                  >
+                    <div
+                      *ngIf="userForm.get('telephone')?.errors?.['required']"
+                    >
+                      Téléphone est requis
+                    </div>
+                    <div *ngIf="userForm.get('telephone')?.errors?.['pattern']">
+                      Format invalide (9 chiffres requis)
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Email</label>
+                  <input
+                    class="form-control"
+                    type="email"
+                    placeholder="Saisir"
+                    formControlName="email"
+                  />
+                  <div
+                    *ngIf="
+                      userForm.get('email')?.invalid &&
+                      userForm.get('email')?.touched
+                    "
+                    class="text-danger"
+                  >
+                    Email valide est requis
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Adresse</label>
+                  <input
+                    class="form-control"
+                    placeholder="Saisir"
+                    formControlName="adress"
+                  />
+                  <div
+                    *ngIf="
+                      userForm.get('adress')?.invalid &&
+                      userForm.get('adress')?.touched
+                    "
+                    class="text-danger"
+                  >
+                    Adresse est requise
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Vous êtes ?</label>
+                  <select class="form-select" formControlName="profil">
+                    <option value="">Choisir</option>
+                    <option *ngFor="let profil of profils" [value]="profil">
+                      {{ profilLabels[profil] }}
+                    </option>
+                  </select>
+                  <div
+                    *ngIf="
+                      userForm.get('profil')?.invalid &&
+                      userForm.get('profil')?.touched
+                    "
+                    class="text-danger"
+                  >
+                    Profil est requis
+                  </div>
+                </div>
+
+                <!-- Mot de passe avec option de visibilité -->
+                <div class="col-md-6">
+                  <label class="form-label">Mot de passe</label>
+                  <div class="input-group input-group-custom">
+                    <input
+                      [type]="showPassword ? 'text' : 'password'"
+                      class="form-control"
+                      placeholder="Saisir"
+                      formControlName="password"
+                    />
+                    <button
+                      type="button"
+                      class="toggle-password"
+                      (click)="togglePasswordVisibility()"
+                      [attr.aria-label]="'Hide password'"
+                      [attr.aria-pressed]="showPassword"
+                    >
+                      <i
+                        class="material-icons"
+                        [title]="
+                          showPassword
+                            ? 'Afficher le mot de passe'
+                            : 'Cacher le mot de passe'
+                        "
+                        >{{ showPassword ? "visibility_off" : "visibility" }}</i
+                      >
+                    </button>
+                  </div>
+                  <div
+                    *ngIf="
+                      userForm.get('password')?.invalid &&
+                      userForm.get('password')?.touched
+                    "
+                    class="text-danger small"
+                  >
+                    <div *ngFor="let error of passwordErrors">{{ error }}</div>
+                  </div>
+                </div>
+
+                <!-- Confirmation mot de passe avec option de visibilité -->
+                <div class="col-md-6">
+                  <label class="form-label">Confirmation mot de passe</label>
+                  <div class="input-group input-group-custom">
+                    <input
+                      [type]="showConfirmPassword ? 'text' : 'password'"
+                      class="form-control"
+                      placeholder="Saisir"
+                      formControlName="confirmPassword"
+                    />
+                    <button
+                      type="button"
+                           class="toggle-password"
+                      (click)="toggleConfirmPasswordVisibility()"
+                  
+                 
+                      [attr.aria-label]="'Hide password'"
+                      [attr.aria-pressed]="showConfirmPassword"
+                    >
+                      <i
+                        class="material-icons"
+                        [title]="
+                          showConfirmPassword
+                            ? 'Afficher le mot de passe'
+                            : 'Cacher le mot de passe'
+                        "
+                        >{{
+                          showConfirmPassword ? "visibility_off" : "visibility"
+                        }}</i
+                      >
+                    </button>
+                  </div>
+                  <div *ngIf="passwordMismatchError" class="text-danger small">
+                    Les mots de passe ne correspondent pas
+                  </div>
+                </div>
+
+                <div class="col-md-12" *ngIf="displayCompanyName">
+                  <label class="form-label">{{ companyLabel }}</label>
+                  <input
+                    class="form-control"
+                    placeholder="Saisir"
+                    formControlName="compagnyName"
+                  />
+                  <div
+                    *ngIf="
+                      userForm.get('compagnyName')?.invalid &&
+                      userForm.get('compagnyName')?.touched
+                    "
+                    class="text-danger"
+                  >
+                    {{ companyLabel }} est requis
+                  </div>
+                </div>
+
+                <div class="col-md-12">
+                  <button
+                    class="button button-primary w-100"
+                    type="button"
+                    (click)="onSubmit()"
+                    [disabled]="loading"
+                  >
+                    <span *ngIf="!loading">S'inscrire</span>
+                    <span *ngIf="loading">Inscription en cours...</span>
+                  </button>
+                </div>
+
+                <div class="col-md-12">
+                  <p class="text-center mt-3">
+                    Vous avez déjà un compte ?
+                    <a
+                      href="javascript:void(0)"
+                      class="text-link"
+                      (click)="onLogin()"
+                      >Se connecter</a
+                    >
+                  </p>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

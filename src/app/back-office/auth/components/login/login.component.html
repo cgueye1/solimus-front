@@ -1,0 +1,99 @@
+<h2 class="title">Connexion</h2>
+
+<div class="row g-3">
+  <div class="col-md-12">
+    <label class="form-label">Email</label>
+    <input
+      class="form-control"
+      placeholder="Saisir votre adresse email"
+      [(ngModel)]="form.username"
+    />
+  </div>
+
+  <div class="col-md-12">
+    <label class="form-label">Mot de passe</label>
+    <div class="input-group input-group-custom">
+      <input
+        [type]="hide ? 'password' : 'text'"
+        autocomplete="on"
+        class="form-control "
+        placeholder="*******"
+        [(ngModel)]="form.password"
+      />
+      <button
+        type="button"
+        class="toggle-password"
+        (click)="hide = !hide"
+        [attr.aria-label]="'Hide password'"
+        [attr.aria-pressed]="hide"
+      >
+      <i class="material-icons" [title]="hide ? 'Afficher le mot de passe':'Cacher le mot de passe'">{{ hide ? 'visibility_off' : 'visibility' }}</i>
+      </button>
+    </div>
+  </div>
+
+  <div class="col-md-12">
+    <a
+      href="javascript:(0)"
+      class="text-link d-flex justify-content-end"
+      (click)="onForgotPassword()"
+      title="Mot de passe oublié"
+      
+      >Mot de passe oublié ?</a
+    >
+  </div>
+
+  <div class="col-md-12">
+    <button
+      class="button button-primary w-100"
+      type="button"
+      (click)="onLogin()"
+    >
+      Se connecter
+    </button>
+  </div>
+
+    <div class="col-md-12">
+      <p class="text-center mt-3">Vous n'avez pas de compte ? <a href="javascript:(0)" class="text-link"
+          (click)="onRegister()">S'inscrire</a></p>
+    </div>
+</div>
+
+
+<ng-template #subscriptionModal let-modal>
+  <div class="modal-header custom-header">
+    <h5 class="modal-title">
+      Se connecter en tant que
+    </h5>
+    <button
+      type="button"
+      class="btn-close"
+      (click)="modal.dismiss()">
+    </button>
+  </div>
+
+  <div class="modal-body">
+    <div class="plans-container">
+      <button
+        *ngFor="let sub of subscriptions"
+        class="plan-card"
+        (click)="onSelectPlan(sub.subscriptionPlans.name)"
+      >
+        <div class="plan-content">
+          <div>
+            <div class="plan-title">
+              {{ formatPlanName(sub.subscriptionPlans.name) }}
+            </div>
+            <div class="plan-label">
+              {{ sub.subscriptionPlans.label }}
+            </div>
+          </div>
+
+          <div class="arrow-icon">
+            <i class="bi bi-chevron-right"></i>
+          </div>
+        </div>
+      </button>
+    </div>
+  </div>
+</ng-template>

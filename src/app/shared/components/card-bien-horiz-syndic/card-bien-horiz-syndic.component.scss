@@ -1,0 +1,65 @@
+.card {
+  border: none;
+  border-radius: 8px;
+  padding: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  background-color: white;
+    position: relative;
+  overflow: hidden;
+}
+
+.card:hover{
+ box-shadow: 0px 0px 32px 0px rgba(136, 152, 170, 0.15);
+}
+
+.card:hover img {
+  transform: scale(1.05);
+}
+
+.card-body {
+  padding: 20px;
+}
+
+.card-text.description-property {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+-webkit-line-clamp: 3;
+}
+
+.card-title {
+  font-size: 18px;
+  font-weight: 600;
+}
+.card-title.price-property {
+  color: var(--primary-color);
+}
+
+.text-black-50 {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.material-icons {
+  // margin-right: 5px;
+  font-size: 18px;
+}
+
+#img-responsive {
+  width: 100%; /* Le conteneur figure prend toute la largeur de la colonne */
+  height: 100%;
+  max-height: 220px;
+  aspect-ratio: 4 / 3; /* Définit le ratio aspect 16:9, ajustable selon vos besoins */
+  overflow: hidden; /* Empêche les débordements */
+  border-radius: 8px; /* Facultatif, pour arrondir les coins */
+}
+
+#img-responsive img {
+  position: relative;
+   transition: all 0.3s ease-in-out;
+  width: auto; /* Remplit toute la largeur du conteneur */
+  height: auto; /* Remplit toute la hauteur en respectant le ratio */
+  object-fit: cover; /* Maintient l'image à l'intérieur du conteneur en remplissant toute la surface */
+  object-position: center; /* Centre l'image si elle est coupée */
+}

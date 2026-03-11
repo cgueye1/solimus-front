@@ -1,0 +1,1265 @@
+// Variables
+$primary-color: var(--primary-color);
+// Mixins;
+$success-color: #2ecc71;
+$warning-color: #f39c12;
+$danger-color: #e74c3c;
+$secondary-color: #95a5a6;
+$dark-color: #2c3e50;
+$light-color: #f8fafc;
+$border-color: #e2e8f0;
+$text-color: #1e293b;
+$text-light: #64748b;
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin transition {
+  transition: all 0.3s ease;
+}
+
+// Container principal
+.etat-lieux-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: $light-color;
+  min-height: 100vh;
+}
+
+// Page title
+.page-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: $dark-color;
+  margin: 0;
+  position: relative;
+  
+  &:after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    width: 80px;
+    height: 4px;
+    background: $primary-color;
+    border-radius: 2px;
+  }
+}
+
+// View toggles
+.view-toggles {
+  display: flex;
+  gap: 0.5rem;
+  background: white;
+  padding: 0.5rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.view-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  font-weight: 500;
+  color: $text-light;
+  cursor: pointer;
+  @include transition;
+  
+  i {
+    font-size: 1.2rem;
+  }
+  
+  &:hover {
+    color: $primary-color;
+    background: rgba($primary-color, 0.05);
+  }
+  
+  &.active {
+    background: $primary-color;
+    color: white;
+  }
+}
+
+// Actions bar
+.actions-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.archive-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border: 2px solid $border-color;
+  background: white;
+  border-radius: 8px;
+  font-weight: 500;
+  color: $text-light;
+  cursor: pointer;
+  @include transition;
+  
+  i {
+    font-size: 1.2rem;
+  }
+  
+  .badge {
+    background: $light-color;
+    color: $text-color;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    margin-left: 0.5rem;
+  }
+  
+  &:hover {
+    border-color: $primary-color;
+    color: $primary-color;
+  }
+  
+  &.active {
+    background: $primary-color;
+    border-color: $primary-color;
+    color: white;
+    
+    .badge {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+    }
+  }
+}
+
+// Loading
+.loading-container {
+  @include flex-center;
+  flex-direction: column;
+  padding: 4rem;
+  gap: 1rem;
+  
+  .spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid $border-color;
+    border-top-color: $primary-color;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  
+  p {
+    color: $text-light;
+    font-size: 1.1rem;
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+// Empty state
+.empty-state {
+  @include flex-center;
+  flex-direction: column;
+  padding: 5rem;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+  
+  .empty-icon {
+    width: 100px;
+    height: 100px;
+    background: $light-color;
+    border-radius: 50%;
+    @include flex-center;
+    margin-bottom: 1.5rem;
+    
+    i {
+      font-size: 3rem;
+      color: $secondary-color;
+    }
+  }
+  
+  h3 {
+    color: $dark-color;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+  }
+  
+  p {
+    color: $text-light;
+    margin: 0;
+  }
+}
+
+// Albums grid
+.albums-grid {
+  margin-top: 2rem;
+}
+
+.album-card {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+  @include transition;
+  
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  }
+  
+  &.archived {
+    opacity: 0.8;
+    background: lighten($light-color, 2%);
+    
+    .album-image {
+      filter: grayscale(50%);
+    }
+  }
+  
+  .album-image {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+    
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      @include transition;
+    }
+    
+    &:hover img {
+      transform: scale(1.1);
+    }
+    
+    .archive-badge {
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      background: rgba($warning-color, 0.9);
+      color: white;
+      padding: 0.4rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      backdrop-filter: blur(5px);
+      
+      i {
+        font-size: 1rem;
+      }
+    }
+    
+    .type-badge {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      padding: 0.4rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      color: white;
+      
+      &.entrance {
+        background: rgba($success-color, 0.9);
+      }
+      
+      &.exit {
+        background: rgba($danger-color, 0.9);
+      }
+      
+      i {
+        font-size: 1rem;
+      }
+    }
+  }
+  
+  .album-content {
+    padding: 1.5rem;
+    
+    .album-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: $dark-color;
+      margin-bottom: 0.5rem;
+    }
+    
+    .album-description {
+      color: $text-light;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin-bottom: 1rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    
+    .album-meta {
+      display: flex;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+      
+      .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+        color: $text-light;
+        font-size: 0.9rem;
+        
+        i {
+          font-size: 1rem;
+          color: $primary-color;
+        }
+      }
+    }
+    
+    .album-actions {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: flex-end;
+      
+      .action-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        border: none;
+        @include flex-center;
+        cursor: pointer;
+        @include transition;
+        background: $light-color;
+        
+        i {
+          font-size: 1.2rem;
+        }
+        
+        &.view {
+          color: $primary-color;
+          &:hover {
+            background: rgba($primary-color, 0.1);
+          }
+        }
+        
+        &.archive {
+          color: $warning-color;
+          &:hover {
+            background: rgba($warning-color, 0.1);
+          }
+        }
+        
+        &.restore {
+          color: $success-color;
+          &:hover {
+            background: rgba($success-color, 0.1);
+          }
+        }
+        
+        &.delete {
+          color: $danger-color;
+          &:hover {
+            background: rgba($danger-color, 0.1);
+          }
+        }
+      }
+    }
+  }
+}
+
+// Charts
+.charts-view {
+  .chart-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      
+      h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: $dark-color;
+        margin: 0;
+      }
+      
+      .chart-badge {
+        background: rgba($primary-color, 0.1);
+        color: $primary-color;
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+      }
+    }
+    
+    .chart-container {
+      min-height: 400px;
+    }
+  }
+}
+
+// Rapports list
+.rapports-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.rapport-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+  @include transition;
+  
+  &:hover {
+    transform: translateX(5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  }
+  
+  &.archived {
+    opacity: 0.8;
+    background: lighten($light-color, 2%);
+  }
+  
+  .rapport-icon {
+    width: 60px;
+    height: 60px;
+    background: rgba($danger-color, 0.1);
+    border-radius: 12px;
+    @include flex-center;
+    
+    i {
+      font-size: 2rem;
+      color: $danger-color;
+    }
+  }
+  
+  .rapport-content {
+    flex: 1;
+    
+    .rapport-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+      
+      .rapport-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: $dark-color;
+        margin: 0;
+      }
+    }
+    
+    .rapport-description {
+      color: $text-light;
+      font-size: 0.95rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .rapport-meta {
+      display: flex;
+      gap: 1.5rem;
+      
+      .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+        color: $text-light;
+        font-size: 0.85rem;
+        
+        i {
+          font-size: 0.95rem;
+        }
+      }
+    }
+  }
+  
+  .rapport-actions {
+    display: flex;
+    gap: 0.5rem;
+    
+    .action-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      border: none;
+      @include flex-center;
+      cursor: pointer;
+      @include transition;
+      background: $light-color;
+      
+      i {
+        font-size: 1.2rem;
+      }
+      
+      &.view {
+        color: $primary-color;
+        &:hover {
+          background: rgba($primary-color, 0.1);
+        }
+      }
+      
+      &.archive {
+        color: $warning-color;
+        &:hover {
+          background: rgba($warning-color, 0.1);
+        }
+      }
+      
+      &.restore {
+        color: $success-color;
+        &:hover {
+          background: rgba($success-color, 0.1);
+        }
+      }
+      
+      &.delete {
+        color: $danger-color;
+        &:hover {
+          background: rgba($danger-color, 0.1);
+        }
+      }
+    }
+  }
+}
+
+// Modal styles (réutilisation du design précédent)
+.modal-modern {
+  background: white;
+  border-radius: 16px;
+  overflow: hidden;
+  
+  .modal-header {
+    background: linear-gradient(135deg, $primary-color,  var(--primary-color-dark));
+    padding: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    
+    .modal-header-content {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      
+      .modal-icon {
+        color: white;
+        font-size: 2rem;
+      }
+      
+      .modal-title {
+        color: white;
+        margin: 0;
+        font-size: 1.3rem;
+        font-weight: 500;
+      }
+      
+      .modal-subtitle {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 0.9rem;
+      }
+    }
+    
+    .modal-actions {
+      display: flex;
+      gap: 0.5rem;
+      
+      .modal-action {
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        @include flex-center;
+        cursor: pointer;
+        @include transition;
+        
+        i {
+          color: white;
+        }
+        
+        &:hover {
+          background: rgba(255, 255, 255, 0.3);
+        }
+      }
+    }
+    
+    .modal-close {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      @include flex-center;
+      cursor: pointer;
+      @include transition;
+      
+      i {
+        color: white;
+      }
+      
+      &:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+    }
+  }
+  
+  .modal-body {
+    padding: 2rem;
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+  
+  .modal-footer {
+    padding: 1.5rem;
+    background: $light-color;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+  }
+  
+  &.fullscreen-modal {
+    &.fullscreen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 1050;
+      border-radius: 0;
+      
+      .modal-body {
+        max-height: calc(100vh - 140px);
+      }
+    }
+  }
+}
+
+// Form styles
+.form-group {
+  margin-bottom: 1.5rem;
+  
+  .form-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+    color: $dark-color;
+    margin-bottom: 0.5rem;
+    
+    i {
+      color: $primary-color;
+      font-size: 1.2rem;
+    }
+  }
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border: 2px solid $border-color;
+  border-radius: 8px;
+  font-size: 1rem;
+  @include transition;
+  
+  &:focus {
+    outline: none;
+    border-color: $primary-color;
+    box-shadow: 0 0 0 3px rgba($primary-color, 0.1);
+  }
+  
+  &.is-invalid {
+    border-color: $danger-color;
+  }
+}
+
+.error-message {
+  color: $danger-color;
+  font-size: 0.85rem;
+  margin-top: 0.3rem;
+}
+
+// Radio group
+.radio-group {
+  display: flex;
+  gap: 1.5rem;
+  
+  .radio-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    
+    input[type="radio"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+    
+    .radio-label {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      color: $text-color;
+      font-weight: 500;
+      
+      i {
+        font-size: 1.2rem;
+      }
+    }
+  }
+}
+
+// File upload
+.file-upload-area {
+  border: 2px dashed $border-color;
+  border-radius: 12px;
+  padding: 1rem;
+  @include transition;
+  background: $light-color;
+  
+  &:hover {
+    border-color: $primary-color;
+    background: rgba($primary-color, 0.02);
+  }
+}
+
+.upload-placeholder {
+  text-align: center;
+  padding: 2rem;
+  cursor: pointer;
+  
+  .upload-icon {
+    font-size: 3rem;
+    color: $primary-color;
+    margin-bottom: 1rem;
+  }
+  
+  .upload-text {
+    margin-bottom: 1rem;
+    
+    .upload-main {
+      display: block;
+      font-weight: 500;
+      color: $dark-color;
+      margin-bottom: 0.3rem;
+    }
+    
+    .upload-hint {
+      color: $text-light;
+      font-size: 0.9rem;
+    }
+  }
+  
+  .file-info {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    background: white;
+    padding: 0.3rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    color: $text-light;
+    
+    i {
+      font-size: 1rem;
+    }
+  }
+}
+
+.upload-success {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 8px;
+  
+  .success-icon {
+    color: $success-color;
+    font-size: 1.5rem;
+  }
+  
+  .change-btn {
+    margin-left: auto;
+    padding: 0.3rem 1rem;
+    border: 2px solid $primary-color;
+    background: transparent;
+    color: $primary-color;
+    border-radius: 20px;
+    font-weight: 500;
+    cursor: pointer;
+    @include transition;
+    
+    &:hover {
+      background: $primary-color;
+      color: white;
+    }
+  }
+}
+
+// Image preview grid
+.image-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 0.5rem;
+  margin-top: 1rem;
+  
+  .preview-item {
+    position: relative;
+    aspect-ratio: 1;
+    
+    .preview-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+    
+    .remove-image {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: $danger-color;
+      border: none;
+      @include flex-center;
+      cursor: pointer;
+      @include transition;
+      
+      i {
+        font-size: 14px;
+        color: white;
+      }
+      
+      &:hover {
+        transform: scale(1.1);
+        background: darken($danger-color, 10%);
+      }
+    }
+  }
+}
+
+// File preview
+.file-preview {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 8px;
+  
+  .file-icon {
+    i {
+      font-size: 2rem;
+      color: $danger-color;
+    }
+  }
+  
+  .file-details {
+    flex: 1;
+    
+    .file-name {
+      display: block;
+      font-weight: 500;
+      color: $dark-color;
+      margin-bottom: 0.2rem;
+    }
+    
+    .file-size {
+      font-size: 0.85rem;
+      color: $text-light;
+    }
+  }
+  
+  .remove-file {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    border: none;
+    background: rgba($danger-color, 0.1);
+    color: $danger-color;
+    @include flex-center;
+    cursor: pointer;
+    @include transition;
+    
+    &:hover {
+      background: $danger-color;
+      color: white;
+    }
+  }
+}
+
+// Image viewer
+.image-viewer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  
+  .main-image-container {
+    position: relative;
+    flex: 1;
+    min-height: 400px;
+    background: $dark-color;
+    
+    .zoom-container {
+      height: 100%;
+      overflow: hidden;
+      cursor: zoom-in;
+      
+      .main-image {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        @include transition;
+      }
+    }
+    
+    .zoom-controls {
+      position: absolute;
+      bottom: 1rem;
+      right: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 0.3rem;
+      border-radius: 30px;
+      backdrop-filter: blur(5px);
+      
+      .zoom-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: none;
+        @include flex-center;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        cursor: pointer;
+        @include transition;
+        
+        &:hover:not(:disabled) {
+          background: rgba(255, 255, 255, 0.3);
+        }
+        
+        &:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+      }
+      
+      .zoom-level {
+        color: white;
+        font-size: 0.9rem;
+        font-weight: 500;
+        min-width: 50px;
+        text-align: center;
+      }
+    }
+    
+    .nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: none;
+      @include flex-center;
+      background: rgba(0, 0, 0, 0.5);
+      color: white;
+      cursor: pointer;
+      @include transition;
+      backdrop-filter: blur(5px);
+      
+      &:hover:not(:disabled) {
+        background: rgba(0, 0, 0, 0.7);
+      }
+      
+      &:disabled {
+        opacity: 0.3;
+        cursor: not-allowed;
+      }
+      
+      &.prev {
+        left: 1rem;
+      }
+      
+      &.next {
+        right: 1rem;
+      }
+    }
+  }
+  
+  .thumbnails-container {
+    padding: 1rem;
+    background: white;
+    border-top: 1px solid $border-color;
+    
+    .thumbnails-scroll {
+      display: flex;
+      gap: 0.5rem;
+      overflow-x: auto;
+      padding-bottom: 0.5rem;
+      
+      .thumbnail {
+        flex-shrink: 0;
+        width: 80px;
+        height: 60px;
+        border-radius: 6px;
+        overflow: hidden;
+        cursor: pointer;
+        opacity: 0.6;
+        @include transition;
+        
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+        
+        &:hover {
+          opacity: 0.8;
+        }
+        
+        &.active {
+          opacity: 1;
+          border: 2px solid $primary-color;
+        }
+      }
+    }
+  }
+}
+
+// Buttons
+.btn-primary, .btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  @include transition;
+  border: none;
+  
+  i {
+    font-size: 1.2rem;
+  }
+}
+
+.btn-primary {
+  background: $primary-color;
+  color: white;
+  
+  &:hover:not(:disabled) {
+    background:  var(--primary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba($primary-color, 0.3);
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.btn-secondary {
+  background: white;
+  color: $text-color;
+  border: 2px solid $border-color;
+  
+  &:hover {
+    background: $light-color;
+    border-color: darken($border-color, 10%);
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .etat-lieux-container {
+    padding: 1rem;
+  }
+  
+  .page-title {
+    font-size: 1.5rem;
+  }
+  
+  .view-toggles {
+    flex-wrap: wrap;
+  }
+  
+  .rapport-card {
+    flex-direction: column;
+    text-align: center;
+    
+    .rapport-content {
+      width: 100%;
+      
+      .rapport-header {
+        justify-content: center;
+      }
+      
+      .rapport-meta {
+        justify-content: center;
+      }
+    }
+  }
+  
+  .modal-footer {
+    flex-direction: column;
+    
+    button {
+      width: 100%;
+    }
+  }
+}
+
+
+
+
+
+
+.image-viewer-body {
+  position: relative;
+  height: calc(100vh - 220px);
+  background: #1e293b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* IMAGE SCROLL */
+.image-scroll-container {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+/* IMAGE */
+.zoomable-image {
+  max-width: none;
+  max-height: none;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* ZOOM CONTROLS */
+.zoom-controls {
+  position: absolute;
+  bottom: 80px;
+  right: 20px;
+  background: rgba(0,0,0,.7);
+  padding: 6px 10px;
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  button {
+    background: rgba(255,255,255,.2);
+    border: none;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    color: white;
+    cursor: pointer;
+
+    &:disabled {
+      opacity: .4;
+      cursor: not-allowed;
+    }
+  }
+
+  span {
+    color: white;
+    min-width: 50px;
+    text-align: center;
+  }
+}
+
+/* NAV BUTTONS */
+.nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(0,0,0,.5);
+  color: white;
+  border: none;
+  cursor: pointer;
+
+  &.prev { left: 15px; }
+  &.next { right: 15px; }
+
+  &:disabled {
+    opacity: .3;
+    cursor: not-allowed;
+  }
+}
+
+/* THUMBNAILS */
+.thumbnails-container {
+  background: white;
+  padding: 10px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.thumbnails-scroll {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+}
+
+.thumbnail {
+  width: 80px;
+  height: 60px;
+  border-radius: 6px;
+  overflow: hidden;
+  cursor: pointer;
+  opacity: .6;
+  border: 2px solid transparent;
+
+  &.active {
+    opacity: 1;
+    border-color: #4361ee;
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}

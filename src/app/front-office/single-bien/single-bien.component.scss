@@ -1,0 +1,103 @@
+/* Styles pour l'image principale */
+.card-img-big {
+  width: 100%;
+  max-width: 30rem;
+  height: auto;
+  object-fit: contain;
+  margin: 0 auto;
+}
+
+/* Carousel Thumbnails */
+.carousel-item-thumbs {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 15px;
+}
+
+.img-thumbnail {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border: 2px solid transparent;
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.img-thumbnail:hover {
+  transform: scale(1.1);
+  border-color: var(--primary-color-front);
+}
+
+.img-thumbnail.active {
+  border-color: var(--primary-color-front);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Styles des boutons de contrôle du carousel */
+.fab-button {
+  position: relative;
+  overflow: hidden;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  background: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background-color 0.3s;
+  font-size: 18px;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 50%;
+  background-color: #fff;
+  color: var(--primary-color-front);
+}
+
+.fab-button::before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    circle,
+    transparent 10%,
+    rgba(255, 255, 255, 0.2) 40%
+  );
+  transform: scale(0);
+  transition: transform 0.5s, opacity 0.5s;
+  pointer-events: none;
+}
+
+.fab-button:hover {
+  background-color: var(--primary-color-front);
+  color: #fff;
+}
+
+.fab-button:hover::before {
+  transform: scale(2);
+  opacity: 0;
+}
+
+/* Responsiveness */
+@media (max-width: 768px) {
+  .carousel-item-thumbs {
+    gap: 8px;
+  }
+
+  .img-thumbnail {
+    width: 60px;
+    height: 60px;
+  }
+
+  .fab-button {
+    width: 30px;
+    height: 30px;
+  }
+
+  .card-img-big {
+    max-height: 250px;
+  }
+}

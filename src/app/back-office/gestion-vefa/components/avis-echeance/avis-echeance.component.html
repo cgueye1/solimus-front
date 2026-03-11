@@ -1,0 +1,265 @@
+<div class="echeance-container">
+  <!-- En-tête avec recherche et bouton d'ajout -->
+  <div class="echeance-header">
+    <div class="search-section">
+      <!--<div class="search-wrapper">
+        <i class="material-icons search-icon">search</i>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Rechercher un appel de fonds..."
+        />
+      </div>-->
+    </div>
+
+    <button
+      *ngIf="
+        currentuser.profil == ProfilEnum.PROMOTEUR ||
+        currentuser.profil == ProfilEnum.AGENCY ||
+        currentuser.profil == ProfilEnum.PROPRIETAIRE
+      "
+      class="btn-add"
+      (click)="openFormModal(CreateForm)"
+    >
+      <i class="material-icons">add</i>
+      <span>{{
+        singleLot.rental
+          ? "Ajouter un avis d'échéance"
+          : "Ajouter un appel de fonds"
+      }}</span>
+    </button>
+  </div>
+  <span *ngIf="callState">
+    <app-payment-call-stats [callState]="callState"></app-payment-call-stats>
+  </span>
+
+  <!-- Tableau -->
+  <div class="table-wrapper">
+    <table class="modern-table">
+      <thead>
+        <tr>
+          <th>DÉSIGNATION</th>
+          <th *ngIf="!singleLot.rental">% APPELÉ</th>
+          <th *ngIf="singleLot.rental">PROVISION T.O.M.</th>
+          <th *ngIf="singleLot.rental">TVA/LOYER</th>
+          <th *ngIf="singleLot.rental">LOYER</th>
+          <th>MONTANT À RÉGLER</th>
+          <th>DATE ÉCHÉANCE</th>
+          <th>STATUT</th>
+          <th class="actions-header">ACTIONS</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let item of paymentCalls" class="table-row">
+          <td class="title-cell">
+            <span class="title-text">{{ item.label }}</span>
+          </td>
+
+          <td *ngIf="!singleLot.rental" class="percentage-cell">
+            <span *ngIf="item.percentage > 0" class="percentage-badge">
+              {{ item.percentage }}%
+            </span>
+          </td>
+
+          <td *ngIf="singleLot.rental" class="amount-cell">
+            <span class="amount-text">{{ formatPrix(item.tom) }}</span>
+          </td>
+
+          <td *ngIf="singleLot.rental" class="tva-cell">
+            <span class="tva-badge">{{ item.tva }}%</span>
+          </td>
+
+          <td *ngIf="singleLot.rental" class="amount-cell">
+            <span class="amount-text">
+              {{
+                formatPrix(
+                  calculateLoyerFromTotal(item.amount, item.tva, item.tom)
+                )
+              }}
+            </span>
+          </td>
+
+          <td class="amount-cell highlight">
+            <span class="amount-text">{{ formatPrix(item.amount) }}</span>
+          </td>
+
+          <td class="date-cell" >
+            <i class="material-icons date-icon" *ngIf="item.percentage > 0" >event</i>
+            <span>{{ item.expectedDate }}</span>
+          </td>
+
+          <td class="status-cell">
+            <span [ngClass]="['status-badge', getStatusLot(item.status).class]">
+              {{ getStatusLot(item.status).text }}
+            </span>
+          </td>
+
+          <td class="actions-cell">
+            <div class="actions-wrapper">
+              <!-- Switch paiement -->
+              <div
+                class="switch-container"
+                *ngIf="
+                  (currentuser.profil === ProfilEnum.PROMOTEUR &&
+                    singleLot?.parentProperty?.agency == null) ||
+                  currentuser.profil === ProfilEnum.AGENCY ||
+                  currentuser.profil === ProfilEnum.PROPRIETAIRE
+                "
+              >
+                <label class="switch">
+                  <input
+                    type="checkbox"
+                    [checked]="item.status === 'PAID'"
+                    (change)="onSwitchChange($event, item)"
+                  />
+                  <span class="slider round"></span>
+                </label>
+              </div>
+
+              <!-- Actions promoteur / agence -->
+              <ng-container
+                *ngIf="
+                  (currentuser.profil === ProfilEnum.PROMOTEUR &&
+                    singleLot?.parentProperty?.agency == null) ||
+                  currentuser.profil === ProfilEnum.AGENCY ||
+                  currentuser.profil === ProfilEnum.PROPRIETAIRE
+                "
+              >
+                <ng-container *ngIf="item.status === 'PENDING'">
+                  <button
+                    class="action-btn edit-btn"
+                    title="Modifier"
+                    (click)="openFormModal(CreateForm, item)"
+                  >
+                    <i class="material-icons">edit</i>
+                  </button>
+
+                  <button
+                    class="action-btn delete-btn"
+                    title="Supprimer"
+                    (click)="onDelete(item)"
+                  >
+                    <i class="material-icons">delete</i>
+                  </button>
+                </ng-container>
+              </ng-container>
+
+              <!-- Actions réservataire / promoteur -->
+              <ng-container
+                *ngIf="
+                  (currentuser.profil === ProfilEnum.RESERVATAIRE ||
+                    currentuser.profil === ProfilEnum.PROMOTEUR ||
+                    currentuser.profil === ProfilEnum.PROPRIETAIRE ||
+                    currentuser.profil === ProfilEnum.NOTAIRE ||
+                    currentuser.profil === ProfilEnum.AGENCY) &&
+                  item.status === 'PAID'
+                "
+              >
+                <button
+                  *ngIf="item.status === 'PAID'"
+                  class="action-btn invoice-btn"
+                  title="Quittance de loyer"
+                  (click)="downloadInvoice(item)"
+                >
+                  <i class="material-icons">receipt</i>
+                </button>
+              </ng-container>
+
+              <!-- Upload / Voir fichier -->
+              <button
+                class="action-btn upload-btn"
+                title="Ajouter une preuve de paiement"
+                (click)="openModal(ADD_FICHE, item)"
+              >
+                <i class="material-icons">attach_file</i>
+              </button>
+
+              <button
+                *ngIf="item.file != null"
+                class="action-btn view-btn"
+                title="Voir la preuve de paiement"
+                (click)="openPdf(item.file)"
+              >
+                <i class="material-icons">visibility</i>
+              </button>
+            </div>
+          </td>
+        </tr>
+
+        <!-- Message si aucune donnée -->
+        <tr *ngIf="paymentCalls.length === 0">
+          <td colspan="9" class="empty-state">
+            <div class="empty-state-content">
+              <i class="material-icons empty-icon">inbox</i>
+              <p>Aucun appel de fonds trouvé</p>
+              <button
+                *ngIf="!hideActions"
+                class="btn-add-empty"
+                (click)="openFormModal(CreateForm)"
+              >
+                <i class="material-icons">add</i>
+                Créer le premier appel de fonds
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Modal création / édition -->
+  <ng-template #CreateForm>
+    <div class="modal-modern">
+      <app-avis-echeance-form
+        [formData]="selectedAppelFond"
+        [isEditMode]="isEditMode"
+        [singleLot]="singleLot"
+        (formSubmit)="onFormSubmit($event)"
+      >
+      </app-avis-echeance-form>
+    </div>
+  </ng-template>
+
+  <!-- Modal upload preuve -->
+  <ng-template #ADD_FICHE let-modal>
+    <div class="modal-modern">
+      <div class="modal-header-modern">
+        <h4 class="modal-title-modern">
+          <i class="material-icons">cloud_upload</i>
+          Preuve de paiement
+        </h4>
+        <button class="btn-close-modern" (click)="modal.dismiss()">
+          <i class="material-icons">close</i>
+        </button>
+      </div>
+
+      <div class="modal-body-modern">
+        <div class="upload-area" (click)="fileInput.click()">
+          <input
+            #fileInput
+            type="file"
+            class="file-input"
+            (change)="onUpload($event)"
+            accept=".pdf,.jpg,.jpeg,.png"
+          />
+          <i class="material-icons upload-icon">cloud_upload</i>
+          <p class="upload-text">Cliquez pour sélectionner un fichier</p>
+          <p class="upload-hint">PDF, JPG, PNG (Max. 10MB)</p>
+          <span *ngIf="file" class="file-name">
+            <i class="material-icons">insert_drive_file</i>
+            {{ file.name }}
+          </span>
+        </div>
+      </div>
+
+      <div class="modal-footer-modern">
+        <button class="btn-cancel" (click)="modal.dismiss()">Annuler</button>
+        <button class="btn-save" (click)="onSave()" [disabled]="!file">
+          <i class="material-icons">save</i>
+          Enregistrer
+        </button>
+      </div>
+    </div>
+  </ng-template>
+</div>

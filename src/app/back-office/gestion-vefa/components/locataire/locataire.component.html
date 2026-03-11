@@ -1,0 +1,279 @@
+<div class="client-info-card">
+  <!-- En-tête avec actions -->
+  <div class="card-header">
+    <div class="header-left">
+      <div class="header-icon">
+        <i class="material-icons">person</i>
+      </div>
+      <div class="header-text">
+        <h6 class="header-title">Informations du client</h6>
+        <p class="header-subtitle" *ngIf="singleLot?.recipient">
+          Réservataire du lot {{ singleLot?.name }}
+        </p>
+        <p class="header-subtitle" *ngIf="!singleLot?.recipient">
+          Aucun réservataire assigné
+        </p>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <!-- Bouton Annuler (quand un client existe) -->
+      <button
+        *ngIf="
+          (currentuser?.profil === ProfilEnum.PROMOTEUR ||
+            currentuser?.profil === ProfilEnum.AGENCY ||
+            currentuser?.profil === ProfilEnum.PROPRIETAIRE) && 
+          singleLot?.recipient !== null
+        "
+        class="btn-action btn-cancel"
+        (click)="onDelete()"
+        title="Annuler la réservation"
+      >
+        <i class="material-icons">close</i>
+        <span>Annuler</span>
+      </button>
+
+      <!-- Bouton Modifier (quand un client existe) -->
+      <button
+        *ngIf="
+          singleLot?.recipient &&
+          (currentuser?.profil === ProfilEnum.PROMOTEUR ||
+            currentuser?.profil === ProfilEnum.AGENCY ||
+            currentuser?.profil === ProfilEnum.PROPRIETAIRE) && 
+          singleLot?.recipient !== null
+        "
+        class="btn-action btn-edit"
+        (click)="onEdit(singleLot.recipient)"
+        title="Modifier les informations"
+      >
+        <i class="material-icons">edit</i>
+        <span>Modifier</span>
+      </button>
+
+      <!-- Bouton Ajouter (quand aucun client) -->
+      <button
+        *ngIf="
+          (currentuser?.profil === ProfilEnum.PROMOTEUR ||
+            currentuser?.profil === ProfilEnum.AGENCY ||
+            currentuser?.profil === ProfilEnum.PROPRIETAIRE) && 
+          singleLot?.recipient === null
+        "
+        class="btn-action btn-add"
+        (click)="openFormModal(formUserModal)"
+        title="Ajouter un réservataire"
+      >
+        <i class="material-icons">add</i>
+        <span>Ajouter</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- État vide -->
+  <div class="empty-state" *ngIf="singleLot?.recipient == null">
+    <div class="empty-state-content">
+      <div class="empty-icon">
+        <i class="material-icons">person_outline</i>
+      </div>
+      <p class="empty-title">Aucun réservataire</p>
+      <p class="empty-description">
+        Ce lot n'a pas encore de réservataire assigné.<br />
+        Cliquez sur "Ajouter" pour en créer un.
+      </p>
+    </div>
+  </div>
+
+  <!-- Informations du client -->
+  <div class="client-details" *ngIf="singleLot?.recipient !== null">
+    <div class="details-grid">
+      <!-- Prénom -->
+      <div class="detail-item">
+        <div class="detail-label">
+          <i class="material-icons">badge</i>
+          <span>Prénom</span>
+        </div>
+        <div class="detail-value">{{ singleLot?.recipient?.prenom || 'Non renseigné' }}</div>
+      </div>
+
+      <!-- Nom -->
+      <div class="detail-item">
+        <div class="detail-label">
+          <i class="material-icons">badge</i>
+          <span>Nom</span>
+        </div>
+        <div class="detail-value">{{ singleLot?.recipient?.nom || 'Non renseigné' }}</div>
+      </div>
+
+      <!-- Téléphone -->
+      <div class="detail-item">
+        <div class="detail-label">
+          <i class="material-icons">phone</i>
+          <span>Téléphone</span>
+        </div>
+        <div class="detail-value">
+          <a href="tel:{{ singleLot?.recipient?.telephone }}" class="contact-link">
+            {{ singleLot?.recipient?.telephone || 'Non renseigné' }}
+          </a>
+        </div>
+      </div>
+
+      <!-- Email -->
+      <div class="detail-item">
+        <div class="detail-label">
+          <i class="material-icons">email</i>
+          <span>Email</span>
+        </div>
+        <div class="detail-value">
+          <a href="mailto:{{ singleLot?.recipient?.email }}" class="contact-link">
+            {{ singleLot?.recipient?.email || 'Non renseigné' }}
+          </a>
+        </div>
+      </div>
+
+      <!-- Adresse -->
+      <div class="detail-item full-width">
+        <div class="detail-label">
+          <i class="material-icons">location_on</i>
+          <span>Adresse</span>
+        </div>
+        <div class="detail-value">{{ singleLot?.recipient?.adress || 'Non renseignée' }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Template -->
+<ng-template #formUserModal let-modal>
+  <div class="modal-modern">
+    <div class="modal-header-modern">
+      <div class="header-content">
+        <div class="header-icon">
+          <i class="material-icons">{{ isEditMode ? 'edit' : 'person_add' }}</i>
+        </div>
+        <div class="header-text">
+          <h5 class="modal-title-modern">
+            {{ isEditMode ? "Modifier le réservataire" : "Nouveau réservataire" }}
+          </h5>
+          <p class="modal-subtitle">
+            {{ isEditMode ? "Modifiez les informations du client" : "Ajoutez un client à ce lot" }}
+          </p>
+        </div>
+      </div>
+      <button type="button" class="btn-close-modern" (click)="modal.dismiss('close')">
+        <i class="material-icons">close</i>
+      </button>
+    </div>
+
+    <div class="modal-body-modern">
+      <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+        <div class="form-grid">
+          <!-- Prénom -->
+          <div class="form-group">
+            <label class="form-label">
+              Prénom
+              <span class="required">*</span>
+            </label>
+            <div class="input-wrapper">
+              <i class="material-icons input-icon">badge</i>
+              <input
+                class="form-control-modern"
+                formControlName="prenom"
+                placeholder="Ex: Jean"
+                [class.error]="userForm.get('prenom')?.invalid && userForm.get('prenom')?.touched"
+              />
+            </div>
+            <div class="error-message" *ngIf="userForm.get('prenom')?.invalid && userForm.get('prenom')?.touched">
+              Le prénom est requis
+            </div>
+          </div>
+
+          <!-- Nom -->
+          <div class="form-group">
+            <label class="form-label">
+              Nom
+              <span class="required">*</span>
+            </label>
+            <div class="input-wrapper">
+              <i class="material-icons input-icon">badge</i>
+              <input
+                class="form-control-modern"
+                formControlName="nom"
+                placeholder="Ex: Dupont"
+                [class.error]="userForm.get('nom')?.invalid && userForm.get('nom')?.touched"
+              />
+            </div>
+            <div class="error-message" *ngIf="userForm.get('nom')?.invalid && userForm.get('nom')?.touched">
+              Le nom est requis
+            </div>
+          </div>
+
+          <!-- Téléphone avec indicatif -->
+          <div class="form-group full-width">
+            <label class="form-label">
+              Téléphone
+              <span class="required">*</span>
+            </label>
+            <div class="phone-input-group">
+              <div class="indicatif-select">
+                <select class="form-control-modern" formControlName="indicatif">
+                  <option *ngFor="let indicatif of indicatifs" [value]="indicatif.code">
+                    {{ indicatif.code }}
+                  </option>
+                </select>
+              </div>
+              <div class="phone-number">
+                <i class="material-icons input-icon">phone</i>
+                <input
+                  class="form-control-modern"
+                  placeholder="77 123 45 67"
+                  formControlName="telephone"
+                  [class.error]="userForm.get('telephone')?.invalid && userForm.get('telephone')?.touched"
+                />
+              </div>
+            </div>
+            <div class="error-message" *ngIf="userForm.get('telephone')?.invalid && userForm.get('telephone')?.touched">
+              Le téléphone est requis
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="form-group full-width">
+            <label class="form-label">Email</label>
+            <div class="input-wrapper">
+              <i class="material-icons input-icon">email</i>
+              <input
+                class="form-control-modern"
+                formControlName="email"
+                placeholder="Ex: jean.dupont@email.com"
+                type="email"
+              />
+            </div>
+          </div>
+
+          <!-- Adresse -->
+          <div class="form-group full-width">
+            <label class="form-label">Adresse</label>
+            <div class="input-wrapper">
+              <i class="material-icons input-icon">location_on</i>
+              <input
+                class="form-control-modern"
+                formControlName="adress"
+                placeholder="Ex: 123 Rue Principale, Dakar"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer-modern">
+          <button type="button" class="btn-outline-modern" (click)="modal.dismiss('close')">
+            <i class="material-icons">close</i>
+            Annuler
+          </button>
+          <button type="submit" class="btn-primary-modern" [disabled]="userForm.invalid">
+            <i class="material-icons">{{ isEditMode ? 'save' : 'person_add' }}</i>
+            {{ isEditMode ? 'Mettre à jour' : 'Créer le réservataire' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</ng-template>

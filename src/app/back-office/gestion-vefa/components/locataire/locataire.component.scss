@@ -1,0 +1,552 @@
+// Variables (à définir dans votre fichier global ou local)
+$primary-color: var(--primary-color);
+$primary-light: #eef2ff;
+$success-color: #2ecc71;
+$success-light: #e8f8f5;
+$warning-color: #f39c12;
+$danger-color: #e74c3c;
+$danger-light: #fdeded;
+$secondary-color: #95a5a6;
+$secondary-light: #f8f9fa;
+$dark-color: #2c3e50;
+$light-color: #f8fafc;
+$border-color: #e2e8f0;
+$text-color: #1e293b;
+$text-light: #64748b;
+$white: #ffffff;
+$shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+$shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+$shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+$border-radius: 16px;
+$border-radius-sm: 8px;
+
+// Mixins
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin transition {
+  transition: all 0.3s ease;
+}
+
+// Carte principale
+.client-info-card {
+  background: $white;
+  border-radius: $border-radius;
+  box-shadow: $shadow-sm;
+  overflow: hidden;
+  border: 1px solid $border-color;
+}
+
+// En-tête
+.card-header {
+  @include flex-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid $border-color;
+  flex-wrap: wrap;
+  gap: 16px;
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    .header-icon {
+      @include flex-center;
+      width: 48px;
+      height: 48px;
+      background: $primary-light;
+      border-radius: 50%;
+
+      i {
+        font-size: 24px;
+        color: $primary-color;
+      }
+    }
+
+    .header-text {
+      .header-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: $text-color;
+        margin: 0 0 4px;
+      }
+
+      .header-subtitle {
+        font-size: 13px;
+        color: $text-light;
+        margin: 0;
+      }
+    }
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+}
+
+// Boutons d'action
+.btn-action {
+  @include flex-center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: $border-radius-sm;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  @include transition;
+
+  i {
+    font-size: 18px;
+  }
+
+  &.btn-add {
+    background: $primary-color;
+    color: $white;
+    box-shadow: 0 4px 12px rgba($primary-color, 0.3);
+
+    &:hover {
+      background: var(--primary-color);
+    }
+  }
+
+  &.btn-edit {
+    background: $primary-light;
+    color: $primary-color;
+
+    &:hover {
+      background: darken($primary-light, 5%);
+    }
+  }
+
+  &.btn-cancel {
+    background: $danger-light;
+    color: $danger-color;
+
+    &:hover {
+      background: darken($danger-light, 5%);
+    }
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// État vide
+.empty-state {
+  padding: 48px 24px;
+  text-align: center;
+
+  .empty-state-content {
+    max-width: 300px;
+    margin: 0 auto;
+
+    .empty-icon {
+      @include flex-center;
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 20px;
+      background: $secondary-light;
+      border-radius: 50%;
+
+      i {
+        font-size: 40px;
+        color: $text-light;
+        opacity: 0.5;
+      }
+    }
+
+    .empty-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: $text-color;
+      margin: 0 0 8px;
+    }
+
+    .empty-description {
+      font-size: 14px;
+      color: $text-light;
+      line-height: 1.6;
+      margin: 0;
+    }
+  }
+}
+
+// Détails du client
+.client-details {
+  padding: 24px;
+
+  .details-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+
+    @media (max-width: 576px) {
+      grid-template-columns: 1fr;
+    }
+
+    .full-width {
+      grid-column: 1 / -1;
+    }
+
+    .detail-item {
+      .detail-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+
+        i {
+          font-size: 18px;
+          color: $primary-color;
+        }
+
+        span {
+          font-size: 13px;
+          font-weight: 500;
+          color: $text-light;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+      }
+
+      .detail-value {
+        font-size: 16px;
+        font-weight: 500;
+        color: $text-color;
+        padding: 12px 16px;
+        background: $secondary-light;
+        border-radius: $border-radius-sm;
+        border: 1px solid $border-color;
+
+        .contact-link {
+          color: $primary-color;
+          text-decoration: none;
+          @include transition;
+
+          &:hover {
+            color: var(--primary-color);;
+            text-decoration: underline;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Styles du modal moderne
+.modal-modern {
+  background: $white;
+  border-radius: $border-radius;
+  overflow: hidden;
+  max-width: 600px;
+  margin: 0 auto;
+
+  .modal-header-modern {
+    @include flex-between;
+    padding: 24px 24px 16px;
+    border-bottom: 1px solid $border-color;
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+
+      .header-icon {
+        @include flex-center;
+        width: 48px;
+        height: 48px;
+        background: $primary-light;
+        border-radius: 50%;
+
+        i {
+          font-size: 24px;
+          color: $primary-color;
+        }
+      }
+
+      .header-text {
+        .modal-title-modern {
+          font-size: 20px;
+          font-weight: 600;
+          color: $text-color;
+          margin: 0 0 4px;
+        }
+
+        .modal-subtitle {
+          font-size: 13px;
+          color: $text-light;
+          margin: 0;
+        }
+      }
+    }
+
+    .btn-close-modern {
+      @include flex-center;
+      width: 36px;
+      height: 36px;
+      background: transparent;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      @include transition;
+
+      i {
+        font-size: 20px;
+        color: $text-light;
+      }
+
+      &:hover {
+        background: $danger-light;
+
+        i {
+          color: $danger-color;
+        }
+      }
+    }
+  }
+
+  .modal-body-modern {
+    padding: 24px;
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+
+      @media (max-width: 576px) {
+        grid-template-columns: 1fr;
+      }
+
+      .full-width {
+        grid-column: 1 / -1;
+      }
+    }
+
+    .form-group {
+      .form-label {
+        display: block;
+        font-size: 13px;
+        font-weight: 500;
+        color: $text-color;
+        margin-bottom: 8px;
+
+        .required {
+          color: $danger-color;
+          margin-left: 4px;
+        }
+      }
+
+      .input-wrapper {
+        position: relative;
+
+        .input-icon {
+          position: absolute;
+          left: 12px;
+          top: 50%;
+          transform: translateY(-50%);
+          color: $text-light;
+          font-size: 20px;
+          pointer-events: none;
+          z-index: 1;
+        }
+
+        .form-control-modern {
+          width: 100%;
+          height: 44px;
+          padding: 0 16px 0 44px;
+          border: 1.5px solid $border-color;
+          border-radius: $border-radius-sm;
+          font-size: 14px;
+          color: $text-color;
+          background: $white;
+          @include transition;
+
+          &::placeholder {
+            color: $text-light;
+            opacity: 0.6;
+          }
+
+          &:hover:not(:disabled) {
+            border-color: $primary-color;
+          }
+
+          &:focus {
+            outline: none;
+            border-color: $primary-color;
+            box-shadow: 0 0 0 4px rgba($primary-color, 0.1);
+          }
+
+          &.error {
+            border-color: $danger-color;
+            
+            &:focus {
+              box-shadow: 0 0 0 4px rgba($danger-color, 0.1);
+            }
+          }
+        }
+      }
+
+      .error-message {
+        font-size: 11px;
+        color: $danger-color;
+        margin-top: 6px;
+        font-weight: 500;
+      }
+    }
+
+    .phone-input-group {
+      display: flex;
+      gap: 12px;
+
+      .indicatif-select {
+        width: 100px;
+
+        select.form-control-modern {
+          padding: 0 12px;
+          background-color: $white;
+          cursor: pointer;
+        }
+      }
+
+      .phone-number {
+        flex: 1;
+        position: relative;
+
+        .input-icon {
+          position: absolute;
+          left: 12px;
+          top: 50%;
+          transform: translateY(-50%);
+          color: $text-light;
+          font-size: 20px;
+          pointer-events: none;
+        }
+
+        .form-control-modern {
+          width: 100%;
+          padding-left: 44px;
+        }
+      }
+    }
+  }
+
+  .modal-footer-modern {
+    @include flex-between;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid $border-color;
+    gap: 12px;
+
+    button {
+      @include flex-center;
+      gap: 8px;
+      padding: 0 24px;
+      height: 44px;
+      border: none;
+      border-radius: $border-radius-sm;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      @include transition;
+      min-width: 140px;
+
+      i {
+        font-size: 18px;
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+
+    .btn-outline-modern {
+      background: transparent;
+      color: $text-light;
+      border: 1.5px solid $border-color;
+
+      &:hover:not(:disabled) {
+        background: $secondary-light;
+        border-color: $text-light;
+        color: $text-color;
+      }
+    }
+
+    .btn-primary-modern {
+      background: $primary-color;
+      color: $white;
+      box-shadow: 0 4px 12px rgba($primary-color, 0.3);
+
+      &:hover:not(:disabled) {
+        background:var(--primary-color);;
+        transform: translateY(-2px);
+      }
+
+      &:active:not(:disabled) {
+        transform: translateY(0);
+      }
+    }
+  }
+}
+
+// Animation
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-modern {
+  animation: fadeIn 0.3s ease;
+}
+
+// Responsive
+@media (max-width: 576px) {
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start;
+
+    .header-actions {
+      width: 100%;
+      
+      .btn-action {
+        flex: 1;
+      }
+    }
+  }
+
+  .modal-footer-modern {
+    flex-direction: column-reverse;
+
+    button {
+      width: 100%;
+    }
+  }
+
+  .phone-input-group {
+    flex-direction: column;
+    
+    .indicatif-select {
+      width: 100% !important;
+    }
+  }
+}

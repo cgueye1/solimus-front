@@ -1,0 +1,52 @@
+<div class="p-3">
+
+ <div class="dflex-end mb-4">
+  <button class="button button-outline-primary" (click)="openModal(ADD_FICHE)">
+    Ajouter un fiche de renseignement <i class="material-icons">add</i>
+  </button>
+ </div>
+
+  <ul class="list-group list-group-flush"  *ngIf="currentUser?.technicalSheet">
+    <li class="list-group-item d-flex dflex-between px-0" >
+      <div class="dflex-start">
+        <img src="assets/icons/file__icon.svg" alt="Details">
+        <div class="dflex-column">
+          <p class="p-0 m-0">
+          Fiche de renseignement
+          </p>
+          <span class="text-black-50"></span>
+        </div>
+      </div>
+      <div class="dflex-start">
+        <button class="button button-outline-primary"  (click)=" openPdf(currentUser.technicalSheet)"><i
+            class="material-icons">download</i></button>
+      </div>
+    </li>
+  </ul>
+</div>
+
+
+<ng-template #ADD_FICHE let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Nouveau Fiche de renseignement</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+
+    <form  [formGroup]="sheetForm" (ngSubmit)="onSave()">
+
+      <div class="row g-3">
+        <div class="col-md-12">
+          <label class="form-label">Document joint</label>
+          <input class="form-control" type="file" (change)="onFileChange($event)" accept=".pdf,.doc,.docx" />
+        </div>
+
+      </div>
+    </form>
+
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="button button-primary" (click)="onSave();">Enregistrer</button>
+    <button type="button" class="button button-outline-primary" (click)="modal.dismiss()">Annuler</button>
+  </div>
+</ng-template>

@@ -1,0 +1,56 @@
+<div class="card" *ngIf="deleted === false">
+
+
+  <div class="row g-0">
+    <div class="col-lg-3">
+      <figure id="img-responsive">
+        <img  [src]="getFullImageUrl(data.plan)" class="img-fluid rounded-start" [alt]="data.title">
+        <div [ngClass]="['status-lot', getStatusLot(data.status).class]">
+          {{
+          getStatusLot(data.status).text
+          }}
+        </div>
+      </figure>
+    </div>
+    <div class="col-lg-9">
+      <div class="card-body">
+        <div class="dflex-between">
+          <h3 class="card-title title-property">{{ data.name }} </h3>
+          <div class="dropdown">
+            <button class="btn btn-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="material-icons">more_vert</i>
+            </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="javascript:(0)" (click)="onViewLot('DETAILS')">Voir détails</a></li>
+              <li><a class="dropdown-item" href="javascript:(0)" (click)="onEditLot()">Modifier</a></li>
+              <li><a class="dropdown-item" href="javascript:(0)" (click)="onViewLot('SUIVI')">Suivi de l’avancement</a></li>
+              <li><a class="dropdown-item" href="javascript:(0)" (click)="onViewLot('APPEL_FOND')">Appel de fond</a></li>
+              <li><a class="dropdown-item" href="javascript:(0)" (click)="onDelete()">Supprimer</a></li>
+            </ul>
+          </div>
+          <!-- <h3 class="card-title price-property">{{ data.price }}</h3> -->
+        </div>
+
+
+
+        <p class="card-text description-property">{{ data.description }}</p>
+
+        <h3 class="card-title price-property"  *ngIf="currentuser && currentuser.profil === ProfilEnum.PROMOTEUR" >{{  formatPrix(data.price) }}</h3>
+
+       <ng-container *ngIf="data.status == 'reserved'">
+        <p class="dflex-center mt-3">
+          <span class="dflex-center text-black-50 me-2">
+            <i class="material-icons">person</i>
+            <i>Réservataire:</i>
+          </span>
+          <span>{{ data.promoter }}</span>
+        </p>
+       </ng-container>
+
+
+      </div>
+    </div>
+  </div>
+
+
+</div>

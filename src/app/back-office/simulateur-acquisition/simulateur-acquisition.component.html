@@ -1,0 +1,112 @@
+<div class="p-3">
+  <div class="flex-row-between">
+    <h3 class="title-bo">Simulateur d'acquisition</h3>
+  </div>
+
+  <nav aria-label="breadcrumb" class="breadcrumb-bo">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="javascript:(0)">Simulateur d'acquisition</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+        Simuler
+      </li>
+    </ol>
+  </nav>
+
+  <!-- Search Form -->
+  <div class="row mb-3">
+    <div class="col-lg-6">
+      <label class="form-label">Projet en cours</label>
+      <input id="typeahead-template" type="search" class="form-control" [(ngModel)]="searchQuery"
+        [ngModelOptions]="{ standalone: true }" (focus)="focus$.next($any($event).target.value)"
+        (click)="click$.next($any($event).target.value)" #instance="ngbTypeahead" [ngbTypeahead]="search"
+        [resultTemplate]="rt" [inputFormatter]="formatter" (selectItem)="onSelect($event.item)"
+        placeholder="Rechercher ici..." />
+    </div>
+    <div class="col-lg-6 d-flex align-items-end">
+      <button class="button button-primary" (click)="performSearch()">Simuler</button>
+    </div>
+  </div>
+
+  <!-- Template for the Typeahead suggestions with image -->
+  <ng-template #rt let-r="result" let-t="term">
+    <img [src]="getFullImageUrl(r.plan)" class="me-2" style="width: 50px" />
+    <ngb-highlight [result]="r.name" [term]="t"></ngb-highlight>
+  </ng-template>
+
+  <div class="row g-4">
+    <!-- Conditionally render the results or the "No results" message -->
+    <ng-container *ngIf="searchPerformed; else noDeptSelected">
+      <!-- Detail du bien -->
+      <div class="col-lg-4">
+        <app-card-bien-vertical [data]="singleBien" [isActions]="false"></app-card-bien-vertical>
+      </div>
+
+      <!-- Autre details -->
+      <div class="col-lg-8">
+        <div class="card__content bg-white h-100" id="simulation-result-content">
+          <!-- Message quand il n'y a pas d'arriérés -->
+          <ng-container *ngIf="similateResult.overduePayments && similateResult.overduePayments.length === 0; else hasOverduePayments">
+            <div class="text-center py-5">
+                    <i class="material-icons" style="font-size: 80px; color: #4caf50;">check_circle</i>
+              <h4 class="text-success mb-3">Aucun Appel de Fonds en Arriéré</h4>
+              <p class="text-muted">Tous les appels de fonds sont à jour pour ce bien.</p>
+            </div>
+          </ng-container>
+
+          <!-- Template quand il y a des arriérés -->
+          <ng-template #hasOverduePayments>
+            <h4>Liste des Appels de Fonds Manqués</h4>
+
+            <table class="table table__sm w-100 mt-3">
+              <thead>
+                <tr>
+                  <th scope="col">Désignation</th>
+                  <th scope="col">% Appelé</th>
+                  <th scope="col">Montant</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let apf of similateResult.overduePayments">
+                  <td>{{apf.label }}</td>
+                  <td>{{apf.percentage}} %</td>
+                  <td>{{formatPrix(calculatePercentage(singleBien.price, apf.percentage))}}</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <br />
+            <h5>Détails du Paiement</h5>
+
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item d-flex dflex-between px-0">
+                <span>Montant Total à Verser</span>
+                <span class="fw-medium fs-5 text-danger">{{ formatPrix(similateResult.totalAmount) }}</span>
+              </li>
+            </ul>
+
+            <!-- Boutons qui s'affichent uniquement quand il y a des arriérés -->
+            <div class="dflex-start mt-3" *ngIf="similateResult.overduePayments && similateResult.overduePayments.length > 0">
+              <button class="button button-primary" (click)="printSimulation()">Imprimer</button>
+              <button class="button button-outline-primary" (click)="downloadPDF()">Télécharger</button>
+              <!--<button class="button button-white" (click)="contactProprietaire()">Contactez le propriétaire</button>-->
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- No result found template -->
+    <ng-template #noDeptSelected>
+      <div class="col-lg-12">
+        <div class="card__content bg-white h-100">
+          <div class="empty-list">
+            <img src="assets/images/empty-icons.svg" alt="Aucun résultat trouvé" />
+            <p>Aucun résultat trouvé</p>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </div>
+</div>

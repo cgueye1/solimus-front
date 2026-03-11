@@ -1,0 +1,62 @@
+.button-secondary
+{
+  padding: .3rem .6rem;
+  font-size: .9rem;
+}
+
+
+
+.btn-create {
+  display: flex;
+  align-items: center;
+  justify-content: center; // ✅ centre le texte + icône même si le bouton est large
+  gap: 8px;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+
+  i {
+    font-size: 20px;
+  }
+
+  &:hover {
+    background: #2563eb;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+  }
+}
+
+  
+
+.btn-delete {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #ef4444; // rouge
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+
+  i {
+    font-size: 20px;
+  }
+
+  &:hover {
+    background: #dc2626; // rouge plus foncé
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(239, 68, 68, 0.4);
+  }
+}

@@ -1,0 +1,377 @@
+<div class="property-type-container">
+  <!-- En-tête -->
+  <div class="property-type-header">
+    <div class="d-flex justify-content-between align-items-center">
+      <h3>
+        <i class="material-icons align-middle">category</i>
+        Types de propriétés
+      </h3>
+      <button class="btn btn-primary" (click)="openCreate()" [disabled]="loading">
+        <ng-container *ngIf="!loading; else loadingTpl">
+          <i class="material-icons align-middle">add</i>
+          Nouveau type
+        </ng-container>
+        <ng-template #loadingTpl>
+          <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+          Chargement...
+        </ng-template>
+      </button>
+    </div>
+  </div>
+
+  <!-- Statistiques -->
+  <div class="stats-cards mb-4">
+    <div class="row">
+      <div class="col-md-3">
+        <div class="stat-card">
+          <div class="stat-icon bg-primary-subtle">
+            <i class="material-icons text-primary">layers</i>
+          </div>
+          <div class="stat-details">
+            <h5 class="stat-title">Total</h5>
+            <p class="stat-value">{{ propertyTypes.length }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stat-card">
+          <div class="stat-icon bg-success-subtle">
+            <i class="material-icons text-success">folder</i>
+          </div>
+          <div class="stat-details">
+            <h5 class="stat-title">Types parents</h5>
+            <p class="stat-value">{{ parentCount }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stat-card">
+          <div class="stat-icon bg-info-subtle">
+            <i class="material-icons text-info">subdirectory_arrow_right</i>
+          </div>
+          <div class="stat-details">
+            <h5 class="stat-title">Sous-types</h5>
+            <p class="stat-value">{{ childCount }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stat-card">
+          <div class="stat-icon bg-warning-subtle">
+            <i class="material-icons text-warning">build</i>
+          </div>
+          <div class="stat-details">
+            <h5 class="stat-title">En gestion</h5>
+            <p class="stat-value">Actif</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtres et recherche -->
+  <div class="filters-section card mb-4">
+    <div class="card-body">
+      <div class="row align-items-center">
+        <div class="col-md-4">
+          <div class="d-flex align-items-center">
+            <label class="me-2 fw-bold">Filtrer par :</label>
+            <select class="form-select" [(ngModel)]="filterParent" style="width: auto;">
+              <option value="all">Tous les types</option>
+              <option value="parent">Types parents uniquement</option>
+              <option value="child">Sous-types uniquement</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="input-group">
+            <span class="input-group-text bg-white">
+              <i class="material-icons">search</i>
+            </span>
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Rechercher un type de propriété..."
+              [(ngModel)]="searchTerm"
+            />
+            <button 
+              *ngIf="searchTerm || filterParent !== 'all'"
+              class="btn btn-outline-secondary" 
+              type="button" 
+              (click)="resetFilters()">
+              <i class="material-icons align-middle">clear</i>
+              Réinitialiser
+            </button>
+          </div>
+        </div>
+        <div class="col-md-2 text-end">
+          <span class="badge bg-light text-dark p-2">
+            {{ filteredPropertyTypes.length }} résultat(s)
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loader -->
+  <div class="text-center mt-5" *ngIf="loading && propertyTypes.length === 0">
+    <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+      <span class="visually-hidden">Chargement...</span>
+    </div>
+    <p class="mt-3 text-muted">Chargement des types de propriétés...</p>
+  </div>
+
+  <!-- Message liste vide -->
+  <div
+    class="alert alert-info text-center py-4"
+    *ngIf="!loading && filteredPropertyTypes.length === 0"
+  >
+    <i class="material-icons" style="font-size: 48px;">info</i>
+    <h5 class="mt-2">Aucun type de propriété trouvé</h5>
+    <p class="mb-0" *ngIf="propertyTypes.length === 0">
+      Commencez par créer votre premier type de propriété.
+    </p>
+    <p class="mb-0" *ngIf="propertyTypes.length > 0">
+      Aucun résultat ne correspond à vos critères de recherche.
+    </p>
+  </div>
+
+  <!-- Tableau des types de propriétés -->
+  <div class="table-responsive" *ngIf="!loading && filteredPropertyTypes.length > 0">
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th>Type de propriété</th>
+          <th>Catégorie</th>
+          <!--<th class="text-center">Statut</th>-->
+          <th class="text-center">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngFor="let type of filteredPropertyTypes">
+          <tr [class.parent-row]="type.parent" [class.child-row]="!type.parent">
+            <td>
+              <div class="d-flex align-items-center">
+                <i 
+                  class="material-icons me-2" 
+                  [ngClass]="type.parent ? 'text-primary' : 'text-secondary'"
+                  [style.fontSize]="type.parent ? '24px' : '20px'"
+                >
+                  {{ type.parent ? 'folder' : 'subdirectory_arrow_right' }}
+                </i>
+                <span [ngClass]="{'fw-bold': type.parent}">
+                  {{ type.typeName }}
+                </span>
+              </div>
+            </td>
+            <td>
+              <span class="custom-badge badge-primary" [ngClass]="getTypeBadgeClass(type.parent)">
+                <i class="material-icons align-middle" style="font-size: 14px;">
+                  {{ type.parent ? 'folder' : 'subdirectory_arrow_right' }}
+                </i>
+                {{ getTypeLabel(type.parent) }}
+              </span>
+            </td>
+            <!--<td class="text-center">
+              <span class="badge bg-success">
+                <i class="material-icons align-middle" style="font-size: 14px;">check_circle</i>
+                Actif
+              </span>
+            </td>-->
+            <td class="text-center">
+              <div class="btn-group">
+                <button 
+                  class="btn btn-sm btn-outline-primary" 
+                  (click)="openEdit(type)"
+                  title="Modifier"
+                >
+                  <i class="material-icons align-middle">edit</i>
+                </button>
+                <button 
+                  class="btn btn-sm btn-outline-danger" 
+                  (click)="delete(type)"
+                  title="Supprimer"
+                  [disabled]="!canDeleteParent(type) && type.parent"
+                >
+                  <i class="material-icons align-middle">delete</i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Légende -->
+  <div class="legend-section card mt-4" *ngIf="propertyTypes.length > 0">
+    <div class="card-body py-2">
+      <div class="d-flex align-items-center gap-4">
+        <span class="text-muted">
+          <i class="material-icons align-middle text-primary" style="font-size: 16px;">folder</i>
+          Type parent : Peut contenir des sous-types
+        </span>
+        <span class="text-muted">
+          <i class="material-icons align-middle text-secondary" style="font-size: 16px;">subdirectory_arrow_right</i>
+          Sous-type : Hérite du type parent
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<ng-template #propertyTypeModal>
+  <div class="modal-header">
+    <h5 class="modal-title">
+      <i class="material-icons align-middle" [ngClass]="editing ? 'text-warning' : 'text-success'">
+        {{ editing ? 'edit' : 'add_circle' }}
+      </i>
+      {{ editing ? 'Modifier' : 'Ajouter' }} un type de propriété
+    </h5>
+    <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
+  </div>
+
+  <form [formGroup]="propertyTypeForm" (ngSubmit)="submit()">
+    <div class="modal-body">
+      <div class="row">
+        <div class="col-12">
+          <!-- Nom du type -->
+          <div class="mb-4">
+            <label class="form-label fw-bold">
+              Nom du type de propriété 
+              <span class="text-danger">*</span>
+            </label>
+            <div class="input-group">
+              <span class="input-group-text bg-light">
+                <i class="material-icons">home</i>
+              </span>
+              <input
+                type="text"
+                class="form-control"
+                formControlName="typeName"
+                [class.is-invalid]="propertyTypeForm.get('typeName')?.invalid && propertyTypeForm.get('typeName')?.touched"
+                placeholder="Ex: Immeuble, Appartement, Villa..."
+              />
+            </div>
+            <div 
+              *ngIf="propertyTypeForm.get('typeName')?.invalid && propertyTypeForm.get('typeName')?.touched" 
+              class="invalid-feedback d-block"
+            >
+              <i class="material-icons align-middle" style="font-size: 14px;">error</i>
+              Le nom du type de propriété est obligatoire
+            </div>
+          </div>
+
+          <!-- Type parent ou enfant -->
+          <div class="mb-3">
+            <label class="form-label fw-bold">Catégorie <span class="text-danger">*</span></label>
+            
+            <div class="card bg-light">
+              <div class="card-body">
+                <div class="d-flex gap-4">
+                  <div class="form-check">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      formControlName="parent"
+                      [value]="true"
+                      id="parentType"
+                    />
+                    <label class="form-check-label" for="parentType">
+                      <div class="d-flex align-items-center">
+                        <span class="badge bg-primary me-2">
+                          <i class="material-icons align-middle" style="font-size: 14px;">folder</i>
+                        </span>
+                        <div>
+                          <strong>Type parent</strong>
+                          <div class="small text-muted">Peut avoir des sous-types</div>
+                        </div>
+                      </div>
+                    </label>
+                  </div>
+
+                  <div class="form-check">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      formControlName="parent"
+                      [value]="false"
+                      id="childType"
+                    />
+                    <label class="form-check-label" for="childType">
+                      <div class="d-flex align-items-center">
+                        <span class="badge bg-secondary me-2">
+                          <i class="material-icons align-middle" style="font-size: 14px;">subdirectory_arrow_right</i>
+                        </span>
+                        <div>
+                          <strong>Sous-type</strong>
+                          <div class="small text-muted">Dépend d'un type parent</div>
+                        </div>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div 
+              *ngIf="propertyTypeForm.get('parent')?.invalid && propertyTypeForm.get('parent')?.touched" 
+              class="text-danger small mt-1"
+            >
+              <i class="material-icons align-middle" style="font-size: 14px;">error</i>
+              Veuillez sélectionner une catégorie
+            </div>
+          </div>
+
+          <!-- Message d'information -->
+          <div class="alert alert-info d-flex align-items-center mt-3" *ngIf="propertyTypeForm.get('parent')?.value">
+            <i class="material-icons me-2">info</i>
+            <div>
+              <strong>Type parent :</strong> Ce type pourra être sélectionné comme catégorie principale
+              pour d'autres propriétés.
+            </div>
+          </div>
+
+          <!--<div class="alert alert-secondary d-flex align-items-center mt-3" *ngIf="propertyTypeForm.get('parent')?.value === false">
+            <i class="material-icons me-2">info</i>
+            <div>
+              <strong>Sous-type :</strong> Ce type sera disponible comme sous-catégorie.
+              Assurez-vous qu'un type parent existe déjà.
+            </div>
+          </div>-->
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer avec boutons -->
+    <div class="modal-footer">
+      <button 
+        type="button" 
+        class="btn btn-outline-secondary" 
+        (click)="closeModal()"
+        [disabled]="loading"
+      >
+        <i class="material-icons align-middle">close</i>
+        Annuler
+      </button>
+      <button 
+        type="submit" 
+        class="btn" 
+        [ngClass]="editing ? 'btn-warning' : 'btn-primary'"
+        [disabled]="loading || propertyTypeForm.invalid"
+      >
+        <ng-container *ngIf="!loading; else btnLoading">
+          <i class="material-icons align-middle">
+            {{ editing ? 'save' : 'add' }}
+          </i>
+          {{ editing ? 'Mettre à jour' : 'Créer' }}
+        </ng-container>
+        <ng-template #btnLoading>
+          <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+          Enregistrement...
+        </ng-template>
+      </button>
+    </div>
+  </form>
+</ng-template>

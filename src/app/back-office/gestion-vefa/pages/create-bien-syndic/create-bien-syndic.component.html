@@ -1,0 +1,489 @@
+<div class="p-3">
+  <div class="flex-row-between">
+    <h3 class="title-bo">Création</h3>
+  </div>
+
+  <nav aria-label="breadcrumb" class="breadcrumb-bo">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="javascript:(0)" [routerLink]="['/gestion-vente-vefa']">{{
+          rental ? "Gestion Copropriétaires" : "Gestion Copropriétaires"
+        }}</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">Création</li>
+    </ol>
+  </nav>
+
+  <div class="container_page">
+    <!-- header -->
+    <div class="container_page-header">
+      <h3 class="subtitle-bo">Informations générales</h3>
+    </div>
+
+    <form [formGroup]="realEstatePropertyForm" (ngSubmit)="onSave()">
+      <div class="row g-4 mt-2">
+        <div class="col-lg-4">
+          <label class="form-label">Type de bien *</label>
+          <select class="form-select" formControlName="propertyTypeId">
+            <option value="">Sélectionner</option>
+            <option *ngFor="let type of propertyTypeList" [value]="type.id">
+              {{ type.typeName }}
+            </option>
+          </select>
+        </div>
+
+
+        <div class="col-lg-4">
+          <label class="form-label">Nom du bien *</label>
+          <input
+            type="text"
+            class="form-control"
+            formControlName="name"
+            placeholder="Saisir"
+          />
+        </div>
+       
+        <div class="col-lg-4">
+          <label class="form-label">Surface (m²) *</label>
+          <input
+            type="number"
+            class="form-control"
+            formControlName="area"
+            placeholder="Saisir"
+          />
+        </div>
+        <!--- <div class="col-lg-4">
+          <label class="form-label">{{
+            rental ? "Montant du loyer" : "Prix (F CFA) * "
+          }}</label>
+          <input
+            type="text"
+            class="form-control"
+            formControlName="price"
+            (input)="onPriceInput($event)"
+            placeholder="Saisir"
+          />
+        </div>-->
+
+        <div class="col-lg-4">
+          <label class="form-label">Adresse *</label>
+          <!-- <input type="text" class="form-control" formControlName="address" placeholder="Saisir" >-->
+          <input
+            type="text"
+            class="form-control"
+            [formControl]="placeControl"
+            [matAutocomplete]="autoAdress"
+            placeholder="Saisir"
+          />
+          <mat-autocomplete #autoAdress="matAutocomplete">
+            <mat-option
+              *ngFor="let option of filteredOptions | async"
+              [value]="option.name"
+            >
+              {{ option.name }}
+            </mat-option>
+          </mat-autocomplete>
+        </div>
+        <div class="col-lg-4">
+          <label class="form-label">{{
+            rental ? "Nombre de chambre * " : "Nombre de Lots * "
+          }}</label>
+          <input
+            type="number"
+            class="form-control"
+            formControlName="numberOfLots"
+            placeholder="Saisir"
+          />
+        </div>
+        <!--- <div class="col-lg-4">
+          <label class="form-label">{{
+            "Image du bien" 
+          }}</label>
+          <input
+            type="file"
+            class="form-control"
+            (change)="onPlanSelected($event)"
+          />
+          <button
+            type="button"
+            class="btn btn-link"
+            *ngIf="plan"
+            (click)="onDeletePlan(plan)"
+          >
+            Supprimer le plan
+          </button>
+        </div>-->
+        
+         <div class="col-lg-12">
+          <label class="form-label">Galerie d'images</label>
+        <div class="file-upload">
+            <input
+              #fileInput
+              type="file"
+              multiple
+              hidden
+              (change)="onMultipleFilesSelected($event)"
+            />
+
+            <button
+              type="button"
+              class="upload-btn"
+              (click)="fileInput.click()"
+            >
+              <i class="material-icons">cloud_upload</i>
+              Ajouter des images
+            </button>
+
+            <span class="file-hint" *ngIf="images.length === 0">
+              Aucun fichier sélectionné
+            </span>
+
+            <span class="file-hint" *ngIf="images.length > 0">
+              {{ images.length }} image{{
+                images.length > 1 ? "s" : ""
+              }}
+              sélectionnée{{ images.length > 1 ? "s" : "" }}
+            </span>
+          </div>
+
+          <div class="col-md-12" *ngIf="pictures.controls.length > 0">
+            <ul class="galleryPreviews">
+              <li *ngFor="let picture of pictures.controls; let i = index">
+                <div class="previewUrl">
+                  <img [src]="picture.value" class="img-fluid" alt="Image Preview" />
+                  <button type="button" class="btn btn-danger" (click)="onDeleteGalleryImage(i)">
+                    <i class="material-icons red-icon">close</i>
+                  </button>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <br>   <br>
+        <!--<div *ngIf="isMapVisible" class="modal" style="display: block;">
+          <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="map" style="height: 400px; width: 100%;"></div> 
+          </div>
+        </div>-
+
+        <div class="col-lg-4" *ngIf="!rental">
+          <label class="form-label">Frais de réservation (%) *</label>
+          <select
+            class="form-select"
+            formControlName="reservationFee"
+            (change)="onPercentageSelect($event)"
+          >
+            <option value="" disabled selected>
+              Sélectionner un pourcentage
+            </option>
+            <option
+              *ngFor="let percentage of percentageOptions"
+              [value]="percentage"
+            >
+              {{ percentage }}%
+            </option>
+          </select>
+        </div>
+
+        <div class="col-lg-4">
+          <label class="form-label">{{
+            rental ? "Montant de la caution" : "Frais de dossier * "
+          }}</label>
+          <input
+            type="text"
+            class="form-control"
+            formControlName="feesFile"
+            (input)="onFeesFileInput($event)"
+            placeholder="Saisir"
+          />
+        </div>
+
+        <div class="col-lg-4">
+          <label class="form-label">{{
+            rental ? "Nombre de chambre * " : "Nombre de Lots * "
+          }}</label>
+          <input
+            type="number"
+            class="form-control"
+            formControlName="numberOfLots"
+            placeholder="Saisir"
+          />
+        </div>
+
+        <div class="col-lg-4" *ngIf="!rental">
+          <label class="form-label">Notaire *</label>
+          <input
+            class="form-control"
+            type="text"
+            [formControl]="notaireControl"
+            [matAutocomplete]="auto1"
+            placeholder="Saisir"
+          />
+          <mat-autocomplete
+            #auto1="matAutocomplete"
+            [displayWith]="displayFn"
+            (optionSelected)="selectNotaire($event)"
+          >
+            <mat-option
+              *ngFor="let option of filteredNotaires | async"
+              [value]="option"
+            >
+              {{ option.nom }} {{ option.prenom }} ({{ option.telephone }})
+            </mat-option>
+          </mat-autocomplete>
+        </div>
+
+        <div class="col-lg-4">
+          <label class="form-label">Nom du bien *</label>
+          <input
+            type="text"
+            class="form-control"
+            formControlName="name"
+            placeholder="Saisir"
+          />
+        </div>
+       
+        <div class="col-lg-4" *ngIf="!rental">
+          <label class="form-label">Sélectionner une banque</label>
+          <input
+            id="typeahead-template"
+            type="search"
+            class="form-control"
+            [(ngModel)]="searchQuery"
+            [ngModelOptions]="{ standalone: true }"
+            (focus)="focus$.next($any($event).target.value)"
+            (click)="click$.next($any($event).target.value)"
+            #instance="ngbTypeahead"
+            [ngbTypeahead]="search"
+            [resultTemplate]="rt"
+            [inputFormatter]="formatter"
+            (selectItem)="onSelect($event.item)"
+            placeholder="Rechercher ici..."
+          />
+        </div>
+
+        <ng-template #rt let-r="result" let-t="term">
+          <ngb-highlight [result]="r.company.name" [term]="t"></ngb-highlight>
+        </ng-template>
+
+        <div class="col-lg-4" *ngIf="!rental">
+          <label class="form-label">Sélectionner une agence</label>
+          <input
+            id="typeahead-template"
+            type="search"
+            class="form-control"
+            [(ngModel)]="searchQuery1"
+            [ngModelOptions]="{ standalone: true }"
+            (focus)="focus1$.next($any($event).target.value)"
+            (click)="click1$.next($any($event).target.value)"
+            #instance="ngbTypeahead"
+            [ngbTypeahead]="searchAgency"
+            [resultTemplate]="rt1"
+            [inputFormatter]="formatter"
+            (selectItem)="onSelectAgency($event.item)"
+            placeholder="Rechercher ici..."
+          />
+        </div>
+
+        <ng-template #rt1 let-r="result" let-t="term">
+          <ngb-highlight [result]="r.company.name" [term]="t"></ngb-highlight>
+        </ng-template>
+
+        <div class="col-lg-4">
+          <label class="form-label">Description *</label>
+          <textarea
+            class="form-control"
+            rows="3"
+            formControlName="description"
+            placeholder="Saisir"
+          ></textarea>
+        </div>
+
+        <div class="col-lg-12">
+          <label class="form-label">Équipements communs</label> <br />
+
+          <div class="form-check form-check-inline">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              formControlName="hasHall"
+            />
+            <label class="form-check-label">Hall</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              formControlName="hasParking"
+            />
+            <label class="form-check-label">Parking</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              formControlName="hasElevator"
+            />
+            <label class="form-check-label">Ascenseur</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              formControlName="hasSwimmingPool"
+            />
+            <label class="form-check-label">Piscine</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              formControlName="hasGym"
+            />
+            <label class="form-check-label">Salle de Gym</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              formControlName="hasPlayground"
+            />
+            <label class="form-check-label">Aire de jeux</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              formControlName="hasSecurityService"
+            />
+            <label class="form-check-label">Service de sécurité</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              formControlName="hasGarden"
+            />
+            <label class="form-check-label">Jardin</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              formControlName="hasSharedTerrace"
+            />
+            <label class="form-check-label">Terrasse partagée</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              formControlName="hasBicycleStorage"
+            />
+            <label class="form-check-label">Rangement pour vélos</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              formControlName="hasLaundryRoom"
+            />
+            <label class="form-check-label">Salle de lavage</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              formControlName="hasStorageRooms"
+            />
+            <label class="form-check-label">Chambres de stockage</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              formControlName="hasWasteDisposalArea"
+            />
+            <label class="form-check-label">Zone de déchets</label>
+          </div>
+        </div>
+
+        <div class="col-lg-4">
+          <label class="form-label">{{
+            rental ? "Image du bien" : "Plan du bien * "
+          }}</label>
+          <input
+            type="file"
+            class="form-control"
+            (change)="onPlanSelected($event)"
+          />
+          <button
+            type="button"
+            class="btn btn-link"
+            *ngIf="plan"
+            (click)="onDeletePlan(plan)"
+          >
+            Supprimer le plan
+          </button>
+        </div>
+
+        <div class="col-lg-4" *ngIf="!rental">
+          <label class="form-label">Statut juridique</label>
+          <input
+            type="file"
+            class="form-control"
+            (change)="onLegalStatusSelected($event)"
+          />
+          <button
+            type="button"
+            class="btn btn-link"
+            *ngIf="legalStatusFile"
+            (click)="onDeleteLegalStatus(legalStatusFile)"
+          >
+            Supprimer le statut juridique
+          </button>
+        </div>-->
+
+        <!--- <div class="col-lg-12">
+          <label class="form-label">Galerie d'images</label>
+          <input type="file" class="form-control" multiple (change)="onMultipleFilesSelected($event)">
+          <div class="col-md-12" *ngIf="pictures.controls.length > 0">
+            <ul class="galleryPreviews">
+              <li *ngFor="let picture of pictures.controls; let i = index">
+                <div class="previewUrl">
+                  <img [src]="picture.value" class="img-fluid" alt="Image Preview" />
+                  <button type="button" class="btn btn-danger" (click)="onDeleteGalleryImage(i)">
+                    <i class="material-icons red-icon">close</i>
+                  </button>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>-->
+
+        <div class="row">
+          <div class="col-lg-4">
+            <div class="dflex-start mt-4">
+              <button
+                class="button button-primary"
+                type="button"
+                [disabled]="loading || realEstatePropertyForm.invalid"
+                (click)="onSave()"
+              >
+                Sauvegarder
+              </button>
+              <button
+                class="button button-outline-primary"
+                type="button"
+                (click)="onReset()"
+              >
+                Annuler
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

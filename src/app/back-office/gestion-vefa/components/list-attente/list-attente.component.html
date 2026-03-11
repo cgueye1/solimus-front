@@ -1,0 +1,266 @@
+<div class="p-3">
+  <!-- Liste -->
+  <ul
+    class="list-group list-group-flush"
+    *ngIf="data && data.length > 0; else emptyState"
+  >
+    <li
+      class="list-group-item d-flex dflex-between px-0"
+      *ngFor="let item of data"
+    >
+      <div class="dflex-start">
+        <img src="assets/icons/user__icon.svg" alt="Utilisateur" />
+        <div class="dflex-column ms-2">
+          <p class="p-0 m-0">
+            {{ item.user.prenom }} {{ item.user.nom }}
+            <span
+              [ngClass]="['status-lot ms-3', getStatusLot(item.status).class]"
+            >
+              {{ getStatusLot(item.status).text }}
+            </span>
+          </p>
+          <span class="text-black-50">{{ item.user.telephone }}</span>
+        </div>
+      </div>
+
+      <div class="dflex-start">
+        <button
+          class="button button-outline-primary"
+          (click)="openModal(DETAIL_FORM, item)"
+        >
+          <i class="material-icons">visibility</i>
+        </button>
+      </div>
+    </li>
+  </ul>
+
+  <!-- Message si vide -->
+  <ng-template #emptyState>
+    <div class="text-center py-5 empty-state">
+      <!--<img
+        src="assets/icons/empty-box.svg"
+        alt="Aucun résultat"
+        width="80"
+        class="mb-3 opacity-75"
+      />-->
+      <p class="mb-1 fw-semibold">Aucun élément à afficher</p>
+      <small class="text-muted">
+        Les données apparaîtront ici dès qu’elles seront disponibles.
+      </small>
+    </div>
+  </ng-template>
+</div>
+
+
+<ng-template #EDIT_FORM let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">
+      Informations sur le réservataire
+    </h4>
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Close"
+      (click)="modal.dismiss('Cross click')"
+    ></button>
+  </div>
+  <div class="modal-body">
+    <form>
+      <h5 class="text-muted">Informations personnelles</h5>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Prénom</label>
+          <input class="form-control" placeholder="Saisir" value="Khadija" />
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Nom</label>
+          <input class="form-control" placeholder="Saisir" value="Sow" />
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Téléphone</label>
+          <input
+            class="form-control"
+            placeholder="Saisir"
+            value="77 111 11 11"
+          />
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Email</label>
+          <input
+            class="form-control"
+            type="email"
+            placeholder="Saisir"
+            value="ksow@gmail.com"
+          />
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Adresse</label>
+          <input class="form-control" placeholder="Saisir" value="Dakar" />
+        </div>
+      </div>
+
+      <br />
+      <br />
+
+      <h5 class="text-muted">Gestion du Paiement</h5>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Mode de Paiement</label>
+          <select class="form-select">
+            <option value="">Choisir</option>
+            <option value="Par chèque">Par chèque</option>
+            <option value="Bancaire">Bancaire</option>
+          </select>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Attestation de paiement</label>
+          <input class="form-control" placeholder="Saisir" type="file" />
+        </div>
+
+        <div class="col-md-6">
+          <div class="form-check">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              value=""
+              id="paiement"
+            />
+            <label class="form-check-label" for="paiement">
+              Paiement effectué
+            </label>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button
+      type="button"
+      class="button button-primary"
+      (click)="onSave(); modal.dismiss()"
+    >
+      Finaliser la Réservation
+    </button>
+    <button type="button" class="button button-outline-primary">
+      Modifier
+    </button>
+    <button type="button" class="button button-secondary">Transférer</button>
+    <button type="button" class="button button-red" (click)="onDelete(1)">
+      Supprimer
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #DETAIL_FORM let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">
+      Informations sur le réservataire
+    </h4>
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Close"
+      (click)="modal.dismiss('Cross click')"
+    ></button>
+  </div>
+  <div class="modal-body">
+    <form>
+      <h5 class="text-muted">Informations personnelles</h5>
+      <div class="row g-4">
+        <div class="col-lg-6">
+          <div class="detail__item">
+            <h6>Prénom</h6>
+            <span>{{ selectedReservation.user.prenom }}</span>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="detail__item">
+            <h6>Nom</h6>
+            <span>{{ selectedReservation.user.nom }}</span>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="detail__item">
+            <h6>Téléphone</h6>
+            <span>{{ selectedReservation.user.telephone }}</span>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="detail__item">
+            <h6>Email</h6>
+            <span>{{ selectedReservation.user.email }}</span>
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="detail__item">
+            <h6>Adresse</h6>
+            <span>{{ selectedReservation.user.adress }}</span>
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="detail__item">
+            <h6>Status</h6>
+            <p class="p-0 m-0">
+              <span
+                [ngClass]="[
+                  'status-lot ms-3',
+                  getStatusLot(selectedReservation.status).class,
+                ]"
+              >
+                {{ getStatusLot(selectedReservation.status).text }}
+              </span>
+            </p>
+          </div>
+        </div>
+      </div>
+      <br />
+      <br />
+      <br />
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="button button-primary"
+          (click)="validReservation()"
+          *ngIf="
+            selectedReservation.status === 'PROSPECT' &&
+            selectedReservation.property.status !== 'RESERVED'
+          "
+        >
+          Finaliser la Réservation
+        </button>
+
+        <!--<button type="button" class="button button-outline-primary">Modifier</button>-->
+        <!--- <button type="button" class="button button-secondary">Transférer</button>-->
+        <!--<button type="button" class="button button-red" (click)="onDelete(1)">Supprimer</button>-->
+      </div>
+      <!--<h5 class="text-muted">Gestion du Paiement</h5>
+      <div class="row g-4">
+        <div class="col-lg-6">
+          <div class="detail__item">
+            <h6>Mode de paiement</h6>
+            <span>Par chèque</span>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="detail__item">
+            <h6>Attestation de paiment</h6>
+            <span><a href="javascript:(0)" class="text-link">attestation-paiement.jpg</a></span>
+          </div>
+        </div>
+        <div class="col-lg-6">
+          <div class="detail__item">
+            <h6>Paiement effectué</h6>
+            <span>Oui</span>
+          </div>
+        </div>
+      </div>-->
+    </form>
+  </div>
+</ng-template>

@@ -1,0 +1,92 @@
+
+
+
+
+
+<div class="py-3">
+  <form [formGroup]="userForm" (ngSubmit)="onSubmit()"  *ngIf="currentUser">
+    <div class="row g-4">
+      <!-- Prénom -->
+      <div class="col-md-6">
+        <label class="form-label">Prénom</label>
+        <input
+          class="form-control"
+          placeholder="Saisir"
+          formControlName="prenom"
+          [ngClass]="{ 'is-invalid': userForm.get('prenom')?.invalid && userForm.get('prenom')?.touched }"
+        />
+        <div *ngIf="userForm.get('prenom')?.invalid && userForm.get('prenom')?.touched" class="invalid-feedback">
+          Le prénom est requis.
+        </div>
+      </div>
+
+      <!-- Nom -->
+      <div class="col-md-6">
+        <label class="form-label">Nom</label>
+        <input
+          class="form-control"
+          placeholder="Saisir"
+          formControlName="nom"
+          [ngClass]="{ 'is-invalid': userForm.get('nom')?.invalid && userForm.get('nom')?.touched }"
+        />
+        <div *ngIf="userForm.get('nom')?.invalid && userForm.get('nom')?.touched" class="invalid-feedback">
+          Le nom est requis.
+        </div>
+      </div>
+
+      <!-- Téléphone -->
+      <div class="col-md-6">
+        <label class="form-label">Indicatif et Téléphone</label>
+        <div class="input-group">
+          <select class="form-select" formControlName="indicatif">
+            <option *ngFor="let indicatif of indicatifs" [value]="indicatif.code">
+              {{ indicatif.country }} ({{ indicatif.code }})
+            </option>
+          </select>
+          <input
+            class="form-control"
+            placeholder="Téléphone"
+            formControlName="telephone"
+            [ngClass]="{ 'is-invalid': userForm.get('telephone')?.invalid && userForm.get('telephone')?.touched }"
+          />
+        </div>
+        <div *ngIf="userForm.get('telephone')?.invalid && userForm.get('telephone')?.touched" class="invalid-feedback">
+          Le téléphone est requis.
+        </div>
+      </div>
+
+      <!-- Email -->
+      <div class="col-md-6">
+        <label class="form-label">Email</label>
+        <input
+          class="form-control"
+          type="email"
+          placeholder="Saisir"
+          formControlName="email"
+          
+        />
+      </div>
+<!--[readonly]="true"-->
+      <!-- Adresse -->
+      <div class="col-md-6">
+        <label class="form-label">Adresse</label>
+        <input
+          class="form-control"
+          placeholder="Saisir"
+          formControlName="adress"
+          [ngClass]="{ 'is-invalid': userForm.get('adress')?.invalid && userForm.get('adress')?.touched }"
+        />
+        <div *ngIf="userForm.get('adress')?.invalid && userForm.get('adress')?.touched" class="invalid-feedback">
+          L'adresse est requise.
+        </div>
+      </div>
+
+      <!-- Bouton de mise à jour -->
+      <div class="col-md-12">
+        <button class="button button-primary" type="submit" [disabled]="userForm.invalid || loading">
+          Mettre à jour
+        </button>
+      </div>
+    </div>
+  </form>
+</div>

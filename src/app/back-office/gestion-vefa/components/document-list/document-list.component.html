@@ -1,0 +1,262 @@
+<div class="documents-container">
+  <!-- Header avec titre et bouton d'ajout -->
+  <div class="documents-header">
+    <h2>Documents</h2>
+    <button class="btn-add" (click)="openModal()" *ngIf="canAdd">
+      <span class="btn-icon">+</span>
+      Ajouter un document
+    </button>
+  </div>
+
+  <!-- Loading spinner -->
+  <div class="loading-spinner" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Chargement des documents...</p>
+  </div>
+
+  <!-- Grid des documents -->
+  <div class="documents-grid" *ngIf="!loading && documents.length > 0">
+    <div class="document-card" *ngFor="let doc of documents">
+      <!-- En-tête de la carte avec indicateur de statut -->
+      <div class="card-header">
+        <div
+          class="document-badge"
+          [class.signed]="isPdfSigned(doc)"
+          [class.partial]="
+            !isPdfSigned(doc) && doc.signatories && doc.signatories.length > 0
+          "
+          [class.unsigned]="!doc.signatories || doc.signatories.length === 0"
+        >
+          <span class="badge-icon">
+            {{
+              isPdfSigned(doc)
+                ? "✓"
+                : doc.signatories && doc.signatories.length > 0
+                  ? "⏱"
+                  : "📄"
+            }}
+          </span>
+          {{ getSignatureStatus(doc) }}
+        </div>
+        <span class="document-date">
+          <span class="date-icon">
+            <i class="material-icons me-1">calendar_today</i>
+          </span>
+          {{ formatDate(doc.lastUpdated) }}
+        </span>
+      </div>
+
+      <!-- Corps de la carte - Représentation du document -->
+      <div class="document-preview" (click)="viewDocument(doc)">
+        <div class="pdf-icon">
+          <div class="pdf-icon-content">
+            <span class="pdf-icon-text">PDF</span>
+          </div>
+        </div>
+        <div class="document-info">
+          <h3 class="document-title">{{ doc.title }}</h3>
+          <span class="document-meta">
+            <span class="meta-icon">📄</span>
+            Document PDF
+          </span>
+        </div>
+      </div>
+
+      <!-- Liste des signataires -->
+      <div
+        class="signatories-list"
+        *ngIf="doc.signatories && doc.signatories.length > 0"
+      >
+        <div class="signatory-item" *ngFor="let signatory of doc.signatories">
+          <div class="signatory-info">
+            <span class="signatory-name"
+              >{{ signatory.firstName }} {{ signatory.lastName }}</span
+            >
+            <span class="signatory-role">{{
+              getSignatoryLabel(signatory.id)
+            }}</span>
+          </div>
+          <div
+            class="signatory-status"
+            [class.signed]="signatory.hasSigned"
+            [class.unsigned]="!signatory.hasSigned"
+          >
+            <span class="status-icon">{{
+              signatory.hasSigned ? "✓" : "⏱"
+            }}</span>
+            <span class="status-text">{{
+              signatory.hasSigned ? "Signé" : "En attente"
+            }}</span>
+            <span
+              class="signature-date"
+              *ngIf="signatory.hasSigned && signatory.signedAt"
+            >
+              {{ formatSignedDate(signatory.signedAt) }}
+            </span>
+          </div>
+        </div>
+      </div>
+      <div
+        class="no-signatories"
+        *ngIf="!doc.signatories || doc.signatories.length === 0"
+      >
+        <span class="no-signatories-text">Aucun signataire assigné</span>
+      </div>
+
+      <!-- Actions -->
+      <!-- Actions -->
+      <div class="document-actions">
+        <button
+          class="btn-action btn-sign"
+          (click)="signDocument(doc)"
+          *ngIf="canSignDocument(doc)"
+          title="Signer"
+        >
+          <i class="material-icons me-1">edit</i>
+        </button>
+
+        <button
+          class="btn-action btn-view"
+          (click)="viewDocument(doc)"
+          title="Voir"
+        >
+          <i class="material-icons me-1">visibility</i>
+        </button>
+
+        <button
+          class="btn-action btn-delete"
+          (click)="deleteDocument(doc.id)"
+          title="Supprimer"
+        >
+          <i class="material-icons me-1">delete</i>
+        </button>
+      </div>
+      <!--<div class="document-actions">
+        <button class="btn-action btn-sign" (click)="signDocument(doc)" *ngIf="canSignDocument(doc)" title="Signer">
+          <span class="action-icon">✏️</span>
+        </button>
+        <button class="btn-action btn-view" (click)="viewDocument(doc)" title="Voir">
+          <span class="action-icon">👁️</span>
+        </button>
+        <button class="btn-action btn-delete" (click)="deleteDocument(doc.id)" title="Supprimer">
+          <span class="action-icon">🗑️</span>
+        </button>
+      </div>-->
+    </div>
+  </div>
+
+  <!-- Message si aucun document -->
+  <div class="no-documents" *ngIf="!loading && documents.length === 0">
+    <div class="no-docs-icon">📄</div>
+    <p>Aucun document trouvé</p>
+    <button class="btn-add" (click)="openModal()" *ngIf="canAdd">
+      <span class="btn-icon">+</span>
+      Ajouter votre premier document
+    </button>
+  </div>
+
+  <!-- Modal d'ajout de document -->
+  <div class="modal" [class.show]="showModal" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Ajouter un document</h3>
+        <button class="btn-close" (click)="closeModal()">
+          <span class="close-icon">✕</span>
+        </button>
+      </div>
+
+      <form [formGroup]="documentForm" (ngSubmit)="onSaveDocument()">
+        <div class="form-group">
+          <label for="title">Titre du document</label>
+          <input
+            type="text"
+            id="title"
+            formControlName="title"
+            placeholder="Entrez le titre du document"
+            [class.error]="
+              documentForm.get('title')?.invalid &&
+              documentForm.get('title')?.touched
+            "
+          />
+          <div
+            class="error-message"
+            *ngIf="
+              documentForm.get('title')?.invalid &&
+              documentForm.get('title')?.touched
+            "
+          >
+            Le titre est requis
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="pdfFile">Fichier PDF</label>
+          <div class="file-input-container">
+            <input
+              type="file"
+              id="pdfFile"
+              accept=".pdf,application/pdf"
+              (change)="onFileSelected($event)"
+            />
+            <div class="file-input-placeholder">
+              <span class="upload-icon">📤</span>
+              <span>{{
+                selectedFile ? selectedFile.name : "Choisir un fichier PDF"
+              }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section des signataires -->
+        <div class="form-group signatories-group">
+          <label>Signataires</label>
+          <div class="signatories-checkboxes">
+            <div class="checkbox-item" *ngFor="let option of signatoryOptions">
+              <label class="checkbox-label">
+                <input
+                  type="checkbox"
+                  [checked]="isSelected(option.id)"
+                  (change)="onCheckboxChange($event, option.id)"
+                />
+                <span class="checkbox-text">
+                  <strong>{{ option.label }}</strong>
+                  <span class="signatory-name">{{ option.name }}</span>
+                </span>
+              </label>
+            </div>
+          </div>
+        </div>
+        <!-- Section des signataires 
+        <div class="form-group signatories-group">
+          <label>Signataires</label>
+          <div class="signatories-checkboxes" formGroupName="signatoryIds">
+            <div class="checkbox-item" *ngFor="let option of signatoryOptions">
+              <label class="checkbox-label">
+                <input type="checkbox" [formControlName]="option.id.toString()">
+                <span class="checkbox-text">
+                  <strong>{{ option.label }}</strong>
+                  <span class="signatory-name">{{ option.name }}</span>
+                </span>
+              </label>
+            </div>
+          </div>
+        </div>-->
+
+        <div class="modal-footer">
+          <button type="button" class="btn-cancel" (click)="closeModal()">
+            Annuler
+          </button>
+          <button
+            type="submit"
+            class="btn-save"
+            [disabled]="documentForm.invalid || !selectedFile || loading"
+          >
+            <span class="save-icon" *ngIf="!loading">💾</span>
+            <span class="spinner-small" *ngIf="loading"></span>
+            {{ loading ? "Enregistrement..." : "Enregistrer" }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
